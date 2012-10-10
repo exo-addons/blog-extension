@@ -1,0 +1,420 @@
+<%
+
+
+import java.util.HashSet;
+import java.util.List;
+import java.text.SimpleDateFormat;
+
+import javax.jcr.Node;
+
+import org.exoplatform.portal.webui.util.Util;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.UserHandler;
+import org.exoplatform.services.wcm.core.NodeLocation;
+import org.exoplatform.services.cms.comments.CommentsService;
+import org.exoplatform.services.cms.folksonomy.NewFolksonomyService;
+import org.exoplatform.services.cms.taxonomy.TaxonomyService;
+import org.exoplatform.social.core.manager.IdentityManager;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.wcm.webui.clv.UICLVPortlet;
+import org.exoplatform.wcm.webui.clv.CategoryBean;
+import org.exoplatform.wcm.webui.Utils;
+
+
+
+uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
+
+
+%>
+
+<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/bootstrap.min.css">
+
+<style>
+  h1, h2, h3, h4, h5, h6{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: bold;
+    color: #404040;
+  }
+  body{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: normal;
+    color: #404040;
+  }
+  
+  .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
+    background-color: #0088CC;
+  }
+  
+  
+  .dropdown-menu a{
+    color: #555555 !important;
+  }
+  
+  
+  .hero-unit {
+    background-color: #F5F5F5;
+  }
+  #main article {
+    border-bottom: none;
+  }
+  
+  img.avatar {
+    height: 40px;
+    width: 40px;
+   }
+</style>
+
+
+<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/bootstrap-responsive.min.css">
+<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/blog.css">
+<style>
+  body {
+    padding-top: 0px;
+  }
+  
+</style>
+
+<div class="container-fluid">
+  <div id="content" class="clearfix row-fluid">
+    <div id="main" class="span9 clearfix" role="main">
+      <%
+  // if (no entries)
+  if (uicomponent.getUIPageIterator().getAvailable() == 0) {
+      %>
+      
+      <div class="alert alert-info">
+        <%=_ctx.appRes(uicomponent.getParent().getMessageKey()) %>
+      </div>
+      
+      <%
+  } // end if (no entries)      
+  // else (has entries)
+  else {
+    def count = 0;
+    def i = 0;
+    def entries = uicomponent.getCurrentPageData()
+
+    // loop on entries
+    for (entry in entries) {  
+   
+      // if blog entry
+      if (isValidBlogEntry(entry)) {
+        
+        String uuid = entry.getProperty("jcr:frozenUuid").getString()
+        def originalNode = entry.getSession().getNodeByUUID(uuid)
+        def link = uicomponent.getURL(entry)
+        def title = uicomponent.getTitle(entry)
+        def username = uicomponent.getAuthor(entry)
+        def author = fullName(username)
+        def avatar = avatarUrl(username)
+        def date = uicomponent.getCreatedDate(entry)  
+        %>      
+      
+      <article id="post-$uuid" class="post type-post status-publish format-standard hentry clearfix" role="article">
+        <header>
+          <a href="$link" title="$title"></a>
+          <div class="page-header"><h1 class="h2"><a href="$link" rel="bookmark" title="$title">$title</a></h1></div>
+          <p class="meta"><a href="/portal/intranet/profile/$username" title="View author profile" rel="author"><img src="$avatar" title="Avatar of $author" class="avatar"/>&nbsp;$author</a></span> on <time datetime="$date" pubdate>$date</time></p>
+         </header> <!-- end article header -->
+            
+         <section class="post_content clearfix">
+           <% renderPost(entry) %>
+         </section> <!-- end article section -->
+            
+         <footer>
+           <p class="tags"><%tags(originalNode)%></p>
+         </footer> <!-- end article footer -->
+            
+       </article> <!-- end article -->
+
+
+<%      commentPreview(originalNode, link) %>      
+<%
+      } // if blog entry
+      
+      } // end loop on entries
+      } // end else has entries
+      %>
+    </div>
+    <div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
+             <!-- categories -->
+             <div id="categories" class="widget widget_categories"><h4 class="widgettitle">Categories</h4>    
+                <ul>   
+                  <%categories()%>                 
+                </ul>
+              </div>              
+
+              <!-- Tag Cloud -->
+              <div id="tagcloud" class="widget widget_tag_cloud">
+                <h4 class="widgettitle">Tags</h4>
+                <div class="tagcloud">
+                  <div id="tag-cloud">
+                    <% tags()%>
+                  </div>
+                </div>
+              </div> 
+
+            <!-- Bloggers -->
+             <div id="bloggers" class="widget widget_categories"><h4 class="widgettitle">Bloggers</h4>    
+                <ul>
+                  <%bloggers()%>                            
+                </ul>
+              </div>      
+
+              <!-- Meta -->
+              <div id="meta" class="widget widget_categories"><h4 class="widgettitle">Meta</h4>    
+                <ul>
+                  <li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Quick Post</a></li>
+                  <li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Admin</a></li>  
+                  <li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Entries RSS</a></li>         
+                </ul>
+              </div>   
+      
+    </div> <!-- end #sidebar1 -->    
+    
+  </div> <!-- end #content -->
+</div> <!-- end #container -->
+
+<%
+
+    
+void tags(def entry) {
+    def folkService = uicomponent.getApplicationComponent(NewFolksonomyService.class)
+    def tags = folkService.getLinkedTagsOfDocument(entry, "collaboration")
+    def i = 0;
+    
+    if (!tags) {
+      tags = [];
+    }
+    else {
+      %>
+        <span class="tags-title">Tags:</span>
+      <%
+    }
+    
+    for(tag in tags) {
+      def name = tag.name
+      def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
+%>
+<a href="$url" title="View all posts in $name" rel="category tag" class="label">$name</a>
+<%
+
+      if (i++ < (tags.size-1)) print " "
+
+     } //end loop on  tags
+
+
+} //end renderTags    
+     
+     
+// get the full name from username
+String fullName(def username) {
+  def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
+  def user = userHandler.findUserByName(username)
+  def name = user.fullName
+  return name?name:username
+}
+  
+String avatarUrl(def username) {
+    String avatar = "/social-resources/skin/ShareImages/Avatar.gif";
+    try {
+      def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
+      def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username)
+      def userProfile = userIdentity.getProfile()
+      avatar = userProfile.getAvatarImageSource()
+    } catch (Exception e) {
+      print e.message // ugly old school debug
+    }
+    return avatar
+}
+
+// (only display  viewable webcontents here)
+boolean isValidBlogEntry(def entry) {
+  def frozen = entry.primaryNodeType.name == "nt:frozenNode"
+  if (frozen) {
+    def viewable = Utils.isViewable(entry)
+    def type = entry.getProperty("jcr:frozenPrimaryType").string
+    if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
+      return true;
+    }
+  }
+  return false;
+}
+ 
+  // render a blog entry
+  void renderPost(def entry) {
+    try {
+  
+    def cssOption = "CSSData=";
+    def excerpt = uicomponent.getSummary(entry);
+    def html = entry.getNode("default.html/jcr:content").getProperty("jcr:data").string
+    // if there is no summary, we use an inline marker
+    if (!excerpt) {
+      def marker = "<!-- more -->";
+
+      if (html.contains(marker)) {
+        def idx = html.indexOf(marker)
+        excerpt = html.substring(0,idx)
+        html = html.substring(idx + marker.length(), html.length())
+      }
+    }
+    if (excerpt) {
+%>
+$excerpt&nbsp;<h4><a href="${uicomponent.getURL(entry)}" class="more-link">Read more »</a></h4>
+
+<%
+    } else {
+      print uicomponent.getInlineEditingField(entry, "default.html/jcr:content/jcr:data", html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
+     
+    }
+    
+  } catch (Exception e) {
+  print e;
+    }
+  } // end render post
+  
+void bloggers() {
+  def bloggers = new HashSet();
+  def entries = uicomponent.getCurrentPageData()
+  entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
+  for (blogger in bloggers) {
+    def author = fullName(blogger)
+    def avatar = avatarUrl(blogger)
+    %>
+    <li><img src="$avatar" title="Avatar of $author" class="avatar"/>&nbsp;<a href="/portal/intranet/profile/$blogger" title="View author profile" rel="author">$author</a></li>
+   <%
+  }
+    
+}
+    
+void categories() {
+  String categoryPath = "repository:collaboration:/Groups/platform/users/Documents/Blog"   
+  String baseurl =  "/portal/intranet/blog"
+  def clvBy = Utils.getPortletPreference(UICLVPortlet.PREFERENCE_SHOW_CLV_BY)
+  String paramPath = Util.getPortalRequestContext().getRequestParameter(clvBy)
+  String path = "";
+  if (paramPath) {
+    path = paramPath.substring(paramPath.lastIndexOf(":")+1)
+    %>
+    <li class="cat-item"><a href="$baseurl" >All</a></li>
+    <%
+  } else {
+    %>
+    <li class="cat-item"><span class="label label-info">All</span></li>
+    <%
+  } // end if
+  def categories = uicomponent.getCategories(categoryPath, "exo:taxonomy", 0, false)
+  for (category in categories) {
+    def url="$baseurl?$clvBy=$categoryPath/${category.title}"
+ 
+    if (category.path == path) {
+            %>
+            <li class="cat-item"><span class="label label-info">${category.title}</span></li>
+            <%
+    } else {
+            %>
+            <li class="cat-item"><a href="$url" title="View all posts filed under ${category.title}">${category.title}</a></li>
+            <%
+    } // end else
+  }//end loop on categories         
+} // end render categories
+  
+List<Node> publicTags() {
+  List<Node> tags = []
+  try {
+   NewFolksonomyService folksonomyService = uicomponent.getApplicationComponent(NewFolksonomyService.class) ;
+   NodeHierarchyCreator nodeHierarchyCreator = uicomponent.getApplicationComponent(NodeHierarchyCreator.class);
+   String publicTagNodePath = nodeHierarchyCreator.getJcrPath("exoPublicTagNode");
+   RepositoryService repositoryService = uicomponent.getApplicationComponent(RepositoryService.class);
+   ManageableRepository manageableRepo = repositoryService.getCurrentRepository();
+   String workspace = manageableRepo.getConfiguration().getDefaultWorkspaceName();
+   tags = folksonomyService.getAllPublicTags(publicTagNodePath, workspace) ;
+  } catch (Exception e) {
+     print e // I know...
+  }
+  return tags;
+ }  
+  
+void tags() {
+
+  def clvBy = Utils.getPortletPreference(UICLVPortlet.PREFERENCE_SHOW_CLV_BY)
+  String paramPath = Util.getPortalRequestContext().getRequestParameter(clvBy)
+  String currentTag = "";
+  if (paramPath) {
+    currentTag = paramPath.substring(paramPath.lastIndexOf("/")+1)
+  }
+ 
+  for(tag in publicTags()) {
+    def name = tag.name
+    def selected = ((name == currentTag)?"label-info":"")
+    def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"    
+    %>
+     <a href="$url" class="label $selected" title="View all posts in $name" style="font-size: 9.75px;">$name</a>      
+    <%
+  }
+} // end render all tags
+  
+
+/* display comments of this post */
+void commentPreview(Node post, String link) {
+
+  try {
+    def formatter =  new SimpleDateFormat("'on' MMM d, yyyy 'at' h:mm a")
+    def viewer = _ctx.getRequestContext().getRemoteUser()
+    def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(post, null)
+    if (comments) {
+      def plural=""
+      if (comments.size > 1) plural = "s"
+%>
+      <h4><a href="${link}#commentlist">${comments.size} comment${plural} »</a></h4>
+      <ol class="commentlist">
+        <%
+      int i=0;
+      for (comment in comments) {
+        try {
+          
+          def rem = ((i++)%2 == 0)?"even":"odd"  
+          if (i>2) break; 
+          def commentor = comment.getProperty("exo:commentor").string
+          def commentorAvatar = avatarUrl(commentor)
+          def commentorName = fullName(commentor)
+          def commentContent = comment.getProperty("exo:commentContent").string
+          def commentDate = formatter.format(comment.getProperty("exo:commentDate").date.time)
+          def isOwner = (commentor == viewer)
+%>     
+        <li class="comment $rem thread-$rem depth-1">
+          <div id="comment-${comment.name}" class="clearfix well" >
+            <div class="comment-author vcard row-fluid clearfix">
+              <div class="avatar span1" style="margin-right: 12px;">
+                <img alt="" src="$commentorAvatar" class="avatar avatar-75 photo" width="75" height="75">
+              </div>
+              <div class="span11 comment-text">
+                
+                <h4><a href="/portal/intranet/profile/$commentor" rel="external nofollow" class="url">$commentorName</a></h4>
+                <a name="commentdate-${comment.name}">$commentDate</a>                                         
+                <p>$commentContent</p>
+                
+              </div>
+            </div>
+          </div>
+        </li>         
+<%         
+         
+         } catch (Exception e) {
+           print e
+           continue; // don't wanna mess with broken comments,, so we skip them
+         }
+       } // end loop on comments
+%>
+      </ol>
+<%
+    } // end if comments
+  } catch (Exception e) {
+    print e // don't say anything
+  }
+} // end comment list 
+
+%>
