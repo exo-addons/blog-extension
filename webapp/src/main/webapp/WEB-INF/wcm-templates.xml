@@ -6,6 +6,7 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
 
+<!-- CLV Templates -->
   <external-component-plugins>
     <target-component>org.exoplatform.services.cms.views.ApplicationTemplateManagerService</target-component>
     <component-plugin>
@@ -31,6 +32,101 @@
             </field>
             <field name="category">
               <string>list</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+<!-- Blog Node Type -->
+    <external-component-plugins>
+    <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
+    <component-plugin>
+      <name>add.nodeType</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.jcr.impl.AddNodeTypePlugin</type>
+      <priority>100</priority>
+      <init-params>
+        <values-param>
+          <name>autoCreatedInNewRepository</name>
+          <description>Node types configuration file</description>
+          <value>war:/blog-nodetype.xml</value>
+        </values-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+   <!-- Blog Document Type -->  
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.cms.templates.TemplateService</target-component>
+
+    <component-plugin>
+      <name>addTemplates</name>
+      <set-method>addTemplates</set-method>
+      <type>org.exoplatform.services.cms.templates.impl.TemplatePlugin</type>
+      <init-params>
+        <value-param>
+          <name>autoCreateInNewRepository</name>
+          <value>true</value>
+        </value-param>
+        <value-param>
+          <name>storedLocation</name>
+          <value>war:/templates</value>
+        </value-param>
+        <object-param>
+          <name>template.configuration</name>
+          <description>configuration for the localtion of nodetypes templates to inject in jcr</description>
+          <object type="org.exoplatform.services.cms.templates.impl.TemplateConfig">
+            <field name="nodeTypes">
+              <collection type="java.util.ArrayList">
+                <value>
+
+
+                  <object type="org.exoplatform.services.cms.templates.impl.TemplateConfig$NodeType">
+                    <field name="nodetypeName">
+                      <string>exo:blog</string>
+                    </field>
+                    <field name="documentTemplate">
+                      <boolean>true</boolean>
+                    </field>
+                    <field name="label">
+                      <string>Blog Post</string>
+                    </field>
+                    <field name="referencedView">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <object type="org.exoplatform.services.cms.templates.impl.TemplateConfig$Template">
+                            <field name="templateFile">
+                              <string>/blog/viewpost.gtmpl</string>
+                            </field>
+                            <field name="roles">
+                              <string>*</string>
+                            </field>
+                          </object>
+                        </value>
+                      </collection>
+                    </field>
+                    <field name="referencedDialog">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <object type="org.exoplatform.services.cms.templates.impl.TemplateConfig$Template">
+                            <field name="templateFile">
+                              <string>/blog/postform.gtmpl</string>
+                            </field>
+                            <field name="roles">
+                              <string>*</string>
+                            </field>
+                          </object>
+                        </value>
+                      </collection>
+                    </field>
+                  </object>
+                </value>
+
+               
+
+              </collection>
             </field>
           </object>
         </object-param>

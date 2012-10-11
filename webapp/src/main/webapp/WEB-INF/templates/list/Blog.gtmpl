@@ -30,7 +30,7 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
 %>
 
-<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/bootstrap.min.css">
+<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/bootstrap.min.js">
 
 <style>
   h1, h2, h3, h4, h5, h6{
@@ -68,7 +68,7 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 </style>
 
 
-<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/bootstrap-responsive.min.css">
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/blog.css">
 <style>
   body {
