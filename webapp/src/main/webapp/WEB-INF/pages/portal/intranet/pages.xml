@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page-set
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_2 http://www.gatein.org/xml/ns/gatein_objects_1_2"
+    xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_2">
+
+    <page>
+		<name>blog</name>
+		<title>Blog</title>
+		<access-permissions>Everyone</access-permissions>
+		<edit-permission>*:/platform/administrators</edit-permission>
+		<portlet-application>
+          <portlet>
+            <application-ref>presentation</application-ref>
+            <portlet-ref>ContentListViewerPortlet</portlet-ref>
+            <preferences>
+              <preference>
+                <name>folderPath</name>
+                <value>repository:collaboration:/Groups/platform/users/Documents/Blog</value>
+                <read-only>false</read-only>
+              </preference>
+              <preference>
+                <name>formViewTemplatePath</name>
+                <value>/exo:ecm/views/templates/content-list-viewer/list/Blog.gtmpl</value>
+                <read-only>false</read-only>
+              </preference>                           
+              <preference>
+                <name>basePath</name>
+                <value>blog/article</value>
+                <read-only>false</read-only>
+              </preference>
+              <preference>
+                <name>itemsPerPage</name>
+                <value>10</value>
+                <read-only>false</read-only>
+              </preference>
+              <preference>
+                <name>showTitle</name>
+                <value>false</value>
+                <read-only>false</read-only>
+              </preference>
+              <preference>
+                <name>showDateCreated</name>
+                <value>false</value>
+                <read-only>false</read-only>
+              </preference>
+              <preference>
+                <name>showHeader</name>
+                <value>false</value>
+                <read-only>false</read-only>
+              </preference>
+              <preference>
+                <name>showLink</name>
+                <value>false</value>
+                <read-only>false</read-only>
+              </preference>
+              <preference>
+                <name>showRssLink</name>
+                <value>false</value>
+                <read-only>false</read-only>
+              </preference>     
+            </preferences>
+         </portlet>
+          <title>Blog Posts</title>
+          <access-permissions>*:/platform/users</access-permissions>
+          <show-info-bar>false</show-info-bar>
+          <show-application-state>false</show-application-state>
+          <show-application-mode>false</show-application-mode>
+        </portlet-application>
+	</page>
+</page-set>

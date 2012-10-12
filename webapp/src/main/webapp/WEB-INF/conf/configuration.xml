@@ -5,7 +5,7 @@
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
 
-  <import>war:/wcm-templates.xml</import>
-
+  <import>war:/conf/wcm-templates.xml</import>
+  <import>war:/conf/portal-pages.xml</import>
 
 </configuration>

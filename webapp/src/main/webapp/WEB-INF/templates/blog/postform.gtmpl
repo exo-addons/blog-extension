@@ -1,0 +1,190 @@
+<%
+
+  import javax.jcr.Node;
+  import org.exoplatform.webui.application.WebuiRequestContext;
+  
+
+  def rcontext = _ctx.getRequestContext() ;
+  def htmlWYSIWYGFormId = "htmlData" + uicomponent.hashCode();
+  def cssFormId = "ContentCSS[" + uicomponent.hashCode() + "]";
+  def jsFormId = "ContentJS[" + uicomponent.hashCode() + "]";
+  
+  //  rcontext.getJavascriptManager().addOnLoadJavascript("eXo.ecm.CKEditor.insertCSS('$htmlWYSIWYGFormId', '$cssFormId')")
+
+  Node webContentNode = uicomponent.getNode();
+
+  
+  %>
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet">
+
+
+<%
+
+try { 
+
+
+  WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+      String b = context.getURLBuilder().createURL(uiform, null, null);
+%>
+
+<form class="UIForm well form-horizontal" id="${uiform.id}" action="$b" method="post">
+
+  <input type="hidden" name="formOp" value="">
+<%
+
+  /* start render action*/
+  if (uiform.isShowActionsOnTop()) {
+    uiform.processRenderAction()
+  }
+  /* end render action*/
+
+
+%>  
+  <fieldset>
+    <div class="control-group">
+      <label class="control-label" for="title"><%=_ctx.appRes("WebContent.dialog.label.title")%></label>
+      <div class="controls">
+<%
+  String[] webContentFieldTitle = ["jcrPath=/node/exo:title", "options=noSanitization", "validate=empty", "editable=if-null", "options=width:'950px'"];
+  uicomponent.addTextField("title", webContentFieldTitle) ;
+  %>
+       
+        <!--p class="help-block">Permalink: http://blog.exoplatform.org/2012/07/11/<span id="uri"></span></p-->
+      </div>
+    </div>
+
+
+   <div class="control-group">
+      <label for="$htmlWYSIWYGFormId" class="control-label">Post Content</label>
+      <div class="controls">    
+<%
+  String[] cssFolder = ["jcrPath=/node/css", "nodetype=exo:cssFolder", "defaultValues=css"] ;
+  String[] jsFolder = ["jcrPath=/node/js", "nodetype=exo:jsFolder", "defaultValues=js"] ;
+  String[] documentsFolder = ["jcrPath=/node/documents", "nodetype=nt:unstructured","mixintype=exo:documentFolder","defaultValues=documents"] ;
+  String[] mediasFolder = ["jcrPath=/node/medias", "nodetype=exo:multimediaFolder", "defaultValues=medias"] ;
+  String[] imagesFolder = ["jcrPath=/node/medias/images", "nodetype=nt:folder", "defaultValues=images"] ;
+  String[] videoFolder = ["jcrPath=/node/medias/videos", "nodetype=nt:folder", "defaultValues=videos"] ;
+  String[] audioFolder = ["jcrPath=/node/medias/videos", "nodetype=nt:folder", "defaultValues=audio"] ;
+  uicomponent.addHiddenField("cssFolder", cssFolder) ;
+  uicomponent.addHiddenField("jsFolder", jsFolder);
+  uicomponent.addHiddenField("documentsFolder", documentsFolder);
+  uicomponent.addHiddenField("mediasFolder", mediasFolder);
+  uicomponent.addHiddenField("imagesFolder", imagesFolder);
+  uicomponent.addHiddenField("videoFolder", videoFolder);
+  uicomponent.addHiddenField("audioFolder", audioFolder);
+  def lang = org.exoplatform.portal.webui.util.Util.getPortalRequestContext().getLocale().toString()
+  String [] langField = ["jcrPath=/node/exo:language","defaultValues="+lang]
+  uicomponent.addHiddenField("content-lang", langField );
+
+  String[] htmlHiddenField1 = ["jcrPath=/node/default.html", "nodetype=nt:file", "defaultValues=default.html", "mixintype=exo:htmlFile"];
+  String[] htmlHiddenField2 = ["jcrPath=/node/default.html/jcr:content", "nodetype=nt:resource", "mixintype=dc:elementSet", "visible=false"];
+  String[] htmlHiddenField3 = ["jcrPath=/node/default.html/jcr:content/jcr:encoding", "visible=false", "UTF-8"];
+  String[] htmlHiddenField4 = ["jcrPath=/node/default.html/jcr:content/jcr:lastModified", "visible=false"];
+  String[] htmlHiddenField5 = ["jcrPath=/node/default.html/jcr:content/dc:date", "visible=false"];
+  String[] htmlHiddenField6 = ["jcrPath=/node/default.html/jcr:content/jcr:mimeType", "visible=false", "text/html"];
+  uicomponent.addHiddenField("htmlHiddenField1", htmlHiddenField1);
+  uicomponent.addHiddenField("htmlHiddenField2", htmlHiddenField2);
+  uicomponent.addHiddenField("htmlHiddenField3", htmlHiddenField3);
+  uicomponent.addCalendarField("htmlHiddenField4", htmlHiddenField4);
+  uicomponent.addCalendarField("htmlHiddenField5", htmlHiddenField5);
+  uicomponent.addHiddenField("htmlHiddenField6", htmlHiddenField6);
+  String htmlContent = "";
+  if(webContentNode != null && webContentNode.hasNode("default.html")) {
+    Node htmlNode = webContentNode.getNode("default.html");
+    htmlContent = htmlNode.getNode("jcr:content").getProperty("jcr:data").getValue().getString();
+  }
+  String[] htmlArguments = ["jcrPath=/node/default.html/jcr:content/jcr:data", "options=toolbar:CompleteWCM,height:'410px',noSanitization", htmlContent];
+  uicomponent.addRichtextField(htmlWYSIWYGFormId, htmlArguments) ;
+  
+
+%>
+        </div>
+    </div> 
+<script src="http://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+ 
+var jq = jQuery.noConflict();
+  
+jq(function() {  
+  
+
+  var name = jq("#name");
+
+  var syncuri = function() {
+    var data = name.val()
+    jq('#uri').replaceWith('<span id="uri">'+data+'</span>');
+  }
+      
+   //
+   syncuri();
+      
+  jq("#title").change(function() {
+   
+    if (!name.readOnly) {
+      var title = this.value;
+      var portalContext = eXo.env.portal.context;
+      var portalRest = eXo.env.portal.rest;
+      var url = portalContext+"/"+portalRest+"/l11n/cleanName";
+
+      jq.ajax({
+        type: "GET",
+        url: url,
+        data: { name: title},
+        success: function(data) {
+          jq('#name').val(data).trigger('change');         
+        }
+       }); // end ajax  
+     } // end if not readonly
+   
+   }); // end change title
+  
+  
+  jq("#name").change(syncuri); // end change name
+  
+  
+}); // end jq  
+//]]>
+
+</script>    
+
+    
+    <div class="control-group">
+      <label for="name" class="control-label">Permalink URI</label>
+      <div class="controls">     
+<%
+  String[] webContentFieldName = ["jcrPath=/node", "nodetype=exo:blog", "options=noSanitization", "mixintype=mix:votable,mix:commentable,mix:i18n", "editable=if-null","validate=name,empty"] ;
+  uicomponent.addTextField("name", webContentFieldName) ;
+%>
+        <p class="help-block muted">http://int.exoplatform.org/portal/content/blog/article/<span id="uri"></span></p>
+
+     </div>
+   </div>     
+    <div class="control-group">
+      <label for="description" class="control-label">Excerpt</label>
+      <div class="controls">
+<%
+    String[] fieldSummary = ["jcrPath=/node/exo:summary", "options=Basic", ""] ;
+    uicomponent.addRichtextField("summary", fieldSummary) ;
+%>
+        <p class="help-block">Excerpts are optional hand-crafted summaries of your content that can be used in your theme.</p>
+      </div>
+    </div>
+        <%
+
+if (!uiform.isShowActionsOnTop()) {
+  uiform.processRenderAction()
+}    
+%>
+  </fieldset>
+  </form>
+<%    
+
+ 
+  
+ 
+  } catch (Exception e) {
+  print e;
+  }
+  
+%>             
