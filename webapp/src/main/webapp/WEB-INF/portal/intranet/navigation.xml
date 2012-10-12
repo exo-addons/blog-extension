@@ -4,16 +4,18 @@
     xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_objects_1_2 http://www.gatein.org/xml/ns/gatein_objects_1_2"
     xmlns="http://www.gatein.org/xml/ns/gatein_objects_1_2">
   <priority>1</priority>
-
-  <page-nodes>
-    
-                           
-  <node>
-			<uri>blog</uri>
-			<name>blog</name>
-			<label>Blog</label>
-			<page-reference>portal::intranet::blog</page-reference>
- </node>
-
+  <page-nodes>             
+    <node>
+	  <uri>blog</uri>
+      <name>blog</name>
+	  <label>Blog</label>
+	  <page-reference>portal::intranet::blog</page-reference>
+	  <node>
+	    <uri>admin</uri>
+        <name>admin</name>
+	    <label>Blog Admin</label>
+	    <page-reference>portal::intranet::blogadmin</page-reference>
+      </node>
+    </node>
   </page-nodes>
-  </node-navigation>
+</node-navigation>

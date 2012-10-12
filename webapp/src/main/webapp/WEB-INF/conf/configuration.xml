@@ -8,4 +8,5 @@
   <import>war:/conf/wcm-templates.xml</import>
   <import>war:/conf/portal-pages.xml</import>
   <import>war:/conf/taxonomy.xml</import>
+  <import>war:/conf/drive.xml</import>
 </configuration>
