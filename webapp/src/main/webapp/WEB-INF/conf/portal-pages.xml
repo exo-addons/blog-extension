@@ -28,7 +28,7 @@
 							<string>portal</string>
 						</field>
 						<field name="templateLocation">
-							<string>war:/pages</string>
+							<string>war:/</string>
 						</field>
 						<field name="importMode"><string>merge</string></field>
 					</object>
