@@ -23,7 +23,14 @@
 	    <label>Quick Post</label>
 	    <visibility>HIDDEN</visibility>
 	    <page-reference>portal::intranet::quickpost</page-reference>
-      </node>      
+      </node> 
+	  <node>
+	    <uri>article</uri>
+	    <name>article</name>
+	    <label>Blog Article</label>
+	    <visibility>HIDDEN</visibility>
+	    <page-reference>portal::intranet::blogarticle</page-reference>
+      </node>            
     </node>
   </page-nodes>
 </node-navigation>
