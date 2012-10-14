@@ -17,13 +17,14 @@ Install [Maven 3](http://maven.apache.org/download.html).
 How to run 
 ----------
 
-Install [eXo Platform 3.5 Tomcat bundle](http://www.exoplatform.com/company/en/download-exo-platform) and rename it `tomcat/`
-
-    cp config/target/blog-extension.jar tomcat/lib
+* Install [eXo Platform 3.5 Tomcat bundle](http://www.exoplatform.com/company/en/download-exo-platform) and rename it `tomcat/`
+    ./deploy.sh
+or
+    cp config/target/blog-config*.jar tomcat/lib
     cp webapp/target/blog.war tomcat/webapp
+* Start Tomcat
     cd tomcat 
     ./start_eXo.sh
-
-* Point your browser to [http://localhost:8080/portal/intranet/blog]
+* Point your browser to http://localhost:8080/portal/intranet/blog
 * Login with `john/gtn`
 * Enjoy your brand new blog
