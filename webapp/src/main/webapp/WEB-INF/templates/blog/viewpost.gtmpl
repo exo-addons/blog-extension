@@ -17,8 +17,6 @@ import org.exoplatform.services.cms.folksonomy.NewFolksonomyService;
 import org.exoplatform.services.cms.taxonomy.TaxonomyService;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
-import org.exoplatform.wcm.webui.clv.UICLVPortlet;
-import org.exoplatform.wcm.webui.clv.CategoryBean;
 import org.exoplatform.wcm.webui.Utils;
 
 
@@ -125,8 +123,9 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
     </div> <!-- end of m ain -->
     <div class="span1" id="sidebar">
 <%
+
   // show edit button
-  if ((poster == viewer) && (uicomponent instanceof org.exoplatform.wcm.webui.scv.UIPresentation)) {
+  if ((poster == viewer) && (uicomponent.class.name =="org.exoplatform.wcm.webui.scv.UIPresentation")) {
 %>
 
       <a class="btn btn-mini" href="/portal/intranet/blog/admin?edit=true&path=/collaboration/Groups/platform/users/Documents/Blog/${post.name}&backto=/portal/intranet/blog"><i class="icon-pencil"></i> Edit</a>
