@@ -8,7 +8,7 @@
     <page>
 		<name>blog</name>
 		<title>Blog</title>
-		<access-permissions>Everyone</access-permissions>
+		<access-permissions>*:/platform/users</access-permissions>
 		<edit-permission>*:/platform/administrators</edit-permission>
 		<portlet-application>
           <portlet>
@@ -72,7 +72,7 @@
     <page>
 		<name>blogadmin</name>
 		<title>Blog Admin</title>
-		<access-permissions>Everyone</access-permissions>
+		<access-permissions>*:/platform/users</access-permissions>
 		<edit-permission>*:/platform/administrators</edit-permission>
 		<portlet-application>
           <portlet>
@@ -92,5 +92,67 @@
           <show-application-state>false</show-application-state>
           <show-application-mode>false</show-application-mode>
         </portlet-application>
-	</page>	
+	</page>
+    <page>
+		<name>quickpost</name>
+		<title>Post on Blog</title>
+		<access-permissions>*:/platform/users</access-permissions>
+		<edit-permission>*:/platform/administrators</edit-permission>
+		<portlet-application>
+          <portlet>
+            <application-ref>formgenerator</application-ref>
+            <portlet-ref>FastContentCreatorBasicPortletStandard</portlet-ref>
+            <preferences>
+
+		      <!-- Specify the destination path which will be use to store saved documents -->
+		      <preference>
+		        <name>path</name>
+		        <value>/Groups/platform/users/Documents/Blog</value>
+		        <read-only>false</read-only>
+		      </preference>
+		      <!-- Specify the node type of document which will be show on the dialog form -->
+		      <preference>
+		        <name>type</name>
+		        <value>exo:blog</value>
+		        <read-only>false</read-only>
+		      </preference>
+		      <!-- The custom button Save -->
+		      <preference>
+		        <name>saveButton</name>
+		        <value>Save as Draft</value>
+		        <read-only>false</read-only>
+		      </preference>
+		      <!-- The custom message when click Save button -->
+		      <preference>
+		        <name>saveMessage</name>
+		        <value>Your blog post has been saved as draft.</value>
+		        <read-only>false</read-only>
+		      </preference>
+		      <!-- Redirect to other page or not -->
+		      <preference>
+		        <name>isRedirect</name>
+		        <value>true</value>
+		        <read-only>false</read-only>
+		      </preference>
+		      <!-- The page will redirect to -->
+		      <preference>
+		        <name>redirectPath</name>
+		        <value>/portal/intranet/blog/admin</value>
+		        <read-only>false</read-only>
+		      </preference>
+		    <!-- Is an action needed to save the configuration -->
+				<preference>
+					<name>isActionNeeded</name>
+					<value>true</value>
+					<read-only>true</read-only>
+				</preference>       	
+            </preferences>
+          </portlet>
+          <title>Blog Post Form</title>
+          <access-permissions>*:/platform/users</access-permissions>
+          <show-info-bar>false</show-info-bar>
+          <show-application-state>false</show-application-state>
+          <show-application-mode>false</show-application-mode>
+        </portlet-application>
+	</page>		
 </page-set>

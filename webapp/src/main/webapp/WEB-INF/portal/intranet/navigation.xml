@@ -7,15 +7,23 @@
   <page-nodes>             
     <node>
 	  <uri>blog</uri>
-      <name>blog</name>
+	  <name>blog</name>
 	  <label>Blog</label>
 	  <page-reference>portal::intranet::blog</page-reference>
 	  <node>
 	    <uri>admin</uri>
-        <name>admin</name>
+	    <name>admin</name>
 	    <label>Blog Admin</label>
+	    <visibility>HIDDEN</visibility>
 	    <page-reference>portal::intranet::blogadmin</page-reference>
       </node>
+	  <node>
+	    <uri>add</uri>
+	    <name>add</name>
+	    <label>Quick Post</label>
+	    <visibility>HIDDEN</visibility>
+	    <page-reference>portal::intranet::quickpost</page-reference>
+      </node>      
     </node>
   </page-nodes>
 </node-navigation>
