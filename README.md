@@ -1,7 +1,7 @@
-exoblog
-=======
+eXo Blog Extension
+===================
 
-A simple blog extension for eXo Platform social intranet. 
+A simple multi-user blog extension for eXo Platform social intranet. 
 It's a showcase of eXo content management capabilities. 
 
 Getting Started
