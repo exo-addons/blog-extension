@@ -12,7 +12,7 @@ Step 1 :  Build
 
 Prerequisite : install [Maven 3](http://maven.apache.org/download.html).
 
-    git clone https://github.com/plamarque/exoblog.git
+    git clone https://github.com/exo-addons/blog-extension.git
     cd exoblog
     mvn clean install
 
