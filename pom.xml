@@ -14,9 +14,9 @@
 	<name>eXo Blog</name>
 	<description>A Simple blog system for eXo.</description>
 	<scm>
-		<connection>scm:git:git://github.com/plamarque/exoblog.git</connection>
-		<developerConnection>scm:git:git@github.com:plamarque/exoblog.git</developerConnection>
-		<url>https://github.com/plamarque/exoblog</url>
+		<connection>scm:git:git://github.com/exo-addons/blog-extension.git</connection>
+		<developerConnection>scm:git:git@github.com:exo-addons/blog-extension.git</developerConnection>
+		<url>https://github.com/exo-addons/blog-extension</url>
 	</scm>
 	<properties>
 		<!-- ********************* -->
