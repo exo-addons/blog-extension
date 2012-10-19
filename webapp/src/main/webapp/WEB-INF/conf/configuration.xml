@@ -10,4 +10,5 @@
   <import>war:/conf/taxonomy.xml</import>
   <import>war:/conf/drive.xml</import>
   <import>war:/conf/explorer.xml</import>
+  <import>war:/conf/publication.xml</import>
 </configuration>

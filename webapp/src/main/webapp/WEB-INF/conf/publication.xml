@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<configuration
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+<external-component-plugins>
+  <target-component>org.exoplatform.services.wcm.extensions.publication.PublicationManager</target-component>
+  <component-plugin>
+    <name>AddLifecycle</name>
+    <set-method>addLifecycle</set-method>
+    <type>org.exoplatform.services.wcm.extensions.publication.lifecycle.StatesLifecyclePlugin</type>
+    <description>Configures</description>
+    <priority>1</priority>
+     <init-params>
+      <object-param>
+        <name>lifecycles</name>
+        <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig">
+          <field  name="lifecycles">
+            <collection type="java.util.ArrayList">
+              <value>
+                <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig$Lifecycle">
+                  <field name="name"><string>blogpost</string></field>
+                  <field name="publicationPlugin"><string>Authoring publication</string></field>
+                  <field  name="states">
+                    <collection type="java.util.ArrayList">
+                      <value>
+                        <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig$State">
+                          <field name="state"><string>draft</string></field>
+                          <field name="membership"><string>*:/platform/users</string></field>
+                        </object>
+                      </value>
+                      <value>
+                        <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig$State">
+                          <field name="state"><string>published</string></field>
+                          <field name="membership"><string>*:/platform/users</string></field>
+                        </object>
+                      </value>
+                    </collection>
+                  </field>
+                </object>
+              </value>
+
+            </collection>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
+  </component-plugin>
+  <component-plugin>
+    <name>AddContext</name>
+    <set-method>addContext</set-method>
+    <type>org.exoplatform.services.wcm.extensions.publication.context.ContextPlugin</type>
+    <init-params>
+      <object-param>
+        <name>contexts</name>
+        <object type="org.exoplatform.services.wcm.extensions.publication.context.impl.ContextConfig">
+          <field  name="contexts">
+            <collection type="java.util.ArrayList">
+              <value>
+                <object type="org.exoplatform.services.wcm.extensions.publication.context.impl.ContextConfig$Context">
+                  <field name="name"><string>blogcontext</string></field>
+                  <field name="priority"><string>100</string></field>
+                  <field name="lifecycle"><string>blogpost</string></field>
+                  <field name="path"><string>repository:collaboration:/Groups/platform/users/Documents</string></field>
+                </object>
+              </value>
+            </collection>
+          </field>
+        </object>
+      </object-param>
+    </init-params>
+  </component-plugin>
+</external-component-plugins>   
+   <!--
+<external-component-plugins>
+    <target-component>org.exoplatform.services.wcm.extensions.publication.PublicationManager</target-component>
+    <component-plugin>
+        <name>AddLifecycle</name>
+        <set-method>addLifecycle</set-method>
+        <type>org.exoplatform.services.wcm.extensions.publication.lifecycle.StatesLifecyclePlugin</type>
+        <priority>0</priority>
+        <init-params>
+            <object-param>
+                <name>lifecyles</name>
+                <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig">
+                    <field name="lifecycles">
+                        <collection type="java.util.ArrayList">
+                            <value>
+                                <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig$Lifecycle">
+                                    <field name="name">
+                                        <string>blog-lifecycle</string>
+                                    </field>
+                                    <field name="publicationPlugin">
+                                        <string>Authoring publication</string>
+                                    </field>
+                                    <field name="states">
+                                        <collection type="java.util.ArrayList">
+                                            <value>
+                                                <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig$State">
+                                                    <field name="state">
+                                                        <string>draft</string>
+                                                    </field>
+                                                    <field name="membership">
+                                                        <string>*:/platform/users</string>
+                                                    </field>
+                                                </object>
+                                            </value>
+                                            <value>
+                                                <object type="org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig$State">
+                                                    <field name="state">
+                                                        <string>published</string>
+                                                    </field>
+                                                    <field name="membership">
+                                                        <string>*:/platform/users</string>
+                                                    </field>
+                                                </object>
+                                            </value>
+                                        </collection>
+                                    </field>
+                                </object>
+                            </value>
+                        </collection>
+                    </field>
+                </object>
+            </object-param>
+        </init-params>
+    </component-plugin>
+  
+    <component-plugin>
+        <name>AddContext</name>
+        <set-method>addContext</set-method>
+        <type>org.exoplatform.services.wcm.extensions.publication.context.ContextPlugin</type>
+        <init-params>
+            <object-param>
+                <name>contexts</name>
+                <object type="org.exoplatform.services.wcm.extensions.publication.context.impl.ContextConfig">
+                    <field name="contexts">
+                        <collection type="java.util.ArrayList">
+                            <value>
+                                <object type="org.exoplatform.services.wcm.extensions.publication.context.impl.ContextConfig$Context">
+                                    <field name="name">
+                                        <string>blog-context</string>
+                                    </field>
+                                    <field name="priority">
+                                        <string>100</string>
+                                    </field>
+                                    <field name="lifecycle">
+                                        <string>blog-lifecycle</string>
+                                    </field>
+                                    <field name="membership">
+                                        <string>*:/platform/users</string>
+                                    </field>
+                                    <field name="site">
+                                        <string>intranet</string>
+                                    </field>
+                                    <field name="path">
+                                        <string>repository:collaboration:/Groups/platform/users/Documents</string>
+                                    </field>
+                                    <field name="nodetype">
+                                        <string>exo:blog</string>
+                                    </field>                                    
+                                </object>
+                            </value>
+                        </collection>
+                    </field>
+                </object>
+            </object-param>
+        </init-params>
+    </component-plugin>
+  </external-component-plugins>
+-->
+  
+</configuration>
