@@ -9,4 +9,5 @@
   <import>war:/conf/portal-pages.xml</import>
   <import>war:/conf/taxonomy.xml</import>
   <import>war:/conf/drive.xml</import>
+  <import>war:/conf/explorer.xml</import>
 </configuration>
