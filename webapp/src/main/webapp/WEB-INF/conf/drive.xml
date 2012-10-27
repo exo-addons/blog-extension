@@ -12,7 +12,7 @@
         <name>manage.drive.plugin</name>
         <set-method>setManageDrivePlugin</set-method>
         <type>org.exoplatform.services.cms.drives.impl.ManageDrivePlugin</type>
-        <description>Nothing</description>
+        <description></description>
         <init-params>
           <object-param>        
             <name>Blog</name>
@@ -31,7 +31,7 @@
               <field name="viewSideBar"><boolean>true</boolean></field>
               <field name="showHiddenNode"><boolean>false</boolean></field>
               <field name="allowCreateFolders"><string>nt:unstructured</string></field>
-              <field name="allowNodeTypesOnTree"><string>*</string></field>       
+              <field name="allowNodeTypesOnTree"><string>exo:taxonomy</string></field>       
             </object>
           </object-param>
         </init-params>  
