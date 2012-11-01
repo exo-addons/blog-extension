@@ -88,7 +88,7 @@ if [[ ! -z ${ACTION_MAVEN} && ${ACTION_MAVEN} == "true" ]]; then
   mvn clean install
   popd
 else
-  echo "# The project binaries will not been rebuild with maven"
+  echo "# The project binaries will not be rebuilt with maven"
   echo "  (add the -u switch if needed)"
 fi
 
@@ -156,7 +156,7 @@ if [[ ! -z ${ACTION_UPDATE} && ${ACTION_UPDATE} == "true" ]]; then
     echo " ... no existing deployed war => SKIP"
   fi
 else
-  echo "# The project binaries will not been redeployed"
+  echo "# The project binaries will not be redeployed"
   echo "  (add the -u switch if needed)"
 fi
 
