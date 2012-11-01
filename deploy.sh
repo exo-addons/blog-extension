@@ -6,7 +6,9 @@
 #   - Platform 3.5.5 + Mac OSX 10.8
 #   -
 
-PLF_DEFAULT_TOMCAT_DIRECTORY=${PLF_TOMCAT_DIRECTORY:-"tomcat"}
+SCRIPT_LAUNCH_DIR=$(pwd)
+PROJECT_DIR=$(cd $(dirname "$0"); pwd)
+PLF_DEFAULT_TOMCAT_DIRECTORY=${PLF_TOMCAT_DIRECTORY:-"$PROJECT_DIR/tomcat"}
 PLF_DEFAULT_DATA_DIRECTORY=${PLF_DATA_DIRECTORY:-"$PLF_DEFAULT_TOMCAT_DIRECTORY/gatein/data"}
 
 function script_usage {
@@ -59,8 +61,6 @@ while getopts "rmuct:d:h" OPTION; do
 		esac
 done
 
-SCRIPT_LAUNCH_DIR=$(pwd)
-PROJECT_DIR=$(cd $(dirname "$0"); pwd)
 PLF_TOMCAT_DIRECTORY=${PLF_TOMCAT_DIRECTORY:-"$PLF_DEFAULT_TOMCAT_DIRECTORY"}
 PLF_WEBAPP_DIRECTORY=${PLF_TOMCAT_DIRECTORY}/webapps
 PLF_DATA_DIRECTORY=${PLF_DATA_DIRECTORY:-"$PLF_TOMCAT_DIRECTORY/gatein/data"}
@@ -88,7 +88,7 @@ if [[ ! -z ${ACTION_MAVEN} && ${ACTION_MAVEN} == "true" ]]; then
   mvn clean install
   popd
 else
-  echo "# The project binaries will not been rebuild with maven"
+  echo "# The project binaries will not be rebuilt with maven"
   echo "  (add the -u switch if needed)"
 fi
 
@@ -156,7 +156,7 @@ if [[ ! -z ${ACTION_UPDATE} && ${ACTION_UPDATE} == "true" ]]; then
     echo " ... no existing deployed war => SKIP"
   fi
 else
-  echo "# The project binaries will not been redeployed"
+  echo "# The project binaries will not be redeployed"
   echo "  (add the -u switch if needed)"
 fi
 
