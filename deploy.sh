@@ -135,15 +135,15 @@ if [[ ! -z ${ACTION_UPDATE} && ${ACTION_UPDATE} == "true" ]]; then
   else
     echo " ... no existing war => SKIP"
   fi
-  echo -n "         rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-config-*.jar"
-  rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-config-*.jar
+  echo -n "         rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-extension-config-*.jar"
+  rm -fv ${PLF_TOMCAT_DIRECTORY}/lib/blog-extension-config-*.jar
   echo " ... OK"
 
   # Deploying new binaries
   echo    "  - Adding the new version : "
-  echo -n "         cp -vp ${PROJECT_DIR}/config/target/blog-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/"
+  echo -n "         cp -vp ${PROJECT_DIR}/config/target/blog-extension-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/"
   if [ -d "${PLF_TOMCAT_DIRECTORY}/lib/" ] ; then
-    cp -vp ${PROJECT_DIR}/config/target/blog-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/
+    cp -vp ${PROJECT_DIR}/config/target/blog-extension-config-*.jar ${PLF_TOMCAT_DIRECTORY}/lib/
     echo " ... OK"
   else
     echo " ... no existing deployed war => SKIP"
