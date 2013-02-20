@@ -100,7 +100,7 @@
 		<edit-permission>*:/platform/administrators</edit-permission>
 		<portlet-application>
           <portlet>
-            <application-ref>formgenerator</application-ref>
+            <application-ref>fastcontentcreator</application-ref>
             <portlet-ref>FastContentCreatorBasicPortletStandard</portlet-ref>
             <preferences>
 
