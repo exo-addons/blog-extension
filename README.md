@@ -4,6 +4,8 @@ eXo Blog Extension
 A simple multi-user blog extension for eXo Platform social intranet. 
 It's a showcase of eXo content management capabilities. 
 
+Target : eXo Platform 4.0
+
 Getting Started
 ===============
 
@@ -27,7 +29,7 @@ or
 Step 2 : Deploy 
 ---------------
 
-Prerequisite : install [eXo Platform 3.5 Tomcat bundle](http://www.exoplatform.com/company/en/download-exo-platform) and rename it `tomcat/`
+Prerequisite : install [eXo Platform 4.0 Tomcat bundle](http://www.exoplatform.com/company/en/download-exo-platform) and rename it `tomcat/`
 
     ./deploy.sh -u
 
