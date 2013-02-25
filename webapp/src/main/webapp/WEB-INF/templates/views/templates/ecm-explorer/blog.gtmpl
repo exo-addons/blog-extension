@@ -53,7 +53,7 @@
        
        if ("draft".equals(status) && (live == true) ) return true;
      } catch (Exception e) {
-     print e;
+      ; // ignore
      }
      return false
    }
@@ -264,7 +264,9 @@
           try {
             def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(targetNode, null)
             commentCount = comments.size
-          } catch (Exception e) {print e;}
+          } catch (Exception e) {
+            ; // ignore
+          }
    
           
           // Content view
