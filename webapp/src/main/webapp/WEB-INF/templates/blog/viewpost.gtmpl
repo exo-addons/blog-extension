@@ -373,7 +373,7 @@ if (i++ < (tags.size-1)) print " "
       def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
       def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, poster)
       def userProfile = userIdentity.getProfile()
-      avatar = userProfile.getAvatarImageSource()
+      if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
     } catch (Exception e) {
         print e.message // ugly old school debug
     }

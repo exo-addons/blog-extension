@@ -241,7 +241,7 @@ String avatarUrl(def username) {
       def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
       def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username)
       def userProfile = userIdentity.getProfile()
-      avatar = userProfile.getAvatarImageSource()
+      if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
     } catch (Exception e) {
       print e.message // ugly old school debug
     }
