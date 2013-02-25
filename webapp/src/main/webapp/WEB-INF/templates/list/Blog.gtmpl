@@ -175,7 +175,7 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
               </div> 
 
             <!-- Bloggers -->
-             <div id="bloggers" class="widget widget_categories"><h4 class="widgettitle">Bloggers</h4>    
+             <div id="bloggers" class="widget widget_categories"><h4 class="widgettitle">Recent Bloggers</h4>    
                 <ul>
                   <%bloggers()%>                            
                 </ul>
@@ -297,7 +297,9 @@ void bloggers() {
   def bloggers = new HashSet();
   def entries = uicomponent.getCurrentPageData()
   entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
+  int maxbloggers = 5
   for (blogger in bloggers) {
+  	if (maxbloggers-- == 0) break;
     def author = fullName(blogger)
     def avatar = avatarUrl(blogger)
     %>
