@@ -83,8 +83,10 @@
             require("SHARED/uiListView", "uiListView").
             require("SHARED/multiUpload", "multiUpload").
   addScripts("uiListView.UIListView.initAllEvent('${componentId}-$viewComponentId', '$enableDragAndDrop');").
-  addScripts("ecmutil.ECMUtils.initClipboard('clip_button','1','$size');").  
-  addScripts('uiListView.UIListView.loadEffectedWidthColumn();');
+  addScripts("ecmutil.ECMUtils.initClipboard('clip_button','1','$size');");
+
+  //remove because not use "uiListGrid" (<div class="uiListGrid">) to display
+  //addScripts('uiListView.UIListView.loadEffectedWidthColumn();');
   
   //Config to display columns with format: ["${column};${width}"]
   //Default 
