@@ -22,7 +22,7 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.wcm.webui.clv.UICLVPortlet;
 import org.exoplatform.wcm.webui.clv.CategoryBean;
 import org.exoplatform.wcm.webui.Utils;
-
+import org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator;
 
 
 uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
@@ -79,7 +79,8 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
 <div class="container-fluid">
   <div id="content" class="clearfix row-fluid">
-    <div id="main" class="span9 clearfix" role="main">
+   <div id="main" class="span9 clearfix" role="main">
+    <div class="UICLVPresentation" id="$uicomponent.id">
       <%
   // if (no entries)
   if (uicomponent.getUIPageIterator().getAvailable() == 0) {
@@ -138,7 +139,23 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
       } // end loop on entries
       } // end else has entries
       %>
+      
+      
+     <!-- Paginator-->    
+     <div class="CaptionFunc ClearFix">
+        <% 
+            if (uicomponent.showPaginator()) { 
+                
+                    uicomponent.renderChild(UICustomizeablePaginator.class)
+                
+            } 
+        %> 
+     </div>
+     
     </div>
+   </div>  <!-- end #main -->    
+    
+    
     <div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
              <!-- categories -->
              <div id="categories" class="widget widget_categories"><h4 class="widgettitle">Categories</h4>    
