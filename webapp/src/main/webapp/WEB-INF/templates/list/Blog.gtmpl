@@ -69,7 +69,7 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
 
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/blog.css">
+<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites/intranet/css/blog.css">
 <style>
   body {
     padding-top: 0px;

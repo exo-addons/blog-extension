@@ -82,8 +82,8 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 </style>
 
 
-<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/bootstrap-responsive.min.css">
-<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites%20content/live/intranet/css/blog.css">
+<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites/intranet/css/bootstrap-responsive.min.css">
+<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites/intranet/css/blog.css">
 <script src="http://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
 <style>
   body {
