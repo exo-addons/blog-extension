@@ -95,20 +95,10 @@
 
   
 %>
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap.min.css" rel="stylesheet">
 
 
 <style>
-  h1, h2, h3, h4, h5, h6{
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-weight: bold;
-    color: #404040;
-  }
-  body{
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-weight: normal;
-    color: #404040;
-  }
+
   
   .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
     background-color: #0088CC;
