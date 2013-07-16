@@ -4,6 +4,8 @@ eXo Blog Extension
 A simple multi-user blog extension for eXo Platform social intranet. 
 It's a showcase of eXo content management capabilities. 
 
+You can discuss or find help on [Blog Extension Community Space](http://community.exoplatform.com/portal/g/:spaces:blog_extension/)
+
 Target : eXo Platform 4.0
 
 Getting Started
