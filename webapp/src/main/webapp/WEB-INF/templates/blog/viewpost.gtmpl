@@ -62,7 +62,6 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 </style>
 
 
-<link rel="stylesheet" href="/rest/private/jcr/repository/collaboration/sites/intranet/css/blog.css">
 
 <div class="container-fluid" style="padding: 20px">
     <div id="content" class="clearfix row-fluid">
