@@ -13,8 +13,8 @@
   import javax.jcr.PathNotFoundException;
   import org.exoplatform.services.cms.link.LinkManager;
   import org.exoplatform.services.wcm.utils.WCMCoreUtils;
-  import org.exoplatform.wcm.webui.reader.ContentReader; 
- 
+  import org.exoplatform.wcm.webui.reader.ContentReader;  
+  
   import org.exoplatform.services.organization.OrganizationService;
   import org.exoplatform.services.cms.comments.CommentsService;
   
@@ -24,40 +24,6 @@
   import org.exoplatform.services.wcm.publication.WCMPublicationService;
   // Content view
   
-   /**
-    * Finds and returns the date information of the given node.
-    *
-    * @return DateFormat Live date if the current state is live. Otherwise, the
-    * lastest modified date.
-    */
-   public Date getDate(Node node, String status) {
-     Date date = null;
-     try {
-       if("live".equals(status)) {
-         date = node.getProperty("publication:liveDate").getDate().getTime();
-       } else if ("draft".equals(status) || "obsolete".equals(status)) {
-         date = uicomponent.getDateModified(node); 
-       } else {
-         date = uicomponent.getDateCreated(node);
-       }
-     } catch (Exception e) {
-       date = uicomponent.getDateCreated(node);
-     }
-     return date;
-   }
-   
-   public boolean isDirty(Node data, def status) {
-     try {
-
-       def live = data.hasProperty("publication:liveRevision")
-       
-       if ("draft".equals(status) && (live == true) ) return true;
-     } catch (Exception e) {
-      ; // ignore
-     }
-     return false
-   }
-   
   def linkManager = WCMCoreUtils.getService(LinkManager.class);  
   def uiWorkingArea = uicomponent.getAncestorOfType(UIWorkingArea.class);
   def uiExplorer = uicomponent.getAncestorOfType(UIJCRExplorer.class);
@@ -74,99 +40,126 @@
   
   UIRightClickPopupMenu contextMenu = uicomponent.getContextMenu() ;
   String componentId = uicomponent.getId();
-  java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd-MMM-yyyy")//uicomponent.getSimpleDateFormat();
+  java.text.DateFormat dateFormat = uicomponent.getSimpleDateFormat();
   def viewComponentId  = new Date().getTime();
   def rcontext = _ctx.getRequestContext() ;
   def size = uicomponent.getChildrenList().size();
   def jsManager = rcontext.getJavascriptManager();
+
   jsManager.require("SHARED/ecm-utils", "ecmutil").
             require("SHARED/uiListView", "uiListView").
             require("SHARED/multiUpload", "multiUpload").
   addScripts("uiListView.UIListView.initAllEvent('${componentId}-$viewComponentId', '$enableDragAndDrop');").
-  addScripts("ecmutil.ECMUtils.initClipboard('clip_button','1','$size');");
+  addScripts('uiListView.UIListView.loadEffectedWidthColumn();');
 
-  //remove because not use "uiListGrid" (<div class="uiListGrid">) to display
-  //addScripts('uiListView.UIListView.loadEffectedWidthColumn();');
-  
   //Config to display columns with format: ["${column};${width}"]
   //Default 
   String[] arrColumns = ["exo:dateCreated;123px", "exo:owner;123px"];
+  String serverUrl= uicomponent.getWebDAVServerPrefix();
   
-
+          
+  
   
 %>
-
-
-<style>
-
-  
-  .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
-    background-color: #0088CC;
-  }
-  
-  
-  .dropdown-menu a{
-    color: #555555 !important;
-  }
-  
-  
-  .hero-unit {
-    background-color: #F5F5F5;
-  }
-  #main article {
-    border-bottom: none;
-  }
-  
-  img.avatar {
-    height: 40px;
-    width: 40px;
-  }
-  
-.UIPresentationContainer a {
-    color: #08C;
-}   
-  
-  a.tag {
-    color: white;
-  }
-  
-  input[type="text"] {
-
-    padding: 0px;
-
-  }
-  
-  .PublicationPublishIcon {
-    height: 24px;
-    background: url("/ecmexplorer/skin/icons/24x24/DefaultSkin/PublicationPublish.png") no-repeat scroll left center transparent;
-}
-
-  
- 
-</style>
-
-
-<div id="$componentId">
-<table id="${componentId}-$viewComponentId" class="table table-striped">
-        <%
-          selectedSortType = uicomponent.getTypeSort()   
-          sortOrder = uicomponent.getSortOrder()
-          typeActionLink = (sortOrder.equals("BlueDownArrow")) ? "Descending;" : "Ascending;"
-
-          def sortHandleClass(def type) {
-              return (selectedSortType.equals(type)) ? "SortButton ${sortOrder}16x16Icon" : ""         
-          }
-        %>  
-  <thead>
-    <tr>
-      <th class="<%=sortHandleClass("Type")%>" style="cursor:pointer;" onclick="<%=uicomponent.event("Sort", typeActionLink + "Type")%>">&nbsp;</th>
-      <th class="<%=sortHandleClass("Alphabetic")%>" style="cursor:pointer;" onclick="<%=uicomponent.event("Sort", typeActionLink + "Alphabetic")%>">Title</th>
-      <th class="<%=sortHandleClass("Date")%>" style="cursor:pointer;" onclick="<%=uicomponent.event("Sort", typeActionLink + "exo:dateCreated")%>">Last Change</th>
-      <th><i class="icon-comment" title="Comments"></i></th>
-    </tr>
-  </thead>
-  
-  <tbody>  
+<div id="$componentId" >
+  <div id="${componentId}-$viewComponentId" class="uiListView $componentId">
+    <div class="uiListGrid">
+		<div class="uiBox noRounded">
+		  <div class="titleTable clearfix">
+			<%
+			  String selectedSortType = uicomponent.getTypeSort() ;   
+			  String sortOrder = uicomponent.getSortOrder();
+			  String typeActionLink = "";
+			  if (sortOrder.equals("Down")) {
+				typeActionLink = "Descending;";
+			  } else {
+				typeActionLink = "Ascending;";
+			  }
+			%>
+			<div class="columnIcon" style="width: 20px;" onclick="<%= uicomponent.event("Sort", typeActionLink + "Type")%>" style="cursor:pointer;">
+          <%
+            if (selectedSortType.equals("Type")) {
+              %>
+								<i class="uiIconArrow${sortOrder} uiIconLightGrey"></i>
+              <%
+            }
+          %>
+        </div>
+        <div class="lineLeft" style="cursor:default;"><span></span></div>
+<!-- Title -->
+        <div class="columnName" style="width: 300px;" onclick="<%=uicomponent.event("Sort", typeActionLink + "Alphabetic")%>" style="cursor:pointer;">
+          <%
+            if (selectedSortType.equals("Alphabetic")) {
+              %>
+                <i class="uiIconArrow${sortOrder} uiIconLightGrey pull-right"></i>
+								Title
+              <%
+            } else { 
+              %>Title<%
+            } 
+          %>
+        </div>
+        <div class="lineLeft" onmousedown="eXo.ecm.UIListView.resizeColumn(this, event);"
+        onkeydown="eXo.ecm.UIListView.resizeColumn(this, event);"><span></span></div>
+<!-- Date created -->
+        <div class="columnDatetime column" style="width: 200px;" onclick="<%=uicomponent.event("Sort", typeActionLink + "exo:dateCreated")%>" style="cursor:pointer;">
+          <%
+            if (selectedSortType.equals("exo:dateCreated")) {
+              %>
+                <i class="uiIconArrow${sortOrder} uiIconLightGrey pull-right"></i>
+								Last Change
+              <%
+            } else { 
+              %>Last Change<%
+            } 
+          %>
+        </div>
+        <div class="lineLeft" onmousedown="eXo.ecm.UIListView.resizeColumn(this, event);"
+        onkeydown="eXo.ecm.UIListView.resizeColumn(this, event);"><span></span></div>
+<!-- Status -->
+        <div class="columnStatus column" style="width: 93px;"><i class="uiIconComment"></i></div>
+        </div>
+        <div style="position: relative; top: 0px; left: 0px; width: 0px; height: 0px">
+          <div class="Mask" style="position: absolute; top: 0px; left: 0px; width: 0px; height: 0px"></div>
+          <div class="JCRMoveAction" style="display: none;" request="<%=uiWorkingArea.getJCRMoveAction().event(UIWorkingArea.MOVE_NODE)%>" symlink="<%=uiWorkingArea.getCreateLinkAction().event(UIWorkingArea.CREATE_LINK)%>"></div>
+          <div class="ItemContextMenu" style="position: absolute; top: 0px; left: 0px; display: none;">
+            <div class="uiRightClickPopupMenu" style="display: block;">
+              <ul class="dropdown-menu uiRightPopupMenuContainer" onmousedown="event.cancelBubble = true;" onkeydown="event.cancelBubble = true;">
+                <%
+                  for(itemContext in managersMultiItemContext) {
+                    action = itemContext.getUIExtensionName();
+                    %>
+											<li class="menuItem" style="display: block;"> 
+												<a onclick=eXo.ecm.UIListView.postGroupAction("<%=itemContext.event(action)%>")>
+													<i class="uiIconEcms${action}"></i> <%=_ctx.appRes("ECMContextMenu.event." + action)%>
+												</a>
+											</li>
+                    <%
+                  }
+                %>
+              </ul>
+            </div>
+          </div>
+          <div class="groundContextMenu" style="position: absolute; top: 0px; left: 0px; display: none;">
+            <div class="uiRightClickPopupMenu" style="display: block;">
+              <ul class="dropdown-menu uiRightPopupMenuContainer" onmousedown="event.cancelBubble = true;" onkeydown="event.cancelBubble = true;">
+                <%
+                  for(itemGroundContext in managersGroundContext) {
+                    action = itemGroundContext.getUIExtensionName();
+                    def actionClick = "Upload".equals(action) ? "eXo.ecm.MultiUpload.uploadByRightClick()" : itemGroundContext.event(action); 
+                    %>
+										<li class="menuItem" style="display: block;"> 	
+                      <a onclick="<%=actionClick%>" href="javascript:void(0)">
+                        <i class="uiIconEcms${action}"></i> <%=_ctx.appRes("ECMContextMenu.event." + action)%>
+                      </a> 
+										</li>
+                    <%
+                  }//for
+                %>
+              </ul>
+            </div>
+          </div>
+      </div> <!-- End TitleTable -->
       
       <%        
         String portalName = uicomponent.getPortalName() ;
@@ -176,16 +169,14 @@
         WCMPublicationService wcmPublicationService = uicomponent.getApplicationComponent(WCMPublicationService.class);
         def permlink;
         int i = 0;
+				String oddEvenClassRow = "odd";
         for (data in uicomponent.getChildrenList()) {
           try {
             data.getSession().getItem(data.getPath());
           } catch(PathNotFoundException pne) {
             continue;
           }
-          
-          // do not display categories)
-          if (data.isNodeType("exo:taxonomy")) continue;
-          
+		  if (data.isNodeType("exo:taxonomy")) continue;
           i++;
           def isPreferenceNode = uicomponent.isPreferenceNode(data) ;
           def preferenceWS = data.getSession().getWorkspace().getName() ;
@@ -195,33 +186,26 @@
           // Content view
           //   Status
           def status = "";
-          def targetNode;
+		  def targetNode;
           if(isSymLink) {
             targetNode = linkManager.getTarget(data);            
             status = wcmPublicationService.getContentState(targetNode);
           } else {
             status = wcmPublicationService.getContentState(data);
           }
-          if (status == null) status = "";
- 
+          if (status == null) status = "draft";
           def statusLabel = _ctx.appRes("UIPublicationPanel.status." + status)
- 
-          // a dirty post is a post modified after publication
-          def dirty = isDirty(data, status)
-          
+
           //   Title
-          def title = uiWorkingArea.getTitle(data);   
-        
-          
+          def title = uiWorkingArea.getTitle(data);          
           //   Name
           def name = nodePath.substring(nodePath.lastIndexOf("/") + 1, nodePath.length()) ;
           name = ContentReader.getXSSCompatibilityContent(name);         
           //   Datetime
-          def date = getDate(data, status);
+          def date = uicomponent.getDateCreated(data);
           def datetime = dateFormat.format(date);
-
           
-          //   Author
+		  //   Author
           def users = organizationService.getUserHandler();
           def author = ""
           try {
@@ -230,75 +214,70 @@
           } catch (Exception e) {
             ; // ignore
           }
-
-          //   Last User
-          def lastUser = "";
-          try {
-            if (data.hasProperty("publication:lastUser")) {
-              lastUser = data.getProperty("publication:lastUser").getValue().getString();
-              lastUser = users.findUserByName(lastUser).getFullName()
-            }
-            
-          } catch (Exception e) {
-            ; // ignore
-          }
-          
-
-          def datevent = ""
+		  
+		  //  Datevent
+		  def datevent = ""
 
           if ("draft".equals(status)) {
             datevent = "Modified"
           } else if ("published".equals(status)) {
             datevent = "Published"
           }
-          
-          def commentCount = 0;
+		  
+		  //  Comment Count
+		  def commentCount = 0;
           try {
             def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(targetNode, null)
+		
             commentCount = comments.size
           } catch (Exception e) {
             ; // ignore
           }
-   
-          
           // Content view
           
           String subName ;
           String actionLink = uicomponent.event("ChangeNode",Utils.formatNodeName(data.path), new Parameter("workspaceName", preferenceWS)) ;
           //Begin permlink
           permLinkComponent =  uiWorkingArea.getPermlink(data);
-          String strActs = "<div class=\"RightClickCustomItem\" style=\"display: none;\">" ;
+          String strActs = "<li class=\"RightClickCustomItem\" style=\"display: none;\">" ;
+          strActs += "<ul>";
           if (permLinkComponent != null) {
             permlink = permLinkComponent.getUIExtensionName();
-            strActs +=  "<a class='MenuItem' style='display: block;' href=\"" + permLinkComponent.getPermlink(data) + "\" target='_new' onclick=\"return eXo.ecm.WCMUtils.hideContextMenu(this);\">" ;
-            strActs +=  " <div class='ItemIcon ${permlink}16x16Icon'>" ;
+            strActs +=  "<li class='menuItem'>";
+            strActs +=  "<a exo:attr='ViewDocument' style='display: block;' href=\"" + permLinkComponent.getPermlink(data) + "\" target='_new' onclick=\"return eXo.ecm.WCMUtils.hideContextMenu(this);\">" ;
+            strActs +=  " <i class='uiIconEcmsViewDocument uiIconEcmsLightGrey'>" ;
+            strActs +=  " </i> ";            
             strActs +=    _ctx.appRes("ECMContextMenu.event." + permlink);
-            strActs +=  " </div>";
             strActs +=  "</a>";
+            strActs += "</li>";
           }
           
           //Begin WebDav Action
           if (!data.isNodeType(Utils.EXO_RESTORELOCATION) && !Utils.isTrashHomeNode(data)) {
             if (data.getPrimaryNodeType().getName().equals("nt:file")) {
-              String mimeType="";
-              try {
-                mimeType=data.getNode("jcr:content").getProperty("jcr:mimeType").getString();
-              } catch (Exception e) {                      
-              }
-              // This escape "'" for js
-              String webDavPath = data.getPath().contains("%27") ? data.getPath().replaceAll("%27","%2527") : data.getPath();
-              String link ="javascript:eXo.ecm.ECMUtils.generateWebDAVLink('','"+ portalName +"','"+ restContextName +"','"+repository+"','"+ preferenceWS+ "','" + webDavPath +"','"+mimeType+"')";                                   
-              strActs +=    "<a class=\"MenuItem\" style='display: block;' onclick=\"return eXo.ecm.WCMUtils.hideContextMenu(this);\" href=\"" + link + "\" >" ;          
-              strActs +=    "  <div class=\"ItemIcon WebDAV16x16Icon\">" + _ctx.appRes("ECMContextMenu.event.WebDavView") + "</div>" ;
-              strActs +=    "</a>" ;            
+				String mimeType="";
+				try {
+					mimeType=data.getNode("jcr:content").getProperty("jcr:mimeType").getString();
+				} catch (Exception e) {
+				}
+				// This escape "'" for js
+				String webDavPath = data.getPath().contains("%27") ? data.getPath().replaceAll("%27","%2527") : data.getPath();
+				String link ="javascript:eXo.ecm.ECMUtils.generateWebDAVLink('','"+ portalName +"','"+ restContextName +"','"+repository+"','"+ preferenceWS+ "','" + webDavPath +"','"+mimeType+"')";
+				strActs +=  "<li class='menuItem'>";
+				strActs +=    "<a exo:attr='Download' style='display: block;' onclick=\"return eXo.ecm.WCMUtils.hideContextMenu(this);\" href=\"" + link + "\" >" ;          
+				strActs +=    "  <i class=\"uiIconDownload uiIconLightGray\"></i> " + _ctx.appRes("ECMContextMenu.event.WebDavView");
+				strActs +=    "</a>" ;            
+				strActs += "</li>";
             } else {
               def dataTarget = data;
               if(uicomponent.isSymLink(data)) dataTarget = Utils.getNodeSymLink(data);
               if (dataTarget != null) {
-                String link = "/" + restContextName + "/private/jcr/" + repository+ "/" + preferenceWS + Utils.formatNodeName(dataTarget.getPath()); 
-                strActs +=    "<a class=\"MenuItem\" style='display: block; {behavior: url(#default#AnchorClick);}' onclick=\"return eXo.ecm.WCMUtils.hideContextMenu(this);\" href=\"" +link + "\" target='_new' folder=\"" + link +"\">" ;          
-                strActs +=    "  <div class=\"ItemIcon WebDAV16x16Icon\">" + _ctx.appRes("ECMContextMenu.event.WebDavView") + "</div>" ;
+                String link = "/" + restContextName + "/private/jcr/" + repository+ "/" + preferenceWS + Utils.formatNodeName(dataTarget.getPath());
+                strActs +=  "<li class='menuItem'>";
+                strActs +=    "<a exo:attr='Download' style='display: block; {behavior: url(#default#AnchorClick);}' onclick=\"eXo.ecm.WCMUtils.hideContextMenu(this);window.open('" +link + "');\" target='_new' folder=\"" + link +"\">" ;          
+                strActs +=    "  <i class=\"uiIconDownload uiIconLightGray\"></i> " + _ctx.appRes("ECMContextMenu.event.WebDavView");
                 strActs +=    "</a>" ;
+                strActs += "</li>";
               }
             }
           } //End WebDav Action
@@ -309,21 +288,25 @@
             for (act in customActs) {
               String actName = act.getProperty("exo:name").getValue().getString() ;
               params = [new Parameter("workspaceName", preferenceWS), new Parameter("actionName",Utils.formatNodeName(act.getName()))] ;
-              strActs += "<a class=\"MenuItem\" style='display: block;' onclick=\"return eXo.webui.UIRightClickPopupMenu.prepareObjectId(event, this);\" href=\"" + uiCustomActionComponent.event("Custom",Utils.formatNodeName(nodePath),params) + "\">" ;
-              strActs += "  <div class=\"ItemIcon " + Utils.getNodeTypeIcon(act, "16x16Icon") + "\">$actName</div>" ;
+              strActs +=  "<li class='menuItem'>";
+              strActs += "<a exo:attr=\"" +  Utils.getNodeTypeIcon(act,"") + "\" style='display: block;' onclick=\"return eXo.webui.UIRightClickPopupMenu.prepareObjectId(event, this);\" href=\"" + uiCustomActionComponent.event("Custom",Utils.formatNodeName(nodePath),params) + "\">" ;
+              strActs += "  <i class=\"" + Utils.getNodeTypeIcon(act, "uiIconEcms") + "\"></i> $actName" ;
               strActs += "</a>" ;
+              strActs += "</li>";
             }            
           }
           
           if (!data.isNodeType(Utils.EXO_RESTORELOCATION) && !Utils.isTrashHomeNode(data)) {
-            String clipboardLink = "/" + restContextName + "/private/jcr/" + repository + "/" + preferenceWS + data.getPath();
-            strActs +=  "<a class='MenuItem' style='display: block;' id='clip_button1$i' path='$clipboardLink' onclick=\"eXo.ecm.ECMUtils.pushToClipboard(event,'$clipboardLink');\">" ;
-            strActs +=  " <div class='ItemIcon GetURL16x16Icon'>" ;
+          	String clipboardLink = serverUrl + "/" + restContextName + "/private/jcr/" + repository + "/" + preferenceWS + data.getPath();
+          	strActs +=  "<li class='menuItem'>";
+          	strActs +=  "<a exo:attr='CopyUrlToClipboard' style='display: block;' id='clip_button1$i' path='$clipboardLink'>" ;
+          	strActs +=  " <i class='uiIconEcmsCopyUrlToClipboard uiIconEcmsLightGrey'>" ;
+          	strActs +=  " </i> " ;
             strActs +=    _ctx.appRes("ECMContextMenu.event.GetURL");
-            strActs +=  " </div>" ;
             strActs +=  "</a>";
+            strActs += "</li>";
           }
-          strActs += "</div>";
+          strActs += "</ul></li>";
           def rightClickMenu = "" ;
           Boolean isLocked = false;
           String lockedLabel = "";
@@ -341,72 +324,59 @@
           if (uicomponent.isMediaType(data)) isMediaType = "true";
           if (Utils.isTrashHomeNode(data)) isTrashHome = "true"
           if (!uicomponent.isSystemWorkspace()) rightClickMenu = contextMenu.getJSOnclickShowPopup(preferenceWS + ":" + Utils.formatNodeName(nodePath), uiWorkingArea.getActionsExtensionList(data)) ;            
-          def iconLabel = statusLabel
+		  def iconLabel = statusLabel
           if (isLocked) iconLabel += " - " + lockedLabel
           def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "PublicationDraftIcon"
 
-      %>
-    <tr <%=rightClickMenu%> class="RowView Normal ClearFix" trashHome="$isTrashHome" locked="$isLocked" mediaType="$isMediaType" removeFavourite="$isFavourite" inTrash="$isInTrash" workspacename="$preferenceWS" objectId="<%=URLEncoder.encode(Utils.formatNodeName(nodePath), "utf-8")%>" ondblclick="$actionLink">$strActs
-      <td ><div title="$iconLabel" class="Icon16x16 default16x16Icon"> <% if ("published".equals(status)) {%> <img src="/ecmexplorer/skin/icons/16x16/DefaultSkin/SelectCheck.gif"></img><%}%></div>
+          %>
+            <div <%= uicomponent.getDragAndDropEvents(data) %>  <%=rightClickMenu%> class="rowView $oddEvenClassRow clearfix" trashHome="$isTrashHome" locked="$isLocked" 
+                 mediaType="$isMediaType" removeFavourite="$isFavourite" inTrash="$isInTrash" workspacename="$preferenceWS" 
+                 ondblclick="$actionLink" isFile="<%=data.isNodeType("nt:file")%>" 
+                 objectId="<%=org.exoplatform.services.cms.impl.Utils.getObjectId(nodePath)%>" 
+                 >$strActs
+              <div class="columnIcon" style="width: 20px;height: 40px;">
+                <div rel="tooltip" data-placement="bottom" title="<%=statusLabel%>">
                   <%if(isLocked) {%>
-                    <div class="IconLocked"></div>
+                    <div class="iconLockedsmall"></div>
                   <%}%>
-                 
-                        
-      </td>
-      <td title="$title $lockedLabel"><strong>$title</strong><%if ("draft".equals(status)) {%> - <span class="label label-important">$statusLabel</span><%}%>
-        <br/><small><span class="muted">by $author</span></small>
-      </td>
-      <td title="$datevent on $datetime">$datevent on $datetime</td>
-      <td><span class="label label-info">$commentCount</span></td>
-    </tr>
-    
-
-
-      <%
-        } // end loop on posts
-      %>    
-    
-
-  </tbody>
-</table>
-        <div style="position: relative; top: 0px; left: 0px; width: 0px; height: 0px">
-          <div class="Mask" style="position: absolute; top: 0px; left: 0px; width: 0px; height: 0px"></div>
-          <div class="JCRMoveAction" style="display: none;" request="<%=uiWorkingArea.getJCRMoveAction().event(UIWorkingArea.MOVE_NODE)%>" symlink="<%=uiWorkingArea.getCreateLinkAction().event(UIWorkingArea.CREATE_LINK)%>"></div>
-          <div class="ItemContextMenu" style="position: absolute; top: 0px; left: 0px; display: none;">
-            <div class="UIRightClickPopupMenu" style="display: block;">
-              <div class="UIRightPopupMenuContainer" onmousedown="event.cancelBubble = true;" onkeydown="event.cancelBubble = true;">
-                <%
-                  for(itemContext in managersMultiItemContext) {
-                    action = itemContext.getUIExtensionName();
-                    %>
-                      <a class="MenuItem" style="display: block;" onclick=eXo.ecm.UIListView.postGroupAction("<%=itemContext.event(action)%>")>
-                        <div class="ItemIcon ${action}16x16Icon"><%=_ctx.appRes("ECMContextMenu.event." + action)%></div>
-                      </a>
-                    <%
-                  }
-                %>
+                  <%
+                    if(isSymLink) {
+                      %><div class="iconLinkSmall"></div><%
+                    }
+                  %>
+		  <% 
+		    if ("published".equals(status)) {
+			%> <i class="uiIconEcmsApprove"></i><%
+			}else{
+			%><i class="uiIconEcmsTemplateDocument"></i><%
+			}
+			%>
+                </div>
+              </div>
+              <div class="lineLeftItem" style="height:55px;"><span></span></div>
+<!-- Title-->
+              <div class="columnName" style="width:300px;height: 40px;">
+                  <div class="nodeLabel" style="$hiddenStyle" rel="tooltip" data-placement="bottom" title="$title $lockedLabel"><span class="nodeName"><strong><%=title%></strong><%if ("draft".equals(status)) {%> - <span class="label label-important"><%=statusLabel%></span><%}%></span>
+				  <br/><small><span class="muted">by <%=author%></span></small></div>
+              </div>
+              <div class="lineLeftItem" style="height:55px;"><span></span></div>
+<!-- Date created -->
+              <div class="columnDatetime column" style="width: 200px;">
+                  <div class="nodeLabel" rel="tooltip" data-placement="bottom" title="<%= datetime %>"><%=datevent%> on <%= datetime %></div>
+              </div>
+              <div class="lineLeftItem" style="height:55px;"><span></span></div>
+<!-- Status-->
+              <div class="columnStatus column" style="width: 93px;">
+                  <div class="nodeLabel" rel="tooltip" data-placement="bottom" title="<%=commentCount%> comments"><span class="label label-info"><%=commentCount %></span></div>
               </div>
             </div>
-          </div>
-          <div class="GroundContextMenu" style="position: absolute; top: 0px; left: 0px; display: none;">
-            <div class="UIRightClickPopupMenu" style="display: block;">
-              <div class="UIRightPopupMenuContainer" onmousedown="event.cancelBubble = true;" onkeydown="event.cancelBubble = true;">
-                <%
-                  for(itemGroundContext in managersGroundContext) {
-                    action = itemGroundContext.getUIExtensionName();
-                    %>
-                      <a class="MenuItem" href="<%=itemGroundContext.event(action)%>" style="display: block;">
-                        <div class="ItemIcon ${action}16x16Icon"><%=_ctx.appRes("ECMContextMenu.event." + action)%></div>
-                      </a> 
-                    <%
-                  }
-                %>
-              </div>
-            </div>
-          </div>
-        </div>
-
+          <%
+					// Make css for odd and event rows
+					oddEvenClassRow = (oddEvenClassRow.equals("odd"))? "even" : "odd";
+        }
+      %>
+    </div>
+    </div>
     <% 
       //re-initialize action
       uiWorkingArea.initialize();
@@ -419,5 +389,5 @@
         <%
       }
     %>
-
+  </div>
 </div>
