@@ -2,6 +2,7 @@
 
   import javax.jcr.Node;
   import org.exoplatform.webui.application.WebuiRequestContext;
+  import org.apache.commons.lang.time.DateFormatUtils;
   
 
   def rcontext = _ctx.getRequestContext() ;
@@ -12,8 +13,14 @@
   //  rcontext.getJavascriptManager().addOnLoadJavascript("eXo.ecm.CKEditor.insertCSS('$htmlWYSIWYGFormId', '$cssFormId')")
 
   Node webContentNode = uicomponent.getNode();
+  def String dateTimePath = "";
+  if(webContentNode != null){
+     def parrentDateNodePath =  webContentNode.getParent().getPath();
+     dateTimePath = parrentDateNodePath.substring(parrentDateNodePath.length()-10, parrentDateNodePath.length());
 
-  
+  }else{
+     dateTimePath =  DateFormatUtils.format(new Date(), "yyyy/MM/dd");
+  }
   %>
 
 
@@ -110,7 +117,8 @@ jq(function() {
   var name = jq("#name");
 
   var syncuri = function() {
-    var data = name.val()
+    var data = name.val();
+    data = "<%=dateTimePath%>" + "/" + data;
     jq('#uri').replaceWith('<span id="uri">'+data+'</span>');
   }
       
