@@ -13,6 +13,11 @@
 			<type>org.exoplatform.portal.config.NewPortalConfigListener</type>
 			<description>this listener init the portal configuration</description>
 			<init-params>
+                                <value-param>
+                                  <name>override</name>
+                                  <description>The flag parameter to decide if portal metadata is overriden on restarting server</description>
+                                  <value>true</value>
+                                </value-param>
 				<object-param>
 					<name>portal.configuration</name>
 					<description>description</description>
