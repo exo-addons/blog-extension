@@ -4,7 +4,7 @@
   <parent>
     <artifactId>blog-extension</artifactId>
     <groupId>org.exoplatform.addons.blog</groupId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
   </parent>
   <artifactId>blog-extension-webapp</artifactId>
   <packaging>war</packaging>
