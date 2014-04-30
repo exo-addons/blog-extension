@@ -30,9 +30,7 @@ If you don't have it already, you can quickly install the add-ons manager :
 Using the Extensions Installer
 ----------------------------
 
-If you don't want to install the add-ons manager on your eXo, you can still rely on the build-in extension installer script that ships with eXo Platform 4.0.
-
-Download exo-blog-extension-1.1.0.zip  from [Sourceforge](https://sourceforge.net/projects/exo/files/Addons/Blog%20Extension/) and unzip in your extensions folder :
+If you don't want to install the add-ons manager on your eXo, you can still rely on the build-in extension.sh  script that ships with eXo Platform 4.0.
 
     cd platform-4.0.5/extensions
     curl -L http://sourceforge.net/projects/exo/files/Addons/Blog%20Extension/exo-blog-extension-1.1.0.zip/download -o exo-blog-extension-1.1.0.zip 
