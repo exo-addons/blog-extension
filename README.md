@@ -8,8 +8,44 @@ You can discuss or find help on [Blog Extension Community Space](http://communit
 
 Target : eXo Platform 4.0
 
-Getting Started
-===============
+How to Install
+==============
+
+You can install the extension very easily using the [add-ons manager](http://blog.exoplatform.com/en/2013/12/20/boost-platform-new-add-ons-manager)
+
+Using the Add-ons Manager  (recommanded)
+--------------------------
+
+    ./addon.sh --install exo-blog-extension:1.1.0
+
+
+If you don't have it already, you can quickly install the add-ons manager :
+
+    cd platform-4.0.5/
+    curl -L http://sourceforge.net/projects/exo/files/Addons/Add-ons%20Manager/addons-manager-1.0.0-alpha-2.zip/download -o addons-manager-1.0.0-alpha-2.zip
+    unzip addons-manager-1.0.0-alpha-2.zip
+    
+
+
+Using the Extensions Installer
+----------------------------
+
+If you don't want to install the add-ons manager on your eXo, you can still rely on the build-in extension installer script that ships with eXo Platform 4.0.
+
+Download exo-blog-extension-1.1.0.zip  from [Sourceforge](https://sourceforge.net/projects/exo/files/Addons/Blog%20Extension/) and unzip in your extensions folder :
+
+    cd platform-4.0.5/extensions
+    curl -L http://sourceforge.net/projects/exo/files/Addons/Blog%20Extension/exo-blog-extension-1.1.0.zip/download -o exo-blog-extension-1.1.0.zip 
+    unzip exo-blog-extension-1.1.0.zip
+    cd ..
+    unzip exo-blog-extension-1.1.0.zip
+    ./extension.sh -i exo-blog-extension-1.1.0
+
+
+
+
+How to Build
+============
 
 Step 1 :  Build 
 ----------------
