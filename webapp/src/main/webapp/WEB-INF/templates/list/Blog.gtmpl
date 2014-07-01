@@ -131,9 +131,9 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 
 <div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
 <!-- categories -->
-<div id="categories" class="uiBox widget_categories">
+<div id="categories" class="uiBox widget-categories widget-blog">
   <h5 class="title">Categories</h5>
-  <div style="padding: 7px">
+  <div class="uiContentBox">
     <ul>
       <%categories()%>
     </ul>
@@ -141,9 +141,9 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 </div>
 
 <!-- Tag Cloud -->
-<div id="tagcloud" class="uiBox widget_tag_cloud">
+<div id="tagcloud" class="uiBox widget-tag-cloud widget-blog">
   <h5 class="title">Tags</h5>
-  <div style="padding: 7px">
+  <div class="uiContentBox">
     <div id="tag-cloud" >
       <% tags()%>
     </div>
@@ -151,9 +151,9 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 </div>
 
 <!-- Bloggers -->
-<div id="bloggers" class="uiBox widget_categories">
+<div id="bloggers" class="uiBox widget-recent-blog widget-blog">
   <h5 class="title">Recent Bloggers</h5>
-  <div style="padding: 7px">
+  <div class="uiContentBox">
     <ul>
       <%bloggers()%>
     </ul>
@@ -161,21 +161,21 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 </div>
 
 <!-- Meta -->
-<div id="meta" class="uiBox widget_categories">
+<div id="meta" class="uiBox widget-meta widget-blog ">
   <h5 class="title">Meta</h5>
-  <div style="padding: 7px">
+  <div class="uiContentBox">
     <ul>
-      <li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'><%=_ctx.appRes("Blog.Meta.AddPost")%></a></li>
-      <li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts"><%=_ctx.appRes("Blog.Meta.ManagerPost")%></a></li>
-      <li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed"><%=_ctx.appRes("Blog.Meta.FollowRss")%></a></li>
+      <li><i class="uiIconLightGray uiIconEdit"></i>&nbsp;<a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'><%=_ctx.appRes("Blog.Meta.AddPost")%></a></li>
+      <li><i class="uiIconLightGray uiIconSetting"></i>&nbsp;<a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts"><%=_ctx.appRes("Blog.Meta.ManagerPost")%></a></li>
+      <li><i class="uiIconLightGray uiIconRss"></i>&nbsp;<a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed"><%=_ctx.appRes("Blog.Meta.FollowRss")%></a></li>
     </ul>
   </div>
 </div>
 <!--Archives-->
-<div id="archives" class="uiBox widget_categories">
+<div id="archives" class="uiBox widget-blog widget-archive">
 <h5 class="title">Archives</h5>
 
-<div class="blog_archive_accordion smk_accordion acc_with_icon">
+<div class="blog_archive_accordion smk_accordion acc_with_icon uiContentBox">
   <%
   def currentYear = Calendar.getInstance().get(Calendar.YEAR);
   def archiveYears = blogService.getArchiveYears();
@@ -189,17 +189,17 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
   %>
 
   <div class="accordion_in $active">
-    <div class="acc_head"><div class="acc_icon_expand"></div>$year ($yearPostCount)</div>
+    <div class="acc_head"><i class="uiIconLightGray uiIconArrowRight"></i>$year ($yearPostCount)</div>
     <div class="acc_content" style="display: block;">
       <%
       for(month in archiveMonthByYear){
       def monthPostCount = blogService.getArchivesCountInMonth(year, month);
       def monthTitle = org.exoplatform.com.blog.service.util.Util.numberToWord(month);
       %>
-      <p class="month" onclick="eXo.ecm.blog.getPost(this, $year, $month)" >
+      <div class="month" onclick="eXo.ecm.blog.getPost(this, $year, $month)" >
 				$monthTitle ($monthPostCount)
       <div id="month-$year-$month" class="blog-archive-post-link" ></div>
-      </p>
+      </div>
       <%}%>
     </div>
   </div>
@@ -297,7 +297,7 @@ void renderPost(def entry) {
 	}
 %>
 	<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
-  <i class="icon-hand-right"></i>
+  <i class="uiIconWatch uiIconLightGray"></i>
   Read full article</a>
 <%
 

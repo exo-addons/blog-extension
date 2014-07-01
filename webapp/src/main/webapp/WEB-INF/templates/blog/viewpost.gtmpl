@@ -196,16 +196,17 @@ if (comments.size > 1) plural = "s"
 							</div><!--end commentLeft-->
 							<div class="commentRight">
 									<div class="author">
-										<a href="/portal/intranet/profile/$commentor">$commentorName</a>
-										<span class="dateTime">$commentDate </span> &nbsp; &nbsp;
-										<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
-											<span id="approve-$timeId" class="pull-right approve">
+										<span id="approve-$timeId" class="pull-right approve">
 												<%if(!approve){%>
 													<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" >Approve</button>
 												<%}else{%>
 													<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >Disapprove</button>
 												<%}%>
 											</span>
+										<a href="/portal/intranet/profile/$commentor">$commentorName</a>
+										<span class="dateTime">$commentDate </span> &nbsp; &nbsp;
+										<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
+											
 									</div>
 									<p class="contentComment">
 										<span id="$timeId" class="ContentBlock

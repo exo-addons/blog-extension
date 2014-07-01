@@ -33,7 +33,7 @@
     }
     var settings = gj.extend({
       animation: true,
-      showIcon: true,
+      showIcon: false,
       closeAble: false,
       closeOther: true,
       slideSpeed: 150,
@@ -59,7 +59,7 @@
       });
       //Append icon
       if (settings.showIcon) {
-        plugin.find('.acc_head').prepend('<div class="acc_icon_expand"></div>');
+        plugin.find('.acc_head').prepend('<i class="uiIconArrowRight uiIconLightGray"></i>');
       }
       //Hide inactive
       plugin.find('.accordion_in .acc_content').not('.acc_active .acc_content').hide();

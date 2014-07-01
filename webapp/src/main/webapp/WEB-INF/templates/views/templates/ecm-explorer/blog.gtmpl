@@ -77,7 +77,7 @@ String serverUrl= uicomponent.getWebDAVServerPrefix();
         <%
         if (selectedSortType.equals("Type")) {
         %>
-        <i class="uiIconArrow${sortOrder} uiIconLightGrey"></i>
+        <i class="uiIconArrow${sortOrder} uiIconLightGray"></i>
         <%
         }
         %>
@@ -88,7 +88,7 @@ String serverUrl= uicomponent.getWebDAVServerPrefix();
       <%
       if (selectedSortType.equals("Alphabetic")) {
       %>
-      <i class="uiIconArrow${sortOrder} uiIconLightGrey pull-right"></i>
+      <i class="uiIconArrow${sortOrder} uiIconLightGray pull-right"></i>
       Title
       <%
       } else {
@@ -103,7 +103,7 @@ String serverUrl= uicomponent.getWebDAVServerPrefix();
     <%
     if (selectedSortType.equals("exo:dateCreated")) {
     %>
-    <i class="uiIconArrow${sortOrder} uiIconLightGrey pull-right"></i>
+    <i class="uiIconArrow${sortOrder} uiIconLightGray pull-right"></i>
     Last Change
     <%
     } else {
