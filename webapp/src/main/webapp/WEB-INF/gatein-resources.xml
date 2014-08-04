@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<gatein-resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
+                  xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
+
+  <portal-skin>
+    <skin-name>Default</skin-name>
+    <skin-module>Blogskin</skin-module>
+    <css-path>/resources/css/blog.css</css-path>
+    <overwrite>false</overwrite>
+  </portal-skin>
+
+  <portlet>
+    <name>FastContentCreatorBasicPortletStandard</name>
+    <module>
+      <depends>
+        <module>blogjs</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <portlet>
+    <name>SingleContentViewer</name>
+    <module>
+      <depends>
+        <module>blogjs</module>
+      </depends>
+    </module>
+  </portlet>
+
+  <module>
+    <name>blogjs</name>
+    <script>
+      <path>/resources/js/blog.js</path>
+    </script>
+    <depends>
+      <module>jquery</module>
+      <as>gj</as>
+    </depends>
+  </module>
+
+</gatein-resources>

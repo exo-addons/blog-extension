@@ -23,27 +23,28 @@ import org.exoplatform.wcm.webui.clv.UICLVPortlet;
 import org.exoplatform.wcm.webui.clv.CategoryBean;
 import org.exoplatform.wcm.webui.Utils;
 import org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator;
-
-
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
+import org.exoplatform.com.blog.service.IBlogService;
 uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
-
+def count = 0;
+def blogService = WCMCoreUtils.getService(IBlogService.class)
 %>
 
 <style>
 
     .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
-    background-color: #0088CC;
+        background-color: #0088CC;
     }
 
 
     .dropdown-menu a{
-    color: #555555 !important;
+        color: #555555 !important;
     }
 
 
     #main article {
-    border-bottom: none;
+        border-bottom: none;
     }
 
     .commmentLeft {
@@ -65,150 +66,215 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
         color: #999;
     }
 
+
+    /*----- Accordion -----*/
+    .accordion {
+        overflow:hidden;
+    }
+
+    /*----- Section Titles -----*/
+    .accordion-section-title {
+        width:100%;
+        padding:15px;
+        display:inline-block;
+        border-bottom:1px solid #1a1a1a;
+        transition:all linear 0.15s;
+        /* Type */
+        font-size:1.200em;
+        text-shadow:0px 1px 0px #1a1a1a;
+        color:#fff;
+    }
+
+    .accordion-section-title.active, .accordion-section-title:hover {
+        text-decoration:none;
+    }
+
+    .accordion-section:last-child .accordion-section-title {
+        border-bottom:none;
+    }
+
+    /*----- Section Content -----*/
+    .accordion-section-content {
+        padding:15px;
+        display:none;
+    }
+
 </style>
 
-
-
 <div class="container-fluid" style="padding: 20px">
-    <div id="content" class="clearfix row-fluid">
-        <div id="main" class="span9 clearfix" role="main">
-            <div class="" id="$uicomponent.id">
-                <%
-                // if (no entries)
-                if (uicomponent.getUIPageIterator().getAvailable() == 0) {
-                %>
+<div id="content" class="clearfix row-fluid">
+<div id="main" class="span9 clearfix" role="main">
+    <div class="" id="$uicomponent.id">
+        <%
+        // if (no entries)
+        if (uicomponent.getUIPageIterator().getAvailable() == 0) {
+        %>
 
-                <div class="alert alert-info">
-                    <%=_ctx.appRes(uicomponent.getParent().getMessageKey()) %>
+        <div class="alert alert-info">
+            <%=_ctx.appRes(uicomponent.getParent().getMessageKey()) %>
+        </div>
+
+        <%
+        } // end if (no entries)
+        // else (has entries)
+        else {
+
+        def i = 0;
+        def entries = uicomponent.getCurrentPageData()
+
+        // loop on entries
+        for (entry in entries) {
+
+        // if blog entry
+        if (isValidBlogEntry(entry)) {
+        count ++ ;
+        String uuid = entry.getProperty("jcr:frozenUuid").getString()
+        def originalNode = entry.getSession().getNodeByUUID(uuid)
+        def link = uicomponent.getURL(entry)
+        def title = uicomponent.getTitle(entry)
+        def username = uicomponent.getAuthor(entry)
+        def author = fullName(username)
+        def poster = username
+        def avatar = avatarUrl(username)
+        def date = uicomponent.getCreatedDate(entry)
+        %>
+
+        <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" style="padding: 7px;">
+            <header>
+                <div class="page-header">
+                    <h3><a href="$link" rel="bookmark" title="$title">$title</a></h3>
                 </div>
-
-                <%
-                } // end if (no entries)
-                // else (has entries)
-                else {
-                def count = 0;
-                def i = 0;
-                def entries = uicomponent.getCurrentPageData()
-
-                // loop on entries
-                for (entry in entries) {
-
-                // if blog entry
-                if (isValidBlogEntry(entry)) {
-
-                String uuid = entry.getProperty("jcr:frozenUuid").getString()
-                def originalNode = entry.getSession().getNodeByUUID(uuid)
-                def link = uicomponent.getURL(entry)
-                def title = uicomponent.getTitle(entry)
-                def username = uicomponent.getAuthor(entry)
-                def author = fullName(username)
-                def poster = username
-                def avatar = avatarUrl(username)
-                def date = uicomponent.getCreatedDate(entry)
-                %>
-
-                <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" style="padding: 7px;">
-                    <header>
-                        <div class="page-header">
-                            <h3><a href="$link" rel="bookmark" title="$title">$title</a></h3>
-                        </div>
-                        <p class="meta">
-                        <div class="commentLeft" style="float:left">
-                            <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
-                                <img alt="$author" src="$avatar">
-                            </a>
-                        </div>
-                        <div class="commentRight">
-                            <div class="author">
-                                <a href="/portal/intranet/profile/$poster">$author</a>
-                                <span class="dateTime" datetime="$date">$date</span>
-                            </div>
-                        </div>
-                        </p>
-                    </header> <!-- end article header -->
-
-                    <section class="post_content clearfix" style="padding-top: 7px;">
-                        <% renderPost(entry) %>
-                    </section> <!-- end article section -->
-
-                    <footer>
-                        <p class="tags"><%tags(originalNode)%></p>
-                    </footer> <!-- end article footer -->
-
-                </article> <!-- end article -->
-
-
-                <%      //commentPreview(originalNode, link) %>
-                <%
-                } // if blog entry
-
-                } // end loop on entries
-                } // end else has entries
-                %>
-
-
-                <!-- Paginator-->
-                <div class="CaptionFunc ClearFix">
-                    <%
-                    if (uicomponent.showPaginator()) {
-
-                    uicomponent.renderChild(UICustomizeablePaginator.class)
-
-                    }
-                    %>
+                <p class="meta">
+                <div class="commentLeft" style="float:left">
+                    <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
+                        <img alt="$author" src="$avatar">
+                    </a>
                 </div>
-
-            </div>
-        </div>  <!-- end #main -->
-
-
-        <div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
-            <!-- categories -->
-            <div id="categories" class="uiBox widget_categories">
-                <h5 class="title">Categories</h5>
-                <div style="padding: 7px">
-                    <ul>
-                        <%categories()%>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Tag Cloud -->
-            <div id="tagcloud" class="uiBox widget_tag_cloud">
-                <h5 class="title">Tags</h5>
-                <div style="padding: 7px">
-                    <div id="tag-cloud" >
-                        <% tags()%>
+                <div class="commentRight">
+                    <div class="author">
+                        <a href="/portal/intranet/profile/$poster">$author</a>
+                        <span class="dateTime" datetime="$date">$date</span>
                     </div>
                 </div>
+                </p>
+            </header> <!-- end article header -->
+
+            <section class="post_content clearfix" style="padding-top: 7px;">
+                <% renderPost(entry) %>
+            </section> <!-- end article section -->
+
+            <footer>
+                <p class="tags"><%tags(originalNode)%></p>
+            </footer> <!-- end article footer -->
+
+        </article> <!-- end article -->
+
+
+        <%      //commentPreview(originalNode, link) %>
+        <%
+        } // if blog entry
+
+        } // end loop on entries
+        } // end else has entries
+        %>
+
+
+        <!-- Paginator-->
+        <div class="CaptionFunc ClearFix">
+            <%
+            if (uicomponent.showPaginator()) {
+
+            uicomponent.renderChild(UICustomizeablePaginator.class)
+
+            }
+            %>
+        </div>
+
+    </div>
+</div>  <!-- end #main -->
+
+
+<div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
+<!-- categories -->
+<div id="categories" class="uiBox widget_categories">
+    <h5 class="title">Categories</h5>
+    <div style="padding: 7px">
+        <ul>
+            <%categories()%>
+        </ul>
+    </div>
+</div>
+
+<!-- Tag Cloud -->
+<div id="tagcloud" class="uiBox widget_tag_cloud">
+    <h5 class="title">Tags</h5>
+    <div style="padding: 7px">
+        <div id="tag-cloud" >
+            <% tags()%>
+        </div>
+    </div>
+</div>
+
+<!-- Bloggers -->
+<div id="bloggers" class="uiBox widget_categories">
+    <h5 class="title">Recent Bloggers</h5>
+    <div style="padding: 7px">
+        <ul>
+            <%bloggers()%>
+        </ul>
+    </div>
+</div>
+
+<!-- Meta -->
+<div id="meta" class="uiBox widget_categories">
+    <h5 class="title">Meta</h5>
+    <div style="padding: 7px">
+        <ul>
+            <li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Quick Post</a></li>
+            <li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Admin</a></li>
+            <li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Entries RSS</a></li>
+        </ul>
+    </div>
+</div>
+<!--Archives-->
+<div id="archives" class="uiBox widget_categories">
+    <h5 class="title">Archives</h5>
+    <div class="accordion">
+        <div class="accordion-section">
+            <a class="accordion-section-title active" href="#accordion-1">2014 (100)</a>
+            <div id="accordion-1" class="accordion-section-content open" style="display: block;">
+                <div>January (12).</div>
+							$count
+							<%
+
+                List<Node> lst = blogService.getNodeTotalByYear("exo:webContent", "exo:dateCreated", 2014);
+								%>
+                <%=uicomponent.getUIPageIterator().getAvailable()%>
+                <div>January (12).</div>
+                <div>January (12).</div>
+                <div>January (12).</div>
+                <div>January (12).</div>
+                <div>January (12).</div>
+                <div>January (12).</div>
+                <div>January (12).</div>
             </div>
+        </div>
 
-            <!-- Bloggers -->
-            <div id="bloggers" class="uiBox widget_categories">
-                <h5 class="title">Recent Bloggers</h5>
-                <div style="padding: 7px">
-                    <ul>
-                        <%bloggers()%>
-                    </ul>
-                </div>
+        <div class="accordion-section">
+            <a class="accordion-section-title" href="#accordion-2">Accordion Section #2</a>
+            <div id="accordion-2" class="accordion-section-content" style="display: none;">
+                <p>p2</p>
             </div>
+        </div>
 
-            <!-- Meta -->
-            <div id="meta" class="uiBox widget_categories">
-                <h5 class="title">Meta</h5>
-                <div style="padding: 7px">
-                    <ul>
-                        <li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Quick Post</a></li>
-                        <li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Admin</a></li>
-                        <li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Entries RSS</a></li>
-                    </ul>
-                </div>
+        <div class="accordion-section">
+            <a class="accordion-section-title" href="#accordion-3">Accordion Section #3</a>
+            <div id="accordion-3" class="accordion-section-content" style="display: none;">
+                <p>p3</p>
             </div>
-
-        </div> <!-- end #sidebar1 -->
-
-    </div> <!-- end #content -->
-</div> <!-- end #container -->
+        </div>
+    </div> <!--end div accordion-->
+</div>
 
 <%
 
@@ -295,7 +361,7 @@ html = html.substring(idx + marker.length(), html.length())
 }
 if (excerpt) {
 %>
-$excerpt&nbsp;<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
+	$excerpt&nbsp;<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
     <i class="icon-hand-right"></i>
     Read full article</a>
 
@@ -411,33 +477,33 @@ List<Node> publicTags() {
             /* TODO : we should reuse activity stream comments style instead of redeclaring*/
 
             .commentList {
-            padding: 15px 15px 0 15px;
+                padding: 15px 15px 0 15px;
             }
             .commentList .commentItem {
-            position: relative;
+                position: relative;
             }
             .commentList .commentItem .commmentLeft {
-            float: left;
+                float: left;
             }
             .commentList .commentItem .commmentLeft+.commentRight {
-            margin-left: 45px;
+                margin-left: 45px;
             }
             .author a {
-            font-family: "Helvetica Neue Bold",Helvetica,Lucida,Arial,sans-serif;
-            font-weight: bold;
-            word-wrap: break-word;
-            color: #2f5e92;
-            text-decoration: none;
+                font-family: "Helvetica Neue Bold",Helvetica,Lucida,Arial,sans-serif;
+                font-weight: bold;
+                word-wrap: break-word;
+                color: #2f5e92;
+                text-decoration: none;
             }
             .author a+span {
-            margin-left: 10px;
-            color: #999;
+                margin-left: 10px;
+                color: #999;
             }
             .contentComment {
-            word-wrap: break-word;
+                word-wrap: break-word;
             }
             .commentList .commentItem .ContentBlock {
-            word-wrap: break-word;
+                word-wrap: break-word;
             }
         </style>
         <div class="uiBox">
@@ -492,3 +558,29 @@ List<Node> publicTags() {
             } // end comment list
 
             %>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
+            <script>
+                if (window.jQuery) {
+                    var jq = jQuery.noConflict();
+
+                    jq(document).ready(function () {
+                        function close_accordion_section() {
+                            jq('.accordion .accordion-section-title').removeClass('active');
+                            jq('.accordion .accordion-section-content').slideUp(300).removeClass('open');
+                        }
+
+                        jq('.accordion-section-title').click(function (e) {
+                            var currentAttrValue = jq(this).attr('href');
+                            if (jq(e.target).is('.active')) {
+                                close_accordion_section();
+                            } else {
+                                close_accordion_section();
+                                jq(this).addClass('active');
+                                jq('.accordion ' + currentAttrValue).slideDown(300).addClass('open');
+                            }
+                            e.preventDefault();
+                        });
+                    });
+
+                }
+            </script>

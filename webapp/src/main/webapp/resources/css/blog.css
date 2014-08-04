@@ -1,0 +1,7 @@
+#blog{
+    color: #0000ff;
+}
+#blog-icon{
+    background: url(../img/blog_icon_web.png) no-repeat;
+    background-size: 16px 16px;
+}
