@@ -25,6 +25,11 @@ import org.exoplatform.wcm.webui.Utils;
 import org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.com.blog.service.IBlogService;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import org.exoplatform.com.blog.service.util.BlogArchiveUtil;
+
+
 uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
 def count = 0;
@@ -240,26 +245,26 @@ def blogService = WCMCoreUtils.getService(IBlogService.class)
 <div id="archives" class="uiBox widget_categories">
     <h5 class="title">Archives</h5>
     <div class="accordion">
+        <%
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        def blogUtil = blogService.getBlogArchive();
+        def _20148 = blogUtil.getCount("2014", "8");
+        def totalcmt = uicomponent.getUIPageIterator().getAvailable();
+        while(1){
+        %>
         <div class="accordion-section">
-            <a class="accordion-section-title active" href="#accordion-1">2014 (100)</a>
+            <a class="accordion-section-title" href="#accordion-1">$year,(100)</a>
             <div id="accordion-1" class="accordion-section-content open" style="display: block;">
-                <div>January (12).</div>
-							$count
-							<%
-
-                List<Node> lst = blogService.getNodeTotalByYear("exo:webContent", "exo:dateCreated", 2014);
-								%>
-                <%=uicomponent.getUIPageIterator().getAvailable()%>
-                <div>January (12).</div>
-                <div>January (12).</div>
-                <div>January (12).</div>
-                <div>January (12).</div>
-                <div>January (12).</div>
-                <div>January (12).</div>
-                <div>January (12).</div>
+                <div>$blogUtil</div>
+								$_20148
+                totalcmt $totalcmt v
             </div>
         </div>
-
+        <%
+				year--;
+				if(year==2010){break;}
+				}
+				%>
         <div class="accordion-section">
             <a class="accordion-section-title" href="#accordion-2">Accordion Section #2</a>
             <div id="accordion-2" class="accordion-section-content" style="display: none;">
@@ -361,7 +366,7 @@ html = html.substring(idx + marker.length(), html.length())
 }
 if (excerpt) {
 %>
-	$excerpt&nbsp;<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
+	$excerpt &nbsp;<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
     <i class="icon-hand-right"></i>
     Read full article</a>
 

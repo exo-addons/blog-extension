@@ -1,6 +1,5 @@
 package org.exoplatform.com.blog.service.impl;
 
-import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
@@ -96,8 +95,8 @@ public class BaseService {
     Session session = getSession();
     List<Node> result = new ArrayList<Node>();
     StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeType);
-    queryBuilder.append(" WHERE ").append(node_date).append(" >= TIMESTAMP '").append(Util.getFirstDayOfYear(year)).append("' AND");
-    queryBuilder.append(node_date).append(" <= TIMESTAMP '").append(Util.getStrLastDayOfYear(year)).append("'");
+   // queryBuilder.append(" WHERE ").append(node_date).append(" >= TIMESTAMP '").append(Util.getFirstDayOfYear(year)).append("' AND ");
+   // queryBuilder.append(node_date).append(" <= TIMESTAMP '").append(Util.getStrLastDayOfYear(year)).append("'");
 
     QueryManager queryManager = session.getWorkspace().getQueryManager();
     Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
@@ -107,5 +106,35 @@ public class BaseService {
       result.add(nodes.nextNode());
     }
     return result;
+  }
+
+  protected List<Node> getListYear(String nodeType) throws Exception{
+    Session session = getSession();
+    List<Node> result = new ArrayList<Node>();
+    StringBuilder queryBuilder = new StringBuilder("SELECT DISTINCT exo:dateCreated FROM ").append(nodeType);
+
+    QueryManager queryManager = session.getWorkspace().getQueryManager();
+    Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+
+    NodeIterator nodes = query.execute().getNodes();
+    while (nodes.hasNext()) {
+      result.add(nodes.nextNode());
+    }
+    return result;
+  }
+
+  protected List<Node> getAllNode(String nodeElement) throws Exception{
+    Session session = getSession();
+    List<Node> rs = new ArrayList<Node>();
+    StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);
+    queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
+    QueryManager queryManager = session.getWorkspace().getQueryManager();
+    Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+
+    NodeIterator nodes = query.execute().getNodes();
+    while (nodes.hasNext()) {
+      rs.add(nodes.nextNode());
+    }
+    return rs;
   }
 }
