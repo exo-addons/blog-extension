@@ -248,15 +248,17 @@ def blogService = WCMCoreUtils.getService(IBlogService.class)
         <%
         int year = Calendar.getInstance().get(Calendar.YEAR);
         def blogUtil = blogService.getBlogArchive();
-        def _20148 = blogUtil.getCount("2014", "8");
+
         def totalcmt = uicomponent.getUIPageIterator().getAvailable();
         while(1){
         %>
         <div class="accordion-section">
             <a class="accordion-section-title" href="#accordion-1">$year,(100)</a>
             <div id="accordion-1" class="accordion-section-content open" style="display: block;">
-                <div>$blogUtil</div>
-								$_20148
+                <div>
+                <%=blogService.getBlogArchive().getKey(year)%>
+                </div>
+
                 totalcmt $totalcmt v
             </div>
         </div>
