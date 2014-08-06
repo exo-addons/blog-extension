@@ -10,4 +10,41 @@
     <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
   </component>
 
+
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.jcr.impl.ext.action.SessionActionCatalog</target-component>
+    <component-plugin>
+      <name>addActions</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.jcr.impl.ext.action.AddActionsPlugin</type>
+      <description>add actions plugin</description>
+      <init-params>
+        <object-param>
+          <name>actions</name>
+          <object type="org.exoplatform.services.jcr.impl.ext.action.AddActionsPlugin$ActionsConfig">
+            <field  name="actions">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <object type="org.exoplatform.services.jcr.impl.ext.action.ActionConfiguration">
+                    <field  name="eventTypes"><string>addNode</string></field>
+                    <field  name="nodeTypes"><string>exo:blog</string></field>
+                    <field  name="actionClassName"><string>org.exoplatform.com.blog.service.action.AddBlogAction</string></field>
+                  </object>
+                </value>
+                <value>
+                  <object type="org.exoplatform.services.jcr.impl.ext.action.ActionConfiguration">
+                    <field  name="eventTypes"><string>removeNode</string></field>
+                    <field  name="nodeTypes"><string>exo:taxonomyLink</string></field>
+                    <field  name="isDeep"><boolean>false</boolean></field>
+                    <field  name="actionClassName"><string>org.exoplatform.com.blog.service.action.RemoveBlogAction</string></field>
+                  </object>
+                </value>
+              </collection>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
 </configuration>

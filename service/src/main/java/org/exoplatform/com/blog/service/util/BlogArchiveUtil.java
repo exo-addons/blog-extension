@@ -13,6 +13,7 @@ public class BlogArchiveUtil<E, K> extends HashMap {
   private Map<K, BlogArchive> blogArchive = new HashMap<K, BlogArchive>();
   private Map<Object, Integer> month = new HashMap<Object, Integer>();
 
+
   public void add(K year, E month) {
     BlogArchive blogArchive;
     if (!this.blogArchive.containsKey(year)) { // year doesnt exits
@@ -51,6 +52,8 @@ public class BlogArchiveUtil<E, K> extends HashMap {
   }
 
   public Map<K, BlogArchive> getBlogArchive() {
-    return blogArchive;
+    return this.blogArchive;
   }
+
+
 }

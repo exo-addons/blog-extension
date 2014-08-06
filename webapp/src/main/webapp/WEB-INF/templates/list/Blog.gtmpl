@@ -1,10 +1,9 @@
 <%
-
-
 import java.util.HashSet;
 import java.util.List;
 import java.text.SimpleDateFormat;
-
+import java.util.HashMap;
+import java.util.Map;
 import javax.jcr.Node;
 
 import org.exoplatform.portal.webui.util.Util;
@@ -28,7 +27,7 @@ import org.exoplatform.com.blog.service.IBlogService;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import org.exoplatform.com.blog.service.util.BlogArchiveUtil;
-
+import org.exoplatform.com.blog.service.entity.BlogArchive;
 
 uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
@@ -246,40 +245,27 @@ def blogService = WCMCoreUtils.getService(IBlogService.class)
     <h5 class="title">Archives</h5>
     <div class="accordion">
         <%
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        def blogUtil = blogService.getBlogArchive();
-
-        def totalcmt = uicomponent.getUIPageIterator().getAvailable();
-        while(1){
+				def currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        def archiveYears = blogService.getArchiveYears();
+				for(year in archiveYears){
+					def yearPostCount = blogService.getArchivesCountInYear(year);
+					def archiveMonthByYear = blogService.getArchiveMonths(year);
+					def active="";
+					if(currentYear==year){active="open";}
         %>
         <div class="accordion-section">
-            <a class="accordion-section-title" href="#accordion-1">$year,(100)</a>
-            <div id="accordion-1" class="accordion-section-content open" style="display: block;">
-                <div>
-                <%=blogService.getBlogArchive().getKey(year)%>
-                </div>
-
-                totalcmt $totalcmt v
+            <a class="accordion-section-title" href="#accordion-$year">$year($yearPostCount)</a>
+            <div id="accordion-$year" class="accordion-section-content $active" style="display: block;">
+                <%
+									for(month in archiveMonthByYear){
+									def monthPostCount = blogService.getArchivesCountInMonth(year, month);
+									def monthTitle = org.exoplatform.com.blog.service.util.Util.numberToWord(month);
+								%>
+									<div class="archive-month-title" >$monthTitle ($monthPostCount)</div>
+								<%}%>
             </div>
         </div>
-        <%
-				year--;
-				if(year==2010){break;}
-				}
-				%>
-        <div class="accordion-section">
-            <a class="accordion-section-title" href="#accordion-2">Accordion Section #2</a>
-            <div id="accordion-2" class="accordion-section-content" style="display: none;">
-                <p>p2</p>
-            </div>
-        </div>
-
-        <div class="accordion-section">
-            <a class="accordion-section-title" href="#accordion-3">Accordion Section #3</a>
-            <div id="accordion-3" class="accordion-section-content" style="display: none;">
-                <p>p3</p>
-            </div>
-        </div>
+				<%}%>
     </div> <!--end div accordion-->
 </div>
 

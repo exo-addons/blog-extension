@@ -33,9 +33,56 @@ public class Util {
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
 
-//  public static void main(String[] args) {
-//    int year = 2014;
-//    System.out.println(getFirstDayOfYear(year));
+  public static String getStrFirstDayOfMonth(int year, int month){
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.YEAR, year);
+    cal.set(Calendar.MONTH, month);
+    cal.set(Calendar.WEEK_OF_YEAR, 1);
+    cal.set(Calendar.DAY_OF_WEEK, 1);
+    return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
+  }
+  public static String getStrLastDayOfMonth(int year, int month){
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.YEAR, year);
+    cal.set(Calendar.MONTH, month+1);
+    cal.set(Calendar.WEEK_OF_YEAR, 1);
+    cal.set(Calendar.DAY_OF_WEEK, 1);
+    return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
+  }
+
+  public static String numberToWord(int number) {
+    switch (number) {
+      case 0:
+        return "January";
+      case 1:
+        return "February";
+      case 2:
+        return "Match";
+      case 3:
+        return "April";
+      case 4:
+        return "May";
+      case 5:
+        return "Jun";
+      case 6:
+        return "July";
+      case 7:
+        return "August";
+      case 8:
+        return "September";
+      case 9:
+        return "October";
+      case 10:
+        return "November";
+      case 11:
+        return "December";
+    }
+    return "";
+  }
+
+  public static void main(String[] args) {
+    int year = 1;
+    System.out.println(numberToWord(year));
 //    System.out.println(getStrLastDayOfYear(year));
-//  }
+  }
 }
