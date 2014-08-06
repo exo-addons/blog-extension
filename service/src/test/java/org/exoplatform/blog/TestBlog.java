@@ -27,6 +27,17 @@ import org.exoplatform.services.security.IdentityConstants;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
+import javax.jcr.Node;
+import javax.jcr.Session;
+
+import junit.framework.TestCase;
+
+import org.exoplatform.container.StandaloneContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityConstants;
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
@@ -73,7 +84,6 @@ public class TestBlog extends TestCase {
       String loginConf = Thread.currentThread().getContextClassLoader().getResource("conf/standalone/login.conf").toString();
       System.setProperty("java.security.auth.login.config", loginConf);
       container = StandaloneContainer.getInstance();
-
       binder = (ResourceBinder) container.getComponentInstanceOfType(ResourceBinder.class);
     } catch (Exception e) {
       throw new RuntimeException("Failed to initialize standalone container: " + e.getMessage(), e);

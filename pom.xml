@@ -28,5 +28,18 @@
     <!-- Jenkins Settings -->
     <!-- **************************************** -->
     <jenkins.job.name>blog-extension-master-ci</jenkins.job.name>
+    <commons-lang3.version>3.1</commons-lang3.version>
+    <exoplatform.version>4.0.0</exoplatform.version>    
   </properties>
+  <dependencyManagement>
+    <dependencies>   
+      <dependency>
+        <groupId>org.exoplatform.platform</groupId>
+        <artifactId>platform</artifactId>
+        <version>${exoplatform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>      
 </project>
