@@ -33,6 +33,11 @@ def avatar = avatarUrl(poster)
 def formatter =  new SimpleDateFormat("MMM d, yyyy")
 def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 
+def rcontext = _ctx.getRequestContext() ;
+def jsManager = rcontext.getJavascriptManager();
+jsManager.require("SHARED/blogjs", "blogjs").
+addScripts("blogjs.test();");
+
 %>
 
 <style>
@@ -264,8 +269,10 @@ def avt = avatarUrl(viewer)
     }
 
 </style>
-<script type="text/javascript">
+<!--script type="text/javascript">
     //<![CDATA[
+
+    var jQuery=eXo.require("gj");
 
     var jq = jQuery.noConflict();
 
@@ -292,7 +299,7 @@ def avt = avatarUrl(viewer)
 
     }); // end jq
     //]]>
-</script>
+</script-->
 
 <div class="commentList inputContainer inputContainerShow" style="display: block;">
 

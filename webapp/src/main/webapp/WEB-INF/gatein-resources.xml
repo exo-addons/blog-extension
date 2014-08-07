@@ -11,24 +11,6 @@
     <overwrite>false</overwrite>
   </portal-skin>
 
-  <portlet>
-    <name>FastContentCreatorBasicPortletStandard</name>
-    <module>
-      <depends>
-        <module>blogjs</module>
-      </depends>
-    </module>
-  </portlet>
-
-  <portlet>
-    <name>SingleContentViewer</name>
-    <module>
-      <depends>
-        <module>blogjs</module>
-      </depends>
-    </module>
-  </portlet>
-
   <module>
     <name>blogjs</name>
     <script>
