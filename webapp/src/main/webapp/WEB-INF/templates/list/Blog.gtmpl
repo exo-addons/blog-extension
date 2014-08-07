@@ -33,77 +33,13 @@ uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
 def count = 0;
 def blogService = WCMCoreUtils.getService(IBlogService.class)
+
+//regis javascript
+def rcontext = _ctx.getRequestContext() ;
+def jsManager = rcontext.getJavascriptManager();
+//jsManager.require("SHARED/blogjs", "blogjs");
+
 %>
-
-<style>
-
-    .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
-        background-color: #0088CC;
-    }
-
-
-    .dropdown-menu a{
-        color: #555555 !important;
-    }
-
-
-    #main article {
-        border-bottom: none;
-    }
-
-    .commmentLeft {
-        float: left;
-    }
-    .commentRight {
-        margin-left: 45px;
-        padding-top: 7px;
-    }
-    .author a {
-        font-family: "Helvetica Neue Bold",Helvetica,Lucida,Arial,sans-serif;
-        font-weight: bold;
-        word-wrap: break-word;
-        color: #2f5e92;
-        text-decoration: none;
-    }
-    .author a+span {
-        margin-left: 10px;
-        color: #999;
-    }
-
-
-    /*----- Accordion -----*/
-    .accordion {
-        overflow:hidden;
-    }
-
-    /*----- Section Titles -----*/
-    .accordion-section-title {
-        width:100%;
-        padding:15px;
-        display:inline-block;
-        border-bottom:1px solid #1a1a1a;
-        transition:all linear 0.15s;
-        /* Type */
-        font-size:1.200em;
-        text-shadow:0px 1px 0px #1a1a1a;
-        color:#fff;
-    }
-
-    .accordion-section-title.active, .accordion-section-title:hover {
-        text-decoration:none;
-    }
-
-    .accordion-section:last-child .accordion-section-title {
-        border-bottom:none;
-    }
-
-    /*----- Section Content -----*/
-    .accordion-section-content {
-        padding:15px;
-        display:none;
-    }
-
-</style>
 
 <div class="container-fluid" style="padding: 20px">
 <div id="content" class="clearfix row-fluid">
@@ -242,31 +178,35 @@ def blogService = WCMCoreUtils.getService(IBlogService.class)
 </div>
 <!--Archives-->
 <div id="archives" class="uiBox widget_categories">
-    <h5 class="title">Archives</h5>
-    <div class="accordion">
-        <%
-				def currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        def archiveYears = blogService.getArchiveYears();
-				for(year in archiveYears){
-					def yearPostCount = blogService.getArchivesCountInYear(year);
-					def archiveMonthByYear = blogService.getArchiveMonths(year);
-					def active="";
-					if(currentYear==year){active="open";}
-        %>
-        <div class="accordion-section">
-            <a class="accordion-section-title" href="#accordion-$year">$year($yearPostCount)</a>
-            <div id="accordion-$year" class="accordion-section-content $active" style="display: block;">
-                <%
-									for(month in archiveMonthByYear){
-									def monthPostCount = blogService.getArchivesCountInMonth(year, month);
-									def monthTitle = org.exoplatform.com.blog.service.util.Util.numberToWord(month);
-								%>
-									<div class="archive-month-title" >$monthTitle ($monthPostCount)</div>
-								<%}%>
-            </div>
+<h5 class="title">Archives</h5>
+
+<div class="accordion_example1 smk_accordion acc_with_icon">
+    <%
+    def currentYear = Calendar.getInstance().get(Calendar.YEAR);
+    def archiveYears = blogService.getArchiveYears();
+    for(year in archiveYears){
+    def yearPostCount = blogService.getArchivesCountInYear(year);
+    def archiveMonthByYear = blogService.getArchiveMonths(year);
+    def active="";
+    if(currentYear==year){active="acc_active";}
+    %>
+    <div class="accordion_in $active">
+        <div class="acc_head"><div class="acc_icon_expand"></div>$year ($yearPostCount)</div>
+        <div class="acc_content" style="display: block;">
+            <%
+            for(month in archiveMonthByYear){
+            def monthPostCount = blogService.getArchivesCountInMonth(year, month);
+            def monthTitle = org.exoplatform.com.blog.service.util.Util.numberToWord(month);
+            %>
+            <p class="month" onclick="loadBlogs(this, $year, $month);">
+							$monthTitle ($monthPostCount)
+								<div id="month-$year-$month" class="blog-archive-post-link" ></div>
+            </p>
+            <%}%>
+
         </div>
-				<%}%>
-    </div> <!--end div accordion-->
+    </div>
+    <%}%>
 </div>
 
 <%
@@ -420,160 +360,212 @@ if (category.path == path) {
 } // end render categories
 
 List<Node> publicTags() {
-    List<Node> tags = []
-        try {
-        NewFolksonomyService folksonomyService = uicomponent.getApplicationComponent(NewFolksonomyService.class) ;
-        NodeHierarchyCreator nodeHierarchyCreator = uicomponent.getApplicationComponent(NodeHierarchyCreator.class);
-        String publicTagNodePath = nodeHierarchyCreator.getJcrPath("exoPublicTagNode");
-        RepositoryService repositoryService = uicomponent.getApplicationComponent(RepositoryService.class);
-        ManageableRepository manageableRepo = repositoryService.getCurrentRepository();
-        String workspace = manageableRepo.getConfiguration().getDefaultWorkspaceName();
-        tags = folksonomyService.getAllPublicTags(publicTagNodePath, workspace) ;
-        } catch (Exception e) {
-        print e // I know...
-        }
-        return tags;
-        }
+List<Node> tags = []
+try {
+NewFolksonomyService folksonomyService = uicomponent.getApplicationComponent(NewFolksonomyService.class) ;
+NodeHierarchyCreator nodeHierarchyCreator = uicomponent.getApplicationComponent(NodeHierarchyCreator.class);
+String publicTagNodePath = nodeHierarchyCreator.getJcrPath("exoPublicTagNode");
+RepositoryService repositoryService = uicomponent.getApplicationComponent(RepositoryService.class);
+ManageableRepository manageableRepo = repositoryService.getCurrentRepository();
+String workspace = manageableRepo.getConfiguration().getDefaultWorkspaceName();
+tags = folksonomyService.getAllPublicTags(publicTagNodePath, workspace) ;
+} catch (Exception e) {
+print e // I know...
+}
+return tags;
+}
 
-        void tags() {
+void tags() {
 
-        def clvBy = Utils.getPortletPreference(UICLVPortlet.PREFERENCE_SHOW_CLV_BY)
-        String paramPath = Util.getPortalRequestContext().getRequestParameter(clvBy)
-        String currentTag = "";
-        if (paramPath) {
-        currentTag = paramPath.substring(paramPath.lastIndexOf("/")+1)
-        }
+def clvBy = Utils.getPortletPreference(UICLVPortlet.PREFERENCE_SHOW_CLV_BY)
+String paramPath = Util.getPortalRequestContext().getRequestParameter(clvBy)
+String currentTag = "";
+if (paramPath) {
+currentTag = paramPath.substring(paramPath.lastIndexOf("/")+1)
+}
 
-        for(tag in publicTags()) {
-        def name = tag.name
-        def selected = ((name == currentTag)?"label-info":"")
-        def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
-        %>
-        <a href="$url" class="label $selected" title="View all posts in $name" style="font-size: 9.75px;">$name</a>
-        <%
-        }
-        } // end render all tags
+for(tag in publicTags()) {
+def name = tag.name
+def selected = ((name == currentTag)?"label-info":"")
+def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
+%>
+<a href="$url" class="label $selected" title="View all posts in $name" style="font-size: 9.75px;">$name</a>
+<%
+}
+} // end render all tags
 
 
-        /* display comments of this post */
-        void commentPreview(Node post, String link) {
+/* display comments of this post */
+void commentPreview(Node post, String link) {
 
-        try {
-        def formatter =  new SimpleDateFormat("'on' MMM d, yyyy 'at' h:mm a")
-        def viewer = _ctx.getRequestContext().getRemoteUser()
-        def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(post, null)
-        if (comments) {
-        def plural=""
-        if (comments.size > 1) plural = "s"
-        %>
-        <style>
-            /* TODO : we should reuse activity stream comments style instead of redeclaring*/
-
-            .commentList {
-                padding: 15px 15px 0 15px;
-            }
-            .commentList .commentItem {
-                position: relative;
-            }
-            .commentList .commentItem .commmentLeft {
-                float: left;
-            }
-            .commentList .commentItem .commmentLeft+.commentRight {
-                margin-left: 45px;
-            }
-            .author a {
-                font-family: "Helvetica Neue Bold",Helvetica,Lucida,Arial,sans-serif;
-                font-weight: bold;
-                word-wrap: break-word;
-                color: #2f5e92;
-                text-decoration: none;
-            }
-            .author a+span {
-                margin-left: 10px;
-                color: #999;
-            }
-            .contentComment {
-                word-wrap: break-word;
-            }
-            .commentList .commentItem .ContentBlock {
-                word-wrap: break-word;
-            }
-        </style>
-        <div class="uiBox">
-            <h5 class="title"><a href="${link}#commentlist">${comments.size} comment${plural}</a></h5>
-            <div class="commentList">
-                <div>
-                    <%
-                    int i=0;
-                    for (comment in comments) {
-                    try {
-
-                    def rem = ((i++)%2 == 0)?"even":"odd"
-                    if (i>2) break;
-                    def commentor = comment.getProperty("exo:commentor").string
-                    def commentorAvatar = avatarUrl(commentor)
-                    def commentorName = fullName(commentor)
-                    def commentContent = comment.getProperty("exo:commentContent").string
-                    def commentDate = formatter.format(comment.getProperty("exo:commentDate").date.time)
-                    def isOwner = (commentor == viewer)
-                    %>
-                    <div class="commentItem" id="comment-${comment.name}">
-
-                        <div class="commmentLeft">
-                            <a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
-                                <img alt="$commentorName" src="$commentorAvatar">
-                            </a>
-                        </div><!--end commentLeft-->
-                        <div class="commentRight">
-                            <div class="author">
-                                <a href="/portal/intranet/profile/$commentor">$commentorName</a>
-                                <span class="dateTime">$commentDate</span>
-                            </div>
-                            <p class="contentComment"></p><p class="ContentBlock">$commentContent</p><p></p>
-                        </div><!--end commentRight-->
-
-                    </div><!--end commentItem-->
-                    <%
-
-                    } catch (Exception e) {
-                    print e
-                    continue; // Skip broken comments
-                    }
-                    } // end loop on comments
-                    %>
-                </div>
-            </div> <!--end commentlist-->
+try {
+def formatter =  new SimpleDateFormat("'on' MMM d, yyyy 'at' h:mm a")
+def viewer = _ctx.getRequestContext().getRemoteUser()
+def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(post, null)
+if (comments) {
+def plural=""
+if (comments.size > 1) plural = "s"
+%>
+<div class="uiBox">
+    <h5 class="title"><a href="${link}#commentlist">${comments.size} comment${plural}</a></h5>
+    <div class="commentList">
+        <div>
             <%
-            } // end if comments
-            } catch (Exception e) {
-            print e // don't say anything
-            }
-            } // end comment list
+            int i=0;
+            for (comment in comments) {
+            try {
 
+            def rem = ((i++)%2 == 0)?"even":"odd"
+            if (i>2) break;
+            def commentor = comment.getProperty("exo:commentor").string
+            def commentorAvatar = avatarUrl(commentor)
+            def commentorName = fullName(commentor)
+            def commentContent = comment.getProperty("exo:commentContent").string
+            def commentDate = formatter.format(comment.getProperty("exo:commentDate").date.time)
+            def isOwner = (commentor == viewer)
             %>
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
-            <script>
-                if (window.jQuery) {
-                    var jq = jQuery.noConflict();
+            <div class="commentItem" id="comment-${comment.name}">
 
-                    jq(document).ready(function () {
-                        function close_accordion_section() {
-                            jq('.accordion .accordion-section-title').removeClass('active');
-                            jq('.accordion .accordion-section-content').slideUp(300).removeClass('open');
-                        }
+                <div class="commmentLeft">
+                    <a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
+                        <img alt="$commentorName" src="$commentorAvatar">
+                    </a>
+                </div><!--end commentLeft-->
+                <div class="commentRight">
+                    <div class="author">
+                        <a href="/portal/intranet/profile/$commentor">$commentorName</a>
+                        <span class="dateTime">$commentDate</span>
+                    </div>
+                    <p class="contentComment"></p><p class="ContentBlock">$commentContent</p><p></p>
+                </div><!--end commentRight-->
 
-                        jq('.accordion-section-title').click(function (e) {
-                            var currentAttrValue = jq(this).attr('href');
-                            if (jq(e.target).is('.active')) {
-                                close_accordion_section();
-                            } else {
-                                close_accordion_section();
-                                jq(this).addClass('active');
-                                jq('.accordion ' + currentAttrValue).slideDown(300).addClass('open');
-                            }
-                            e.preventDefault();
+            </div><!--end commentItem-->
+            <%
+
+            } catch (Exception e) {
+            print e
+            continue; // Skip broken comments
+            }
+            } // end loop on comments
+            %>
+        </div>
+    </div> <!--end commentlist-->
+    <%
+    } // end if comments
+    } catch (Exception e) {
+    print e // don't say anything
+    }
+    } // end comment list
+
+    %>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script>
+        if (window.jQuery) {
+            var jq = jQuery.noConflict();
+            (function ( jq ) {
+                jq.fn.smk_Accordion = function( options ) {
+                    if (this.length > 1){
+                        this.each(function() {
+                            jq(this).smk_Accordion(options);
                         });
-                    });
+                        return this;
+                    }
+                    var settings = jq.extend({
+                        animation:  true,
+                        showIcon:   true,
+                        closeAble:  false,
+                        closeOther: true,
+                        slideSpeed: 150,
+                        activeIndex: false
+                    }, options );
+                    var plugin = this;
+                    var init = function() {
+                        plugin.createStructure();
+                        plugin.clickHead();
+                    }
+                    this.createStructure = function() {
+                        plugin.addClass('smk_accordion');
+                        if( settings.showIcon ){
+                            plugin.addClass('acc_with_icon');
+                        }
+                        if( plugin.find('.accordion_in').length < 1 ){
+                            plugin.children().addClass('accordion_in');
+                        }
+                        plugin.find('.accordion_in').each(function(index, elem){
+                            var childs = jq(elem).children();
+                            jq(childs[0]).addClass('acc_head');
+                            jq(childs[1]).addClass('acc_content');
+                        });
+                        //Append icon
+                        if( settings.showIcon ){
+                            plugin.find('.acc_head').prepend('<div class="acc_icon_expand"></div>');
+                        }
+                        //Hide inactive
+                        plugin.find('.accordion_in .acc_content').not('.acc_active .acc_content').hide();
+                        //Active index
+                        if( settings.activeIndex === parseInt(settings.activeIndex) ){
+                            if(settings.activeIndex === 0){
+                                plugin.find('.accordion_in').addClass('acc_active').show();
+                                plugin.find('.accordion_in .acc_content').addClass('acc_active').show();
+                            }
+                            else{
+                                plugin.find('.accordion_in').eq(settings.activeIndex - 1).addClass('acc_active').show();
+                                plugin.find('.accordion_in .acc_content').eq(settings.activeIndex - 1).addClass('acc_active').show();
+                            }
+                        }
+                    }
+                    // Action when the user click accordion head
+                    this.clickHead = function() {
+                        plugin.on('click', '.acc_head', function(){
+                            var s_parent = jq(this).parent();
+                            if( s_parent.hasClass('acc_active') == false ){
+                                if( settings.closeOther ){
+                                    plugin.find('.acc_content').slideUp(settings.slideSpeed);
+                                    plugin.find('.accordion_in').removeClass('acc_active');
+                                }
+                            }
+                            if( s_parent.hasClass('acc_active') ){
+                                if( false !== settings.closeAble ){
+                                    s_parent.children('.acc_content').slideUp(settings.slideSpeed);
+                                    s_parent.removeClass('acc_active');
+                                }
+                            }
+                            else{
+                                jq(this).next('.acc_content').slideDown(settings.slideSpeed);
+                                s_parent.addClass('acc_active');
+                            }
+                        });
+                    }
+                    init();
+                    return this;
+                };
+            }( jq ));
 
-                }
-            </script>
+            function loadBlogs(el, year, month) {
+                jq.ajax({
+                    url: "/portal/rest/blog-extension/service/get-blogs?year=" + year + "&month=" + month,
+                    dataType: "text",
+                    type: "POST"
+                })
+                        .success(function (data) {
+                            var _blogs = jq.parseJSON(data);
+														console.log(data);
+                            var html = "";
+                            jq.each(_blogs, function (key, val) {
+                                console.log(val.postTitle);
+                                html += "<div> <a href='' >" + val.postTitle + "</a></div>";
+                            });
+                            jq(".blog-archive-post-link").html('');
+                            jq("#month-" + year + "-" + month).html(html);
+                        })
+
+            }
+        }
+        jQuery(document).ready(function(jq){
+            jq(".accordion_example1").smk_Accordion();
+        });
+    </script>
+<script>
+
+</script>
