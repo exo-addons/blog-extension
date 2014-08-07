@@ -37,16 +37,14 @@ public class Util {
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month);
-    cal.set(Calendar.WEEK_OF_YEAR, 1);
-    cal.set(Calendar.DAY_OF_WEEK, 1);
+    cal.set(Calendar.DAY_OF_MONTH, 1);
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
   public static String getStrLastDayOfMonth(int year, int month){
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month+1);
-    cal.set(Calendar.WEEK_OF_YEAR, 1);
-    cal.set(Calendar.DAY_OF_WEEK, 1);
+    cal.set(Calendar.DAY_OF_MONTH, 1);
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
 
@@ -57,7 +55,7 @@ public class Util {
       case 1:
         return "February";
       case 2:
-        return "Match";
+        return "March";
       case 3:
         return "April";
       case 4:
@@ -81,8 +79,11 @@ public class Util {
   }
 
   public static void main(String[] args) {
-    int year = 1;
-    System.out.println(numberToWord(year));
+    int year = 2014;
+    int month = 1;
+    System.out.println(getStrFirstDayOfMonth(year, month));
+    System.out.println(getStrLastDayOfMonth(year, month));
+//    System.out.println(numberToWord(year));
 //    System.out.println(getStrLastDayOfYear(year));
   }
 }

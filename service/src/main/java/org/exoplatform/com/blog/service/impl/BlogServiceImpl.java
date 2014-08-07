@@ -5,25 +5,47 @@ import org.exoplatform.com.blog.service.entity.BlogArchive;
 import org.exoplatform.com.blog.service.util.BlogArchiveUtil;
 import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.Session;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
 import java.util.*;
 
 /**
  * Created by toannh on 8/4/14.
  */
-public class BlogServiceImpl extends BaseService implements IBlogService {
+public class BlogServiceImpl implements IBlogService {
 
   private boolean initData = true;
   public static String BLOG_NODE = "exo:blog";
+  Log log = ExoLogger.getExoLogger(BlogServiceImpl.class);
+
+  private String repo = "repository";
+  private String ws = "collaboration";
+
+  RepositoryService repoService;
+  SessionProviderService sessionProviderService;
+
 
   private static BlogArchiveUtil<Integer, Integer> blogArchive = new BlogArchiveUtil<Integer, Integer>();
 
   public BlogServiceImpl(RepositoryService repoService, SessionProviderService sessionProviderService) {
     this.repoService = repoService;
     this.sessionProviderService = sessionProviderService;
-
+    try {
+      this.repo = repoService.getCurrentRepository().getConfiguration().getName();
+      this.ws = repoService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
+    } catch (Exception ex) {
+      log.info("Using default repository & workspace");
+      ex.printStackTrace();
+    }
     initBlogArchive();
     setInitData(false);
   }
@@ -102,7 +124,8 @@ public class BlogServiceImpl extends BaseService implements IBlogService {
   public void addBlog(Node blogNode) {
     try {
       if (blogNode.isNodeType(BlogServiceImpl.BLOG_NODE)) {
-        Calendar cal = blogNode.getProperty("exo:dateCreated").getDate();
+//        Calendar cal = blogNode.getProperty("exo:dateCreated").getDate();
+        Calendar cal = new GregorianCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         BlogArchive _blogYearArchive = blogArchive.getBlogArchive().get(year);
@@ -136,5 +159,68 @@ public class BlogServiceImpl extends BaseService implements IBlogService {
     } catch (Exception ex) {
       ex.printStackTrace();
     }
+  }
+
+
+  /**
+   * Get All node of element
+   *
+   * @param nodeElement
+   * @return
+   * @throws Exception
+   */
+  protected List<Node> getAllNode(String nodeElement) throws Exception {
+    Session session = getSession();
+    List<Node> rs = new ArrayList<Node>();
+    StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);
+    queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
+    QueryManager queryManager = session.getWorkspace().getQueryManager();
+    Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+
+    NodeIterator nodes = query.execute().getNodes();
+    while (nodes.hasNext()) {
+      rs.add(nodes.nextNode());
+    }
+    return rs;
+  }
+
+  /**
+   * Get All node by node, month
+   *
+   * @param nodeElement
+   * @param firstDayOfMonth
+   * @param lastDayOfMonth
+   * @return
+   * @throws Exception
+   */
+  protected List<Node> getAllNode(String nodeElement, String firstDayOfMonth, String lastDayOfMonth) throws Exception {
+    Session session = getSession();
+    List<Node> rs = new ArrayList<Node>();
+    StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);
+    queryBuilder.append(" WHERE exo:dateCreated >= TIMESTAMP '" + firstDayOfMonth + "' ");
+    queryBuilder.append(" AND   exo:dateCreated <= TIMESTAMP '" + lastDayOfMonth + "' ");
+    queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
+    QueryManager queryManager = session.getWorkspace().getQueryManager();
+    Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+
+    NodeIterator nodes = query.execute().getNodes();
+    while (nodes.hasNext()) {
+      rs.add(nodes.nextNode());
+    }
+    return rs;
+  }
+
+  /**
+   * Get session
+   *
+   * @return
+   * @throws Exception
+   */
+  protected Session getSession() throws Exception {
+    ManageableRepository repository = repoService.getRepository(this.repo);
+    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    Session session = sessionProvider.getSession(this.ws, repository);
+
+    return session;
   }
 }
