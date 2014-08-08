@@ -12,14 +12,16 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
- * Created by toannh on 8/7/14.
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 7, 2014
  */
 public class TestBlogService extends TestBlog {
   private static IBlogService blogService;
 
   private static final String BLOG_NODE = "exo:blog";
   private static BlogArchiveUtil<Integer, Integer> blogArchive = new BlogArchiveUtil<Integer, Integer>();
-
 
   static {
 
@@ -82,12 +84,11 @@ public class TestBlogService extends TestBlog {
       try {
         _name = node.getProperty("exo:title").getString();
       }catch(Exception ex){
-        ex.printStackTrace();
+        log.error(ex.getMessage());
       }
       System.out.println("name: "+_name);
     }
   }
-
 
   public void addBlog(String name, String title, String summary, Calendar date) throws Exception{
     Session session = getSession();

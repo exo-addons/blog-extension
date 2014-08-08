@@ -57,9 +57,7 @@
   String[] arrColumns = ["exo:dateCreated;123px", "exo:owner;123px"];
   String serverUrl= uicomponent.getWebDAVServerPrefix();
   
-          
-  
-  
+
 %>
 <div id="$componentId" >
   <div id="${componentId}-$viewComponentId" class="uiListView $componentId">

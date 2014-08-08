@@ -17,7 +17,10 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
- * Created by toannh on 8/7/14.
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 7, 2014
  */
 @Path("/blog-extension/service")
 public class BlogServiceRest implements ResourceContainer {
@@ -41,12 +44,11 @@ public class BlogServiceRest implements ResourceContainer {
         JSONObject obj = new JSONObject();
         obj.put("postTitle", node.getProperty("exo:title").getString());
         obj.put("postPath", node.getPath());
-        obj.put("node", node);
         result.put(obj);
       }
       return Response.ok(result.toString(), MediaType.APPLICATION_JSON).build();
     }catch(Exception ex){
-      ex.printStackTrace();
+      log.error(ex.getMessage());
     }
     return Response.ok("false").build();
   }

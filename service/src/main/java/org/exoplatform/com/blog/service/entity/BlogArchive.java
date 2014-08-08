@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by toannh on 8/5/14.
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 5, 2014
  */
 public class BlogArchive extends HashMap{
   private int year_post;
-  private Map<Object, Integer> month;
+  private Map<Integer, Integer> month;
 
   public int getYear_post() {
     return year_post;
@@ -18,11 +21,11 @@ public class BlogArchive extends HashMap{
     this.year_post = year_post;
   }
 
-  public Map<Object, Integer> getMonth() {
+  public Map<Integer, Integer> getMonth() {
     return month;
   }
 
-  public void setMonth(Map<Object, Integer> month) {
+  public void setMonth(Map<Integer, Integer> month) {
     this.month = month;
   }
 }

@@ -4,7 +4,10 @@ import javax.jcr.Node;
 import java.util.List;
 
 /**
- * Created by toannh on 8/4/14.
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 4, 2014
  */
 public interface IBlogService {
 
@@ -44,7 +47,15 @@ public interface IBlogService {
    */
   public List<Node> getBlogs(int year, int month);
 
-
+  /**
+   * Increase post count from blog-archive cached table. when add new a post.
+   * @param blogNode
+   */
   public void addBlog(Node blogNode);
+
+  /**
+   * Decrease post count from blog-archive cached table. when remove a post.
+   * @param blogNode
+   */
   public void removeBlog(Node blogNode);
 }

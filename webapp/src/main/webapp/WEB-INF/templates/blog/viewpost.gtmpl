@@ -35,9 +35,7 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 
 def rcontext = _ctx.getRequestContext() ;
 def jsManager = rcontext.getJavascriptManager();
-jsManager.require("SHARED/blogjs", "blogjs").
-addScripts("blogjs.test();");
-
+jsManager.require("SHARED/blogjs", "blogjs");
 %>
 
 <style>
@@ -65,9 +63,6 @@ addScripts("blogjs.test();");
 
 
 </style>
-
-
-
 <div class="container-fluid" style="padding: 20px">
     <div id="content" class="clearfix row-fluid">
         <div id="main" class="span11 clearfix" role="main">
@@ -127,9 +122,6 @@ addScripts("blogjs.test();");
     </div> <!-- end #content -->
 </div> <!-- end #container -->
 <%
-
-
-
 /* display comments of this post */
 void commentList(Node post) {
 
@@ -269,45 +261,12 @@ def avt = avatarUrl(viewer)
     }
 
 </style>
-<!--script type="text/javascript">
-    //<![CDATA[
-
-    var jQuery=eXo.require("gj");
-
-    var jq = jQuery.noConflict();
-
-    jq(function() {
-    jq("#btn-$uuid").click(function(event) {
-    event.preventDefault();
-
-    var aform = jq("#commentform-$uuid");
-    var comment = aform.find( 'input[name="comment"]' ).val();
-    var path = aform.find( 'input[name="jcrPath"]' ).val();
-    jq.ajax({
-    type: "POST",
-    url: "/rest/contents/comment/add",
-    data: { comment: comment, jcrPath:path},
-    success: function() {
-    jq('#respond-$uuid').html("<div id='message'></div>");
-    jq('#message').html('<div class="alert alert-success"><p>Your comment has been posted.</p></div>')
-    .hide()
-    .fadeIn(1500);
-    }
-    }); // end ajax
-    return false;
-    }); // end click on button
-
-    }); // end jq
-    //]]>
-</script-->
 
 <div class="commentList inputContainer inputContainerShow" style="display: block;">
-
-
     <div class="commentItem commentFormBox" id="respond-$uuid">
 
         <div class="commmentLeft">
-            <a class="avatarXSmall" rel="tooltip" data-placement="bottom" href="/portal/intranet/profile/$viewer" data-original-title="$fme">
+            <a class="avatarXShttp://localhost:8080/portal/intranet/mall" rel="tooltip" data-placement="bottom" href="/portal/intranet/profile/$viewer" data-original-title="$fme">
                 <img src="$avt" alt="$fme">
             </a>
         </div><!--end commentLeft-->
@@ -317,7 +276,7 @@ def avt = avatarUrl(viewer)
                     <input name="jcrPath" type="hidden" value="/repository/collaboration${post.path}"/>
 
                     <input type="text" name="comment" id="comment-$uuid" placeholder="Your Comment Here…"  style="margin-bottom: 7px; height: 28px; resize: none; max-height: 28px;"  tabindex="0" />
-                    <input type="submit" value="Post Comment" class="btn btn-primary" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment" />
+                    <input type="submit" value="Post Comment" class="btn btn-primary" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment" onclick="eXo.ecm.blog.postComment('$uuid')" />
                 </form>
             </div>
         </div><!--end commentRight-->

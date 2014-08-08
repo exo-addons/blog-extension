@@ -11,7 +11,10 @@ import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import javax.jcr.Node;
 
 /**
- * Created by toannh on 8/6/14.
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 6, 2014
  */
 public class RemoveBlogAction implements Action {
   private Log log = ExoLogger.getExoLogger(AddBlogAction.class);

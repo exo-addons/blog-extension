@@ -5,7 +5,10 @@ import org.exoplatform.com.blog.service.rest.BlogServiceRest;
 import javax.ws.rs.core.Response;
 
 /**
- * Created by toannh on 8/7/14.
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 7, 2014
  */
 public class TestBlogServiceRest extends TestBlog {
   private BlogServiceRest restService;

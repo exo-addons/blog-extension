@@ -37,14 +37,13 @@ def blogService = WCMCoreUtils.getService(IBlogService.class)
 //regis javascript
 def rcontext = _ctx.getRequestContext() ;
 def jsManager = rcontext.getJavascriptManager();
-//jsManager.require("SHARED/blogjs", "blogjs");
-
+jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccordionInit();");
 %>
 
 <div class="container-fluid" style="padding: 20px">
-<div id="content" class="clearfix row-fluid">
-<div id="main" class="span9 clearfix" role="main">
-    <div class="" id="$uicomponent.id">
+	<div id="content" class="clearfix row-fluid">
+		<div id="main" class="span9 clearfix" role="main">
+    	<div class="" id="$uicomponent.id">
         <%
         // if (no entries)
         if (uicomponent.getUIPageIterator().getAvailable() == 0) {
@@ -117,8 +116,6 @@ def jsManager = rcontext.getJavascriptManager();
         } // end loop on entries
         } // end else has entries
         %>
-
-
         <!-- Paginator-->
         <div class="CaptionFunc ClearFix">
             <%
@@ -131,87 +128,86 @@ def jsManager = rcontext.getJavascriptManager();
         </div>
 
     </div>
-</div>  <!-- end #main -->
+
+		</div>  <!-- end #main -->
 
 
-<div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
-<!-- categories -->
-<div id="categories" class="uiBox widget_categories">
-    <h5 class="title">Categories</h5>
-    <div style="padding: 7px">
-        <ul>
-            <%categories()%>
-        </ul>
-    </div>
-</div>
+	<div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
+		<!-- categories -->
+		<div id="categories" class="uiBox widget_categories">
+				<h5 class="title">Categories</h5>
+				<div style="padding: 7px">
+						<ul>
+								<%categories()%>
+						</ul>
+				</div>
+		</div>
 
-<!-- Tag Cloud -->
-<div id="tagcloud" class="uiBox widget_tag_cloud">
-    <h5 class="title">Tags</h5>
-    <div style="padding: 7px">
-        <div id="tag-cloud" >
-            <% tags()%>
-        </div>
-    </div>
-</div>
+		<!-- Tag Cloud -->
+		<div id="tagcloud" class="uiBox widget_tag_cloud">
+				<h5 class="title">Tags</h5>
+				<div style="padding: 7px">
+						<div id="tag-cloud" >
+								<% tags()%>
+						</div>
+				</div>
+		</div>
 
-<!-- Bloggers -->
-<div id="bloggers" class="uiBox widget_categories">
-    <h5 class="title">Recent Bloggers</h5>
-    <div style="padding: 7px">
-        <ul>
-            <%bloggers()%>
-        </ul>
-    </div>
-</div>
+		<!-- Bloggers -->
+		<div id="bloggers" class="uiBox widget_categories">
+				<h5 class="title">Recent Bloggers</h5>
+				<div style="padding: 7px">
+						<ul>
+								<%bloggers()%>
+						</ul>
+				</div>
+		</div>
 
-<!-- Meta -->
-<div id="meta" class="uiBox widget_categories">
-    <h5 class="title">Meta</h5>
-    <div style="padding: 7px">
-        <ul>
-            <li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Quick Post</a></li>
-            <li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Admin</a></li>
-            <li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Entries RSS</a></li>
-        </ul>
-    </div>
-</div>
-<!--Archives-->
-<div id="archives" class="uiBox widget_categories">
-<h5 class="title">Archives</h5>
+		<!-- Meta -->
+		<div id="meta" class="uiBox widget_categories">
+				<h5 class="title">Meta</h5>
+				<div style="padding: 7px">
+						<ul>
+								<li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Quick Post</a></li>
+								<li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Admin</a></li>
+								<li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Entries RSS</a></li>
+						</ul>
+				</div>
+		</div>
+		<!--Archives-->
+		<div id="archives" class="uiBox widget_categories">
+		<h5 class="title">Archives</h5>
 
-<div class="accordion_example1 smk_accordion acc_with_icon">
-    <%
-    def currentYear = Calendar.getInstance().get(Calendar.YEAR);
-    def archiveYears = blogService.getArchiveYears();
-    for(year in archiveYears){
-    def yearPostCount = blogService.getArchivesCountInYear(year);
-    def archiveMonthByYear = blogService.getArchiveMonths(year);
-    def active="";
-    if(currentYear==year){active="acc_active";}
-    %>
-    <div class="accordion_in $active">
-        <div class="acc_head"><div class="acc_icon_expand"></div>$year ($yearPostCount)</div>
-        <div class="acc_content" style="display: block;">
-            <%
-            for(month in archiveMonthByYear){
-            def monthPostCount = blogService.getArchivesCountInMonth(year, month);
-            def monthTitle = org.exoplatform.com.blog.service.util.Util.numberToWord(month);
-            %>
-            <p class="month" onclick="loadBlogs(this, $year, $month);">
-							$monthTitle ($monthPostCount)
-								<div id="month-$year-$month" class="blog-archive-post-link" ></div>
-            </p>
-            <%}%>
+		<div class="blog_archive_accordion smk_accordion acc_with_icon">
+				<%
+				def currentYear = Calendar.getInstance().get(Calendar.YEAR);
+				def archiveYears = blogService.getArchiveYears();
+				for(year in archiveYears){
+				def yearPostCount = blogService.getArchivesCountInYear(year);
+				def archiveMonthByYear = blogService.getArchiveMonths(year);
+				def active="";
+				if(currentYear==year){active="acc_active";}
+				%>
+				<div class="accordion_in $active">
+						<div class="acc_head"><div class="acc_icon_expand"></div>$year ($yearPostCount)</div>
+						<div class="acc_content" style="display: block;">
+								<%
+								for(month in archiveMonthByYear){
+								def monthPostCount = blogService.getArchivesCountInMonth(year, month);
+								def monthTitle = org.exoplatform.com.blog.service.util.Util.numberToWord(month);
+								%>
+								<p class="month" onclick="eXo.ecm.blog.getPost(this, $year, $month)" >
+									$monthTitle ($monthPostCount)
+									<div id="month-$year-$month" class="blog-archive-post-link" ></div>
+								</p>
+								<%}%>
 
-        </div>
-    </div>
-    <%}%>
-</div>
+						</div>
+				</div>
+				<%}%>
+		</div>
 
 <%
-
-
 void tags(def entry) {
 def folkService = uicomponent.getApplicationComponent(NewFolksonomyService.class)
 def tags = folkService.getLinkedTagsOfDocument(entry, "collaboration")
@@ -225,7 +221,6 @@ else {
 <span class="tags-title">Tags:</span>
 <%
 }
-
 for(tag in tags) {
 def name = tag.name
 def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
@@ -236,11 +231,7 @@ def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
 if (i++ < (tags.size-1)) print " "
 
 } //end loop on  tags
-
-
 } //end renderTags
-
-
 // get the full name from username
 String fullName(def username) {
 def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
@@ -458,114 +449,3 @@ if (comments.size > 1) plural = "s"
     } // end comment list
 
     %>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-    <script>
-        if (window.jQuery) {
-            var jq = jQuery.noConflict();
-            (function ( jq ) {
-                jq.fn.smk_Accordion = function( options ) {
-                    if (this.length > 1){
-                        this.each(function() {
-                            jq(this).smk_Accordion(options);
-                        });
-                        return this;
-                    }
-                    var settings = jq.extend({
-                        animation:  true,
-                        showIcon:   true,
-                        closeAble:  false,
-                        closeOther: true,
-                        slideSpeed: 150,
-                        activeIndex: false
-                    }, options );
-                    var plugin = this;
-                    var init = function() {
-                        plugin.createStructure();
-                        plugin.clickHead();
-                    }
-                    this.createStructure = function() {
-                        plugin.addClass('smk_accordion');
-                        if( settings.showIcon ){
-                            plugin.addClass('acc_with_icon');
-                        }
-                        if( plugin.find('.accordion_in').length < 1 ){
-                            plugin.children().addClass('accordion_in');
-                        }
-                        plugin.find('.accordion_in').each(function(index, elem){
-                            var childs = jq(elem).children();
-                            jq(childs[0]).addClass('acc_head');
-                            jq(childs[1]).addClass('acc_content');
-                        });
-                        //Append icon
-                        if( settings.showIcon ){
-                            plugin.find('.acc_head').prepend('<div class="acc_icon_expand"></div>');
-                        }
-                        //Hide inactive
-                        plugin.find('.accordion_in .acc_content').not('.acc_active .acc_content').hide();
-                        //Active index
-                        if( settings.activeIndex === parseInt(settings.activeIndex) ){
-                            if(settings.activeIndex === 0){
-                                plugin.find('.accordion_in').addClass('acc_active').show();
-                                plugin.find('.accordion_in .acc_content').addClass('acc_active').show();
-                            }
-                            else{
-                                plugin.find('.accordion_in').eq(settings.activeIndex - 1).addClass('acc_active').show();
-                                plugin.find('.accordion_in .acc_content').eq(settings.activeIndex - 1).addClass('acc_active').show();
-                            }
-                        }
-                    }
-                    // Action when the user click accordion head
-                    this.clickHead = function() {
-                        plugin.on('click', '.acc_head', function(){
-                            var s_parent = jq(this).parent();
-                            if( s_parent.hasClass('acc_active') == false ){
-                                if( settings.closeOther ){
-                                    plugin.find('.acc_content').slideUp(settings.slideSpeed);
-                                    plugin.find('.accordion_in').removeClass('acc_active');
-                                }
-                            }
-                            if( s_parent.hasClass('acc_active') ){
-                                if( false !== settings.closeAble ){
-                                    s_parent.children('.acc_content').slideUp(settings.slideSpeed);
-                                    s_parent.removeClass('acc_active');
-                                }
-                            }
-                            else{
-                                jq(this).next('.acc_content').slideDown(settings.slideSpeed);
-                                s_parent.addClass('acc_active');
-                            }
-                        });
-                    }
-                    init();
-                    return this;
-                };
-            }( jq ));
-
-            function loadBlogs(el, year, month) {
-                jq.ajax({
-                    url: "/portal/rest/blog-extension/service/get-blogs?year=" + year + "&month=" + month,
-                    dataType: "text",
-                    type: "POST"
-                })
-                        .success(function (data) {
-                            var _blogs = jq.parseJSON(data);
-														console.log(data);
-                            var html = "";
-                            jq.each(_blogs, function (key, val) {
-                                console.log(val.postTitle);
-                                html += "<div> <a href='' >" + val.postTitle + "</a></div>";
-                            });
-                            jq(".blog-archive-post-link").html('');
-                            jq("#month-" + year + "-" + month).html(html);
-                        })
-
-            }
-        }
-        jQuery(document).ready(function(jq){
-            jq(".accordion_example1").smk_Accordion();
-        });
-    </script>
-<script>
-
-</script>

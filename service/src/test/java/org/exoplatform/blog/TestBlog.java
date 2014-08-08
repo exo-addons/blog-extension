@@ -20,6 +20,8 @@ import junit.framework.TestCase;
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.impl.ResourceBinder;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
@@ -48,6 +50,7 @@ public class TestBlog extends TestCase {
 
   public static ResourceBinder binder;
   protected static StandaloneContainer  container;
+  protected Log log = ExoLogger.getExoLogger(TestBlog.class);
 
   static {
     initContainer();

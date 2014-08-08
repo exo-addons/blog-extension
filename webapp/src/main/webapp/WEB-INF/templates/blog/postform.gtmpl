@@ -4,48 +4,38 @@
   import org.exoplatform.webui.application.WebuiRequestContext;
   import org.apache.commons.lang.time.DateFormatUtils;
   
-
   def rcontext = _ctx.getRequestContext() ;
   def htmlWYSIWYGFormId = "htmlData" + uicomponent.hashCode();
   def cssFormId = "ContentCSS[" + uicomponent.hashCode() + "]";
   def jsFormId = "ContentJS[" + uicomponent.hashCode() + "]";
-  
   //  rcontext.getJavascriptManager().addOnLoadJavascript("eXo.ecm.CKEditor.insertCSS('$htmlWYSIWYGFormId', '$cssFormId')")
-
   Node webContentNode = uicomponent.getNode();
   def String dateTimePath = "";
   if(webContentNode != null){
      def parrentDateNodePath =  webContentNode.getParent().getPath();
      dateTimePath = parrentDateNodePath.substring(parrentDateNodePath.length()-10, parrentDateNodePath.length());
-
   }else{
      dateTimePath =  DateFormatUtils.format(new Date(), "yyyy/MM/dd");
   }
+
+	def jsManager = rcontext.getJavascriptManager();
+	jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.syncuri("+dateTimePath+");");
+
   %>
-
-
 <%
-
-try { 
-
-
+try {
   WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-      String b = context.getURLBuilder().createURL(uiform, null, null);
+	String b = context.getURLBuilder().createURL(uiform, null, null);
 %>
-
 <form class="UIForm well form-horizontal" id="${uiform.id}" action="$b" method="post">
-
   <input type="hidden" name="formOp" value="">
 <%
-
   /* start render action*/
   if (uiform.isShowActionsOnTop()) {
     uiform.processRenderAction()
   }
   /* end render action*/
-
-
-%>  
+%>
   <fieldset>
     <div class="control-group">
       <label class="control-label" for="title"><%=_ctx.appRes("WebContent.dialog.label.title")%></label>
@@ -54,7 +44,6 @@ try {
   String[] webContentFieldTitle = ["jcrPath=/node/exo:title", "options=noSanitization", "validate=empty", "editable=if-null", "options=width:'950px'"];
   uicomponent.addTextField("title", webContentFieldTitle) ;
   %>
-       
         <!--p class="help-block">Permalink: http://blog.exoplatform.org/2012/07/11/<span id="uri"></span></p-->
       </div>
     </div>
@@ -106,55 +95,7 @@ try {
 %>
         </div>
     </div> 
-<script type="text/javascript">
-//<![CDATA[
- 
-var jq = jQuery.noConflict();
-  
-jq(function() {  
-  
 
-  var name = jq("#name");
-
-  var syncuri = function() {
-    var data = name.val();
-    data = "<%=dateTimePath%>" + "/" + data;
-    jq('#uri').replaceWith('<span id="uri">'+data+'</span>');
-  }
-      
-   //
-   syncuri();
-      
-  jq("#title").change(function() {
-   
-    if (!name.readOnly) {
-      var title = this.value;
-      var portalContext = eXo.env.portal.context;
-      var portalRest = eXo.env.portal.rest;
-      var url = portalContext+"/"+portalRest+"/l11n/cleanName";
-
-      jq.ajax({
-        type: "GET",
-        url: url,
-        data: { name: title},
-        success: function(data) {
-          jq('#name').val(data).trigger('change');         
-        }
-       }); // end ajax  
-     } // end if not readonly
-   
-   }); // end change title
-  
-  
-  jq("#name").change(syncuri); // end change name
-  
-  
-}); // end jq  
-//]]>
-
-</script>    
-
-    
     <div class="control-group">
       <label for="name" class="control-label">Permalink URI</label>
       <div class="controls">     
@@ -177,7 +118,6 @@ jq(function() {
       </div>
     </div>
         <%
-
 if (!uiform.isShowActionsOnTop()) {
   uiform.processRenderAction()
 }    
@@ -185,12 +125,7 @@ if (!uiform.isShowActionsOnTop()) {
   </fieldset>
   </form>
 <%    
-
- 
-  
- 
   } catch (Exception e) {
   print e;
   }
-  
-%>             
+%>

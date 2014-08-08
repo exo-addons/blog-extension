@@ -6,6 +6,7 @@ import java.util.Calendar;
 /**
  * Created by toannh on 8/4/14.
  */
+
 public class Util {
   public static final String EXO_COMMENT_NODE_TYPE = "exo:comments";
   public static final String EXO_COMMENT_DATE = "exo:commentDate";
@@ -33,17 +34,18 @@ public class Util {
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
 
-  public static String getStrFirstDayOfMonth(int year, int month){
+  public static String getStrFirstDayOfMonth(int year, int month) {
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month);
     cal.set(Calendar.DAY_OF_MONTH, 1);
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
-  public static String getStrLastDayOfMonth(int year, int month){
+
+  public static String getStrLastDayOfMonth(int year, int month) {
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.YEAR, year);
-    cal.set(Calendar.MONTH, month+1);
+    cal.set(Calendar.MONTH, month + 1);
     cal.set(Calendar.DAY_OF_MONTH, 1);
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
@@ -78,12 +80,4 @@ public class Util {
     return "";
   }
 
-  public static void main(String[] args) {
-    int year = 2014;
-    int month = 1;
-    System.out.println(getStrFirstDayOfMonth(year, month));
-    System.out.println(getStrLastDayOfMonth(year, month));
-//    System.out.println(numberToWord(year));
-//    System.out.println(getStrLastDayOfYear(year));
-  }
 }

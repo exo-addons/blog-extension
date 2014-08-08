@@ -11,16 +11,16 @@ import java.util.*;
 public class BlogArchiveUtil<E, K> extends HashMap {
 
   private Map<K, BlogArchive> blogArchive = new HashMap<K, BlogArchive>();
-  private Map<Object, Integer> month = new HashMap<Object, Integer>();
+  private Map<Integer, Integer> month = new HashMap<Integer, Integer>();
 
 
   public void add(K year, E month) {
     BlogArchive blogArchive;
     if (!this.blogArchive.containsKey(year)) { // year doesnt exits
-      this.month = new HashMap<Object, Integer>();
+      this.month = new HashMap<Integer, Integer>();
       blogArchive = new BlogArchive();
       blogArchive.setYear_post(1);
-      this.month.put(month, 1);
+      this.month.put((Integer) month, 1);
       blogArchive.setMonth(this.month);
       this.blogArchive.put(year, blogArchive);
     } else { // year exits
@@ -28,9 +28,9 @@ public class BlogArchiveUtil<E, K> extends HashMap {
       blogArchive.setYear_post(blogArchive.getYear_post() + 1);
       this.month = blogArchive.getMonth();
       if (!this.month.containsKey(month)) { //month of year doesnt exits
-        this.month.put(month, 1);
+        this.month.put((Integer) month, 1);
       } else {
-        this.month.put(month, this.month.get(month) + 1);
+        this.month.put((Integer) month, this.month.get(month) + 1);
       }
       blogArchive.setMonth(this.month);
       this.blogArchive.put(year, blogArchive);

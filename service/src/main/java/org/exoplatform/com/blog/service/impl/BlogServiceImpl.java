@@ -19,7 +19,10 @@ import javax.jcr.query.QueryManager;
 import java.util.*;
 
 /**
- * Created by toannh on 8/4/14.
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 4, 2014
  */
 public class BlogServiceImpl implements IBlogService {
 
@@ -75,10 +78,13 @@ public class BlogServiceImpl implements IBlogService {
     this.initData = initData;
   }
 
-  public BlogArchiveUtil<Integer, Integer> getBlogArchive() {
-    return blogArchive;
-  }
+//  public BlogArchiveUtil<Integer, Integer> getBlogArchive() {
+//    return blogArchive;
+//  }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<Integer> getArchiveYears() {
     List<Integer> result = new ArrayList<Integer>();
@@ -89,58 +95,75 @@ public class BlogServiceImpl implements IBlogService {
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<Integer> getArchiveMonths(int year) {
     BlogArchive month = this.blogArchive.getBlogArchive().get(year);
     List<Integer> result = new ArrayList<Integer>();
-    Map<Object, Integer> monthHashmap = month.getMonth();
-    for (Map.Entry<Object, Integer> entry : monthHashmap.entrySet()) {
+    Map<Integer, Integer> monthHashmap = month.getMonth();
+    for (Map.Entry<Integer, Integer> entry : monthHashmap.entrySet()) {
       result.add(Integer.valueOf(entry.getKey().toString()));
     }
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int getArchivesCountInYear(int year) {
     return this.blogArchive.getBlogArchive().get(year).getYear_post();
   }
 
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public int getArchivesCountInMonth(int year, int month) {
     return this.blogArchive.getBlogArchive().get(year).getMonth().get(month);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<Node> getBlogs(int year, int month) {
     try {
       return getAllNode(BLOG_NODE, Util.getStrFirstDayOfMonth(year, month), Util.getStrLastDayOfMonth(year, month));
     } catch (Exception ex) {
-      ex.printStackTrace();
+      log.error(ex.getMessage());
     }
     return null;
   }
-
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void addBlog(Node blogNode) {
     try {
       if (blogNode.isNodeType(BlogServiceImpl.BLOG_NODE)) {
-//        Calendar cal = blogNode.getProperty("exo:dateCreated").getDate();
         Calendar cal = new GregorianCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         BlogArchive _blogYearArchive = blogArchive.getBlogArchive().get(year);
         blogArchive.getBlogArchive().get(year).setYear_post(_blogYearArchive.getYear_post() + 1);
-        Map<Object, Integer> monthByYear = _blogYearArchive.getMonth();
+        Map<Integer, Integer> monthByYear = _blogYearArchive.getMonth();
 
         if (monthByYear.containsKey(month)) {
           blogArchive.getBlogArchive().get(year).getMonth().put(month, monthByYear.get(month) + 1);
         }
       }
     } catch (Exception ex) {
-      ex.printStackTrace();
+      log.error(ex.getMessage());
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void removeBlog(Node blogNode) {
     try {
@@ -150,14 +173,14 @@ public class BlogServiceImpl implements IBlogService {
         int month = cal.get(Calendar.MONTH);
         BlogArchive _blogYearArchive = blogArchive.getBlogArchive().get(year);
         blogArchive.getBlogArchive().get(year).setYear_post(_blogYearArchive.getYear_post() - 1);
-        Map<Object, Integer> monthByYear = _blogYearArchive.getMonth();
+        Map<Integer, Integer> monthByYear = _blogYearArchive.getMonth();
 
         if (monthByYear.containsKey(month)) {
           blogArchive.getBlogArchive().get(year).getMonth().put(month, monthByYear.get(month) - 1);
         }
       }
     } catch (Exception ex) {
-      ex.printStackTrace();
+      log.error(ex.getMessage());
     }
   }
 
