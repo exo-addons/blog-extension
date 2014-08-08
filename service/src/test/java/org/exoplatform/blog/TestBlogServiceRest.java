@@ -24,6 +24,7 @@ public class TestBlogServiceRest extends TestBlog {
     System.out.println("-------------getBlogByMonth-------------");
     Response response = restService.getBlogs(2014, 7);
     System.out.println(response.getEntity());
+
   }
 
   public void tearDown() throws Exception {

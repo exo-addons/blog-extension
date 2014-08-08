@@ -8,8 +8,7 @@ import java.util.Calendar;
  */
 
 public class Util {
-  public static final String EXO_COMMENT_NODE_TYPE = "exo:comments";
-  public static final String EXO_COMMENT_DATE = "exo:commentDate";
+
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
 

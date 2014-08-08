@@ -2,14 +2,16 @@ package org.exoplatform.com.blog.service.impl;
 
 import org.exoplatform.com.blog.service.IBlogService;
 import org.exoplatform.com.blog.service.entity.BlogArchive;
-import org.exoplatform.com.blog.service.util.BlogArchiveUtil;
 import org.exoplatform.com.blog.service.util.Util;
+import org.exoplatform.services.cms.drives.DriveData;
+import org.exoplatform.services.cms.drives.ManageDriveService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -21,7 +23,7 @@ import java.util.*;
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
+ * exo@exoplatform.com
  * Aug 4, 2014
  */
 public class BlogServiceImpl implements IBlogService {
@@ -33,11 +35,35 @@ public class BlogServiceImpl implements IBlogService {
   private String repo = "repository";
   private String ws = "collaboration";
 
-  RepositoryService repoService;
-  SessionProviderService sessionProviderService;
+  private RepositoryService repoService;
+  private SessionProviderService sessionProviderService;
+  private ManageDriveService manageDriveService = WCMCoreUtils.getService(ManageDriveService.class);
 
+  private Map<Integer, BlogArchive> blogArchive = new HashMap<Integer, BlogArchive>();
+  private Map<Integer, Integer> month = new HashMap<Integer, Integer>();
 
-  private static BlogArchiveUtil<Integer, Integer> blogArchive = new BlogArchiveUtil<Integer, Integer>();
+  public void add(Integer year, Integer month) {
+    BlogArchive blogArchive;
+    if (!this.blogArchive.containsKey(year)) { // year doesnt exits
+      this.month = new HashMap<Integer, Integer>();
+      blogArchive = new BlogArchive();
+      blogArchive.setYear_post(1);
+      this.month.put((Integer) month, 1);
+      blogArchive.setMonth(this.month);
+      this.blogArchive.put(year, blogArchive);
+    } else { // year exits
+      blogArchive = this.blogArchive.get(year);
+      blogArchive.setYear_post(blogArchive.getYear_post() + 1);
+      this.month = blogArchive.getMonth();
+      if (!this.month.containsKey(month)) { //month of year doesnt exits
+        this.month.put((Integer) month, 1);
+      } else {
+        this.month.put((Integer) month, this.month.get(month) + 1);
+      }
+      blogArchive.setMonth(this.month);
+      this.blogArchive.put(year, blogArchive);
+    }
+  }
 
   public BlogServiceImpl(RepositoryService repoService, SessionProviderService sessionProviderService) {
     this.repoService = repoService;
@@ -46,8 +72,8 @@ public class BlogServiceImpl implements IBlogService {
       this.repo = repoService.getCurrentRepository().getConfiguration().getName();
       this.ws = repoService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
     } catch (Exception ex) {
+      log.error(ex.getMessage());
       log.info("Using default repository & workspace");
-      ex.printStackTrace();
     }
     initBlogArchive();
     setInitData(false);
@@ -62,10 +88,10 @@ public class BlogServiceImpl implements IBlogService {
           cal = node.getProperty("exo:dateCreated").getValue().getDate();
           int _year = cal.get(Calendar.YEAR);
           int _month = cal.get(Calendar.MONTH);
-          blogArchive.add(_year, _month);
+          add(_year, _month);
         }
       } catch (Exception ex) {
-        ex.printStackTrace();
+        log.error(ex.getMessage());
       }
     }
   }
@@ -78,21 +104,18 @@ public class BlogServiceImpl implements IBlogService {
     this.initData = initData;
   }
 
-//  public BlogArchiveUtil<Integer, Integer> getBlogArchive() {
-//    return blogArchive;
-//  }
-
   /**
    * {@inheritDoc}
    */
   @Override
   public List<Integer> getArchiveYears() {
-    List<Integer> result = new ArrayList<Integer>();
-    HashMap<Integer, BlogArchive> blogArchiveHashMap = this.blogArchive;
-    for (Map.Entry<Integer, BlogArchive> entry : blogArchiveHashMap.entrySet()) {
-      result.add(entry.getKey());
-    }
-    return result;
+//    List<Integer> result = new ArrayList<Integer>();
+//    HashMap<Integer, BlogArchive> blogArchiveHashMap = this.blogArchive;
+//    for (Map.Entry<Integer, BlogArchive> entry : blogArchiveHashMap.entrySet()) {
+//      result.add(entry.getKey());
+//    }
+//    blogArchive.keySet()
+    return new ArrayList(blogArchive.keySet());
   }
 
   /**
@@ -100,7 +123,7 @@ public class BlogServiceImpl implements IBlogService {
    */
   @Override
   public List<Integer> getArchiveMonths(int year) {
-    BlogArchive month = this.blogArchive.getBlogArchive().get(year);
+    BlogArchive month = this.blogArchive.get(year);
     List<Integer> result = new ArrayList<Integer>();
     Map<Integer, Integer> monthHashmap = month.getMonth();
     for (Map.Entry<Integer, Integer> entry : monthHashmap.entrySet()) {
@@ -114,7 +137,7 @@ public class BlogServiceImpl implements IBlogService {
    */
   @Override
   public int getArchivesCountInYear(int year) {
-    return this.blogArchive.getBlogArchive().get(year).getYear_post();
+    return this.blogArchive.get(year).getYear_post();
   }
 
 
@@ -123,7 +146,7 @@ public class BlogServiceImpl implements IBlogService {
    */
   @Override
   public int getArchivesCountInMonth(int year, int month) {
-    return this.blogArchive.getBlogArchive().get(year).getMonth().get(month);
+    return this.blogArchive.get(year).getMonth().get(month);
   }
 
   /**
@@ -138,6 +161,7 @@ public class BlogServiceImpl implements IBlogService {
     }
     return null;
   }
+
   /**
    * {@inheritDoc}
    */
@@ -148,12 +172,12 @@ public class BlogServiceImpl implements IBlogService {
         Calendar cal = new GregorianCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
-        BlogArchive _blogYearArchive = blogArchive.getBlogArchive().get(year);
-        blogArchive.getBlogArchive().get(year).setYear_post(_blogYearArchive.getYear_post() + 1);
+        BlogArchive _blogYearArchive = blogArchive.get(year);
+        blogArchive.get(year).setYear_post(_blogYearArchive.getYear_post() + 1);
         Map<Integer, Integer> monthByYear = _blogYearArchive.getMonth();
 
         if (monthByYear.containsKey(month)) {
-          blogArchive.getBlogArchive().get(year).getMonth().put(month, monthByYear.get(month) + 1);
+          blogArchive.get(year).getMonth().put(month, monthByYear.get(month) + 1);
         }
       }
     } catch (Exception ex) {
@@ -171,19 +195,18 @@ public class BlogServiceImpl implements IBlogService {
         Calendar cal = blogNode.getProperty("exo:dateCreated").getDate();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
-        BlogArchive _blogYearArchive = blogArchive.getBlogArchive().get(year);
-        blogArchive.getBlogArchive().get(year).setYear_post(_blogYearArchive.getYear_post() - 1);
+        BlogArchive _blogYearArchive = blogArchive.get(year);
+        blogArchive.get(year).setYear_post(_blogYearArchive.getYear_post() - 1);
         Map<Integer, Integer> monthByYear = _blogYearArchive.getMonth();
 
         if (monthByYear.containsKey(month)) {
-          blogArchive.getBlogArchive().get(year).getMonth().put(month, monthByYear.get(month) - 1);
+          blogArchive.get(year).getMonth().put(month, monthByYear.get(month) - 1);
         }
       }
     } catch (Exception ex) {
       log.error(ex.getMessage());
     }
   }
-
 
   /**
    * Get All node of element
@@ -218,9 +241,14 @@ public class BlogServiceImpl implements IBlogService {
    */
   protected List<Node> getAllNode(String nodeElement, String firstDayOfMonth, String lastDayOfMonth) throws Exception {
     Session session = getSession();
+    DriveData driveData = manageDriveService.getDriveByName("Blog");
     List<Node> rs = new ArrayList<Node>();
+    String searchPath = driveData.getHomePath();
+    searchPath = searchPath.substring(0, searchPath.lastIndexOf("/") + 1);
+    searchPath += "%";
     StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);
-    queryBuilder.append(" WHERE exo:dateCreated >= TIMESTAMP '" + firstDayOfMonth + "' ");
+    queryBuilder.append(" WHERE jcr:path LIKE '" + searchPath + "' ");
+    queryBuilder.append(" AND   exo:dateCreated >= TIMESTAMP '" + firstDayOfMonth + "' ");
     queryBuilder.append(" AND   exo:dateCreated <= TIMESTAMP '" + lastDayOfMonth + "' ");
     queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
     QueryManager queryManager = session.getWorkspace().getQueryManager();

@@ -1,7 +1,6 @@
 package org.exoplatform.blog;
 
 import org.exoplatform.com.blog.service.IBlogService;
-import org.exoplatform.com.blog.service.util.BlogArchiveUtil;
 import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 
@@ -21,7 +20,6 @@ public class TestBlogService extends TestBlog {
   private static IBlogService blogService;
 
   private static final String BLOG_NODE = "exo:blog";
-  private static BlogArchiveUtil<Integer, Integer> blogArchive = new BlogArchiveUtil<Integer, Integer>();
 
   static {
 
@@ -62,6 +60,24 @@ public class TestBlogService extends TestBlog {
     blogService = WCMCoreUtils.getService(IBlogService.class);
   }
 
+  public void testGetYearArchives(){
+    System.out.println("-----------------Year Archive----------------");
+    List<Integer> years = blogService.getArchiveYears();
+    System.out.println("Total: "+years.size());
+    for(int year:years){
+      System.out.println(year);
+    }
+  }
+
+  public void testGetMonth(){
+    //get 2014/08
+    List<Integer> months = blogService.getArchiveMonths(2014);
+    System.out.println("-----------------Month Archive----------------");
+    System.out.println("Total: "+months.size());
+    for(int month: months){
+      System.out.println(month);
+    }
+  }
   public void testBlogArchive(){
     List<Integer> years = blogService.getArchiveYears();
     System.out.println("-------------------Archive----------------");
@@ -90,6 +106,22 @@ public class TestBlogService extends TestBlog {
     }
   }
 
+  public void testAddBlog() throws Exception{
+    //total blog of 2014/08 before create a new post
+    int postCountBefore = blogService.getArchivesCountInMonth(2014,7);
+    //add 5 post
+
+    addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 07, 12));
+    addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 07, 12));
+    addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 07, 12));
+    addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 07, 12));
+    addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 07, 12));
+
+    int postCountAfter = blogService.getArchivesCountInMonth(2014,7);
+    int denta = postCountAfter - postCountBefore;
+    assertTrue("Increate blog cached table", denta == 5);
+  }
+
   public void addBlog(String name, String title, String summary, Calendar date) throws Exception{
     Session session = getSession();
     Node node = session.getRootNode().addNode(name, BLOG_NODE);
@@ -99,11 +131,4 @@ public class TestBlogService extends TestBlog {
     node.setProperty("exo:dateCreated", date);
     session.save();
   }
-
-
-
-
-
-
-
 }
