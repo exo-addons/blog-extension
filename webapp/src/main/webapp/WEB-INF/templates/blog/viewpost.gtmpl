@@ -35,13 +35,13 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 
 def rcontext = _ctx.getRequestContext() ;
 def jsManager = rcontext.getJavascriptManager();
-jsManager.require("SHARED/blogjs", "blogjs");
+jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.intShare();");
 %>
-
+<!--
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
 <script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
-<!---->
+-->
 <style>
 
     .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {

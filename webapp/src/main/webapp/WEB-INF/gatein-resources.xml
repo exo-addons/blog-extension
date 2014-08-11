@@ -20,8 +20,17 @@
       <module>jquery</module>
       <as>gj</as>
     </depends>
-
+    <depends>
+      <module>sharethis</module>
+      <as>sharethis</as>
+    </depends>
   </module>
 
+  <module>
+    <name>sharethis</name>
+    <script>
+      <path>/resources/js/shareThis.js</path>
+    </script>
+  </module>
 
 </gatein-resources>

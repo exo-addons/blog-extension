@@ -1,4 +1,4 @@
-(function (gj) {
+(function (gj, sharethis) {
     function blog() {
     };
 
@@ -132,7 +132,6 @@
     }); // end change title
     gj("#name").change(blog.prototype.syncuri);
 
-
     blog.prototype.postComment = function(uuid) {
         var aform = gj("#commentform-"+uuid);
         var comment = aform.find( 'input[name="comment"]' ).val();
@@ -152,7 +151,13 @@
         return false;
     }; // end click on button
 
+    //sharethis
+    blog.prototype.intShare = function(){
+        var switchTo5x=true;
+        sharethis.stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});
+    };
+
     eXo.ecm.blog = new blog();
     return eXo.ecm.blog;
     //-------------------------------------------------------------------------//
-})(gj);
+})(gj, sharethis);
