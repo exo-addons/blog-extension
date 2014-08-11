@@ -23,7 +23,7 @@ import org.exoplatform.wcm.webui.clv.CategoryBean;
 import org.exoplatform.wcm.webui.Utils;
 import org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
-import org.exoplatform.com.blog.service.IBlogService;
+import org.exoplatform.com.blog.service.BlogService;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -32,7 +32,7 @@ import org.exoplatform.com.blog.service.entity.BlogArchive;
 uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012
 
 def count = 0;
-def blogService = WCMCoreUtils.getService(IBlogService.class)
+def blogService = WCMCoreUtils.getService(BlogService.class)
 
 //regis javascript
 def rcontext = _ctx.getRequestContext() ;

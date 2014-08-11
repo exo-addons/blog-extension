@@ -10,9 +10,9 @@
     <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
   </component>
 
-  <!--<component>-->
-    <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
-  <!--</component>-->
+  <component>
+    <type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>
+  </component>
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.impl.ext.action.SessionActionCatalog</target-component>

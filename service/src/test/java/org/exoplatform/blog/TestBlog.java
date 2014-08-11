@@ -29,16 +29,17 @@ import org.exoplatform.services.security.IdentityConstants;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
+
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
- * Aug 6, 2014  
+ * exo@exoplatform.com
+ * Aug 6, 2014
  */
 public class TestBlog extends TestCase {
 
   public static ResourceBinder binder;
-  protected static StandaloneContainer  container;
+  protected static StandaloneContainer container;
   protected Log log = ExoLogger.getExoLogger(TestBlog.class);
 
   protected static final String BLOG_NODE = "exo:blog";
@@ -46,7 +47,7 @@ public class TestBlog extends TestCase {
   static {
     initContainer();
   }
-  
+
   @Override
   protected void setUp() throws Exception {
     begin();
@@ -58,9 +59,9 @@ public class TestBlog extends TestCase {
    * Set current container
    */
   private void begin() {
-    RequestLifeCycle.begin(container);    
+    RequestLifeCycle.begin(container);
   }
-  
+
   /**
    * Clear current container
    */
@@ -71,9 +72,9 @@ public class TestBlog extends TestCase {
   private static void initContainer() {
     try {
       String containerConf = Thread.currentThread()
-                                   .getContextClassLoader()
-                                   .getResource("conf/standalone/configuration.xml")
-                                   .toString();
+              .getContextClassLoader()
+              .getResource("conf/standalone/configuration.xml")
+              .toString();
       StandaloneContainer.addConfigurationURL(containerConf);
       String loginConf = Thread.currentThread().getContextClassLoader().getResource("conf/standalone/login.conf").toString();
       System.setProperty("java.security.auth.login.config", loginConf);
@@ -83,7 +84,7 @@ public class TestBlog extends TestCase {
       throw new RuntimeException("Failed to initialize standalone container: " + e.getMessage(), e);
     }
   }
-  
+
   public void testA() throws Exception {
     Session session = getSession();
     Node node = session.getRootNode().addNode("Test");
@@ -92,9 +93,9 @@ public class TestBlog extends TestCase {
     session.save();
   }
 
-  protected Session getSession() throws Exception{
-    RepositoryService repoService = (RepositoryService)container.getComponentInstanceOfType(RepositoryService.class);
+  protected Session getSession() throws Exception {
+    RepositoryService repoService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
     return repoService.getCurrentRepository().login();
   }
-  
+
 }
