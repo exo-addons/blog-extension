@@ -8,8 +8,10 @@ import java.util.List;
  * Author : eXoPlatform
  *          exo@exoplatform.com
  * Aug 4, 2014
+ *
+ * Blog-extension service, provider methods for blog extension
  */
-public interface IBlogService {
+public interface BlogService {
 
   /**
    * Get all blog archive years

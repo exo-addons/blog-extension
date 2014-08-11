@@ -26,7 +26,7 @@ import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.com.blog.service.IBlogService;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import org.exoplatform.com.blog.service.util.BlogArchiveUtil;
+
 import org.exoplatform.com.blog.service.entity.BlogArchive;
 
 uicomponent.setDateTimeFormat("MMM d, yyyy") // June 28th, 2012

@@ -29,17 +29,6 @@ import org.exoplatform.services.security.IdentityConstants;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
-import javax.jcr.Node;
-import javax.jcr.Session;
-
-import junit.framework.TestCase;
-
-import org.exoplatform.container.StandaloneContainer;
-import org.exoplatform.container.component.RequestLifeCycle;
-import org.exoplatform.services.jcr.RepositoryService;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.security.IdentityConstants;
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
@@ -51,6 +40,8 @@ public class TestBlog extends TestCase {
   public static ResourceBinder binder;
   protected static StandaloneContainer  container;
   protected Log log = ExoLogger.getExoLogger(TestBlog.class);
+
+  protected static final String BLOG_NODE = "exo:blog";
 
   static {
     initContainer();
@@ -95,7 +86,7 @@ public class TestBlog extends TestCase {
   
   public void testA() throws Exception {
     Session session = getSession();
-    Node node = session.getRootNode().addNode("Test");
+    Node node = session.getRootNode().addNode(BLOG_NODE,"Test");
     session.save();
     System.out.println("Add node test: " + node);
     session.save();

@@ -15,36 +15,21 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-
-package org.exoplatform.com.blog.service.entity;
-
-import java.util.Map;
+package org.exoplatform.com.blog.component;
 
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
  *          exo@exoplatform.com
- * Aug 5, 2014
- *
- * Build blog-archive cache table structure
+ * Aug 11, 2014
  */
-public class BlogArchive{
-  private int year_post;
-  private Map<Integer, Integer> month;
 
-  public int getYear_post() {
-    return year_post;
-  }
+import org.exoplatform.webui.config.annotation.ComponentConfig;
+import org.exoplatform.webui.core.UIComponent;
 
-  public void setYear_post(int year_post) {
-    this.year_post = year_post;
-  }
 
-  public Map<Integer, Integer> getMonth() {
-    return month;
-  }
-
-  public void setMonth(Map<Integer, Integer> month) {
-    this.month = month;
-  }
+@ComponentConfig(
+        template = "classpath:templates/TopNavigatorBarActionComponent.gtmpl"
+)
+public class TopNavigatorActionComponent extends UIComponent {
 }

@@ -1,6 +1,6 @@
 package org.exoplatform.com.blog.service.rest;
 
-import org.exoplatform.com.blog.service.IBlogService;
+import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -26,9 +26,9 @@ import java.util.List;
 public class BlogServiceRest implements ResourceContainer {
   private Log log = ExoLogger.getExoLogger(BlogServiceRest.class);
 
-  private IBlogService blogService;
+  private BlogService blogService;
 
-  public BlogServiceRest(IBlogService blogService) {
+  public BlogServiceRest(BlogService blogService) {
     this.blogService = blogService;
   }
 

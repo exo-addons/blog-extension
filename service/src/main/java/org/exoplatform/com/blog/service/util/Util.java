@@ -1,11 +1,14 @@
 package org.exoplatform.com.blog.service.util;
 
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+
 /**
  * Created by toannh on 8/4/14.
  */
 
 public class Util {
-
+  private static Log log = ExoLogger.getExoLogger("BlogService");
   public static String numberToWord(int number) {
     switch (number) {
       case 0:
@@ -36,4 +39,13 @@ public class Util {
     return "";
   }
 
+  /**
+   *
+   * @param info message
+   * @param error message
+   */
+  public static void log(String info, String error){
+    if(log.isErrorEnabled()) log.error(error);
+    if(log.isInfoEnabled()) log.info(info);
+  }
 }

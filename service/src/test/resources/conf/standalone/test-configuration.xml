@@ -34,6 +34,16 @@
     <type>org.exoplatform.services.organization.auth.OrganizationAuthenticatorImpl</type>
   </component>
 
+  <!--<component>-->
+    <!--<key>org.exoplatform.com.blog.service.BlogService</key>-->
+    <!--<type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>-->
+  <!--</component>og-->
+
+  <!--<component>-->
+  <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
+  <!--</component>-->
+
+
   <component>
     <key>org.exoplatform.services.database.HibernateService</key>
     <type>org.exoplatform.services.database.impl.HibernateServiceImpl</type>
@@ -336,4 +346,6 @@
 
   <remove-configuration>org.exoplatform.services.cache.ExoCacheFactory</remove-configuration>
   <remove-configuration>org.exoplatform.services.scheduler.JobSchedulerService</remove-configuration>
+
+
 </configuration>
