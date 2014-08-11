@@ -134,7 +134,7 @@ public class BlogServiceImpl implements BlogService {
    */
   @Override
   public List<Integer> getArchiveYears() {
-    return new ArrayList(blogArchives.keySet());
+    return new ArrayList<Integer>(blogArchives.keySet());
   }
 
   /**
@@ -144,7 +144,7 @@ public class BlogServiceImpl implements BlogService {
   public List<Integer> getArchiveMonths(int year) {
     try {
       BlogArchive month = this.blogArchives.get(year);
-      return new ArrayList(month.getMonth().keySet());
+      return new ArrayList<Integer>(month.getMonth().keySet());
     } catch (Exception ex) {
       Util.log("Not found any month by year: " + year, ex.getMessage());
     }
