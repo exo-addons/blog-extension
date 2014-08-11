@@ -316,14 +316,14 @@ public class BlogServiceImpl implements BlogService {
   }
 
   private String getDriverPath() throws Exception {
-    try {
+//    try {
       DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
       String driverPath = driveData.getHomePath();
       driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
       driverPath += "%";
       return driverPath;
-    } catch (Exception ex) {
-      return "/Blog%";
-    }
+//    } catch (Exception ex) {
+//      return "/Blog%";
+//    }
   }
 }
