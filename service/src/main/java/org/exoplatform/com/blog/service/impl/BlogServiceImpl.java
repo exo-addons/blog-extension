@@ -2,7 +2,6 @@ package org.exoplatform.com.blog.service.impl;
 
 import org.exoplatform.com.blog.service.IBlogService;
 import org.exoplatform.com.blog.service.entity.BlogArchive;
-import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.services.cms.drives.DriveData;
 import org.exoplatform.services.cms.drives.ManageDriveService;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -18,6 +17,7 @@ import javax.jcr.NodeIterator;
 import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -41,6 +41,13 @@ public class BlogServiceImpl implements IBlogService {
 
   private Map<Integer, BlogArchive> blogArchive = new HashMap<Integer, BlogArchive>();
   private Map<Integer, Integer> month = new HashMap<Integer, Integer>();
+
+  private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
+  private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
+
+  static {
+    formatDateTime.applyPattern("yyyy-MM-dd");
+  }
 
   public void add(Integer year, Integer month) {
     BlogArchive blogArchive;
@@ -155,7 +162,7 @@ public class BlogServiceImpl implements IBlogService {
   @Override
   public List<Node> getBlogs(int year, int month) {
     try {
-      return getAllNode(BLOG_NODE, Util.getStrFirstDayOfMonth(year, month), Util.getStrLastDayOfMonth(year, month));
+      return getAllNode(BLOG_NODE, getStrFirstDayOfMonth(year, month), getStrLastDayOfMonth(year, month));
     } catch (Exception ex) {
       log.error(ex.getMessage());
     }
@@ -273,5 +280,21 @@ public class BlogServiceImpl implements IBlogService {
     Session session = sessionProvider.getSession(this.ws, repository);
 
     return session;
+  }
+
+  private String getStrFirstDayOfMonth(int year, int month) {
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.YEAR, year);
+    cal.set(Calendar.MONTH, month);
+    cal.set(Calendar.DAY_OF_MONTH, 1);
+    return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
+  }
+
+  private String getStrLastDayOfMonth(int year, int month) {
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.YEAR, year);
+    cal.set(Calendar.MONTH, month + 1);
+    cal.set(Calendar.DAY_OF_MONTH, 1);
+    return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
 }

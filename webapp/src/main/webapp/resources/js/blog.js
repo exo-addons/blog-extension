@@ -152,7 +152,6 @@
         return false;
     }; // end click on button
 
-
     eXo.ecm.blog = new blog();
     return eXo.ecm.blog;
     //-------------------------------------------------------------------------//

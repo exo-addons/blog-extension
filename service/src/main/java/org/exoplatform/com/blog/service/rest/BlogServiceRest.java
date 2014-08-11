@@ -22,7 +22,7 @@ import java.util.List;
  *          exo@exoplatform.com
  * Aug 7, 2014
  */
-@Path("/blog-extension/service")
+@Path("/blog/service")
 public class BlogServiceRest implements ResourceContainer {
   private Log log = ExoLogger.getExoLogger(BlogServiceRest.class);
 

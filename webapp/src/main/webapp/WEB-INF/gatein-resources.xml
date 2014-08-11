@@ -20,6 +20,8 @@
       <module>jquery</module>
       <as>gj</as>
     </depends>
+
   </module>
+
 
 </gatein-resources>

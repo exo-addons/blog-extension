@@ -38,6 +38,10 @@ def jsManager = rcontext.getJavascriptManager();
 jsManager.require("SHARED/blogjs", "blogjs");
 %>
 
+<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+<script type="text/javascript">var switchTo5x=true;</script>
+<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+<!---->
 <style>
 
     .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
@@ -94,6 +98,14 @@ jsManager.require("SHARED/blogjs", "blogjs");
                 <footer>
                     <p class="tags"><% tags(post)
                         %></p>
+										<!--share this-->
+                    <span class='st_facebook' displayText='Facebook'></span>
+                    <span class='st_googleplus' displayText='Google +'></span>
+                    <span class='st_twitter' displayText='Tweet'></span>
+                    <span class='st_linkedin' displayText='LinkedIn'></span>
+                    <span class='st_pinterest' displayText='Pinterest'></span>
+                    <span class='st_email' displayText='Email'></span>
+
                 </footer> <!-- end article footer -->
 
             </article> <!-- end article -->
