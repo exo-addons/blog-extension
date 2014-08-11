@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2014 eXo Platform SAS.
+ * Copyright (C) 2003-2014 eXo Platform SEA.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -27,7 +27,6 @@ import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
-import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -55,7 +54,7 @@ public class BlogServiceImpl implements BlogService {
 
   private RepositoryService repoService;
   private SessionProviderService sessionProviderService;
-  private ManageDriveService manageDriveService = WCMCoreUtils.getService(ManageDriveService.class);
+  private ManageDriveService manageDriveService;//= WCMCoreUtils.getService(ManageDriveService.class);
 
   private Map<Integer, BlogArchive> blogArchives = new HashMap<Integer, BlogArchive>();
 
@@ -90,7 +89,9 @@ public class BlogServiceImpl implements BlogService {
     }
   }
 
-  public BlogServiceImpl(RepositoryService repoService, SessionProviderService sessionProviderService) {
+  public BlogServiceImpl(RepositoryService repoService, SessionProviderService sessionProviderService,
+                         ManageDriveService managerDriverService) {
+    this.manageDriveService = managerDriverService;
     this.repoService = repoService;
     this.sessionProviderService = sessionProviderService;
     try {
@@ -145,7 +146,7 @@ public class BlogServiceImpl implements BlogService {
       BlogArchive month = this.blogArchives.get(year);
       return new ArrayList(month.getMonth().keySet());
     } catch (Exception ex) {
-      Util.log("Not found any month by year: "+year, ex.getMessage());
+      Util.log("Not found any month by year: " + year, ex.getMessage());
     }
     return null;
   }
@@ -164,7 +165,11 @@ public class BlogServiceImpl implements BlogService {
    */
   @Override
   public int getArchivesCountInMonth(int year, int month) {
-    return this.blogArchives.get(year).getMonth().get(month);
+    try {
+      return this.blogArchives.get(year).getMonth().get(month);
+    } catch (Exception ex) {
+      return 0;
+    }
   }
 
   /**
@@ -196,6 +201,8 @@ public class BlogServiceImpl implements BlogService {
 
         if (monthByYear.containsKey(month)) {
           blogArchives.get(year).getMonth().put(month, monthByYear.get(month) + 1);
+        } else {
+          blogArchives.get(year).getMonth().put(month, 1);
         }
       }
     } catch (Exception ex) {
@@ -309,10 +316,14 @@ public class BlogServiceImpl implements BlogService {
   }
 
   private String getDriverPath() throws Exception {
-    DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
-    String driverPath = driveData.getHomePath();
-    driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
-    driverPath += "%";
-    return driverPath;
+    try {
+      DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
+      String driverPath = driveData.getHomePath();
+      driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
+      driverPath += "%";
+      return driverPath;
+    } catch (Exception ex) {
+      return "/Blog%";
+    }
   }
 }

@@ -13,17 +13,15 @@
         <valueConstraints />
       </propertyDefinition>
 
-      <!--<propertyDefinition name="exo:summary" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">-->
-        <!--<valueConstraints />-->
-      <!--</propertyDefinition>-->
+      <propertyDefinition name="exo:summary" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints />
+      </propertyDefinition>
 
-      <!--<propertyDefinition name="exo:dateCreated" requiredType="Date" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">-->
-        <!--<valueConstraints />-->
-      <!--</propertyDefinition>-->
+      <propertyDefinition name="exo:dateCreated" requiredType="Date" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints />
+      </propertyDefinition>
 
     </propertyDefinitions>
   </nodeType>
-
-
 
 </nodeTypes>

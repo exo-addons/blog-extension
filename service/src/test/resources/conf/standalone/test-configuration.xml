@@ -23,7 +23,8 @@
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
    xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
-  
+
+
   <component>
     <key>org.exoplatform.services.organization.OrganizationService</key>
     <type>org.exoplatform.services.organization.hibernate.OrganizationServiceImpl</type>
@@ -34,15 +35,45 @@
     <type>org.exoplatform.services.organization.auth.OrganizationAuthenticatorImpl</type>
   </component>
 
-  <!--<component>-->
-    <!--<key>org.exoplatform.com.blog.service.BlogService</key>-->
-    <!--<type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>-->
-  <!--</component>og-->
+  <component>
+    <key>org.exoplatform.services.cms.drives.ManageDriveService</key>
+    <type>org.exoplatform.services.cms.drives.impl.ManageDriveServiceImpl</type>
+  </component>
 
-  <!--<component>-->
-  <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
-  <!--</component>-->
+  <component>
+    <type>org.exoplatform.services.cms.impl.DMSConfiguration</type>
+  </component>
 
+  <component>
+    <key>org.exoplatform.services.jcr.ext.distribution.DataDistributionManager</key>
+    <type>org.exoplatform.services.jcr.ext.distribution.impl.DataDistributionManagerImpl</type>
+  </component>
+  <component>
+    <key>org.exoplatform.services.jcr.ext.hierarchy.NodeHierarchyCreator</key>
+    <type>org.exoplatform.services.jcr.ext.hierarchy.impl.NodeHierarchyCreatorImpl</type>
+    <init-params>
+      <object-param>
+        <name>Blog</name>
+        <description>Blog Posts in Taxonomy</description>
+        <object type="org.exoplatform.services.cms.drives.DriveData">
+          <field name="name"><string>Blog</string></field>
+          <field name="workspace"><string>collaboration</string></field>
+          <field name="permissions"><string>*:/platform/users</string></field>
+          <field name="homePath"><string>/</string></field>
+          <field name="icon"><string></string></field>
+          <field name="views">
+            <string>blog-view</string>
+          </field>
+          <field name="viewPreferences"><boolean>false</boolean></field>
+          <field name="viewNonDocument"><boolean>true</boolean></field>
+          <field name="viewSideBar"><boolean>true</boolean></field>
+          <field name="showHiddenNode"><boolean>false</boolean></field>
+          <field name="allowCreateFolders"><string>nt:unstructured</string></field>
+          <field name="allowNodeTypesOnTree"><string>exo:taxonomy</string></field>
+        </object>
+      </object-param>
+    </init-params>
+  </component>
 
   <component>
     <key>org.exoplatform.services.database.HibernateService</key>
@@ -344,8 +375,42 @@
      </component-plugin>
   </external-component-plugins>
 
+  <external-component-plugins>
+    <target-component>org.exoplatform.services.cms.drives.ManageDriveService</target-component>
+
+    <component-plugin>
+      <name>manage.drive.plugin</name>
+      <set-method>setManageDrivePlugin</set-method>
+      <type>org.exoplatform.services.cms.drives.impl.ManageDrivePlugin</type>
+      <description></description>
+      <init-params>
+        <object-param>
+          <name>Blog</name>
+          <description>Blog Posts in Taxonomy</description>
+          <object type="org.exoplatform.services.cms.drives.DriveData">
+            <field name="name"><string>Blog</string></field>
+            <field name="workspace"><string>collaboration</string></field>
+            <field name="permissions"><string>*:/platform/users</string></field>
+            <field name="homePath"><string>/</string></field>
+            <field name="icon"><string></string></field>
+            <field name="views">
+              <string>blog-view</string>
+            </field>
+            <field name="viewPreferences"><boolean>false</boolean></field>
+            <field name="viewNonDocument"><boolean>true</boolean></field>
+            <field name="viewSideBar"><boolean>true</boolean></field>
+            <field name="showHiddenNode"><boolean>false</boolean></field>
+            <field name="allowCreateFolders"><string>nt:unstructured</string></field>
+            <field name="allowNodeTypesOnTree"><string>exo:taxonomy</string></field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+
+  </external-component-plugins>
+
+
   <remove-configuration>org.exoplatform.services.cache.ExoCacheFactory</remove-configuration>
   <remove-configuration>org.exoplatform.services.scheduler.JobSchedulerService</remove-configuration>
-
 
 </configuration>

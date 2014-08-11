@@ -86,7 +86,7 @@ public class TestBlog extends TestCase {
   
   public void testA() throws Exception {
     Session session = getSession();
-    Node node = session.getRootNode().addNode(BLOG_NODE,"Test");
+    Node node = session.getRootNode().addNode("Test");
     session.save();
     System.out.println("Add node test: " + node);
     session.save();
