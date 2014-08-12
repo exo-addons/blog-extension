@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<configuration
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_1.xsd
+        http://www.exoplatform.org/xml/ns/kernel_1_1.xsd"
+        xmlns="http://www.exoplatform.org/xml/ns/kernel_1_1.xsd">
+
+  <!--Add Link to PLF-Navigator-->
+  <external-component-plugins>
+    <target-component>org.exoplatform.webui.ext.UIExtensionManager</target-component>
+    <component-plugin>
+      <name>add.action</name>
+      <set-method>registerUIExtensionPlugin</set-method>
+      <type>org.exoplatform.webui.ext.UIExtensionPlugin</type>
+      <init-params>
+        <object-param>
+          <name>BlogPost</name>
+          <object type="org.exoplatform.webui.ext.UIExtension">
+            <field name="type">
+              <string>platform.extension.navigation</string>
+            </field>
+            <field name="rank">
+              <int>1000</int>
+            </field>
+            <field name="name">
+              <string>BlogPost</string>
+            </field>
+            <field name="enable">
+              <boolean>true</boolean>
+            </field>
+            <field name="component">
+              <string>org.exoplatform.com.blog.component.TopNavigatorActionComponent</string>
+            </field>
+          </object>
+        </object-param>
+      </init-params>
+    </component-plugin>
+  </external-component-plugins>
+
+</configuration>

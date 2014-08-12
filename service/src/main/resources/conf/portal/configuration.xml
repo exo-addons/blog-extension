@@ -10,9 +10,9 @@
     <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
   </component>
 
-  <component>
-    <type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>
-  </component>
+  <!--<component>-->
+    <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
+  <!--</component>-->
 
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.impl.ext.action.SessionActionCatalog</target-component>
@@ -63,37 +63,4 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
-
-  <!--Add Link to PLF-Navigator-->
-  <external-component-plugins>
-    <target-component>org.exoplatform.webui.ext.UIExtensionManager</target-component>
-    <component-plugin>
-      <name>add.action</name>
-      <set-method>registerUIExtensionPlugin</set-method>
-      <type>org.exoplatform.webui.ext.UIExtensionPlugin</type>
-      <init-params>
-        <object-param>
-          <name>BlogPost</name>
-          <object type="org.exoplatform.webui.ext.UIExtension">
-            <field name="type">
-              <string>platform.extension.navigation</string>
-            </field>
-            <field name="rank">
-              <int>1000</int>
-            </field>
-            <field name="name">
-              <string>BlogPost</string>
-            </field>
-            <field name="enable">
-              <boolean>true</boolean>
-            </field>
-            <field name="component">
-              <string>org.exoplatform.com.blog.component.TopNavigatorActionComponent</string>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
-
 </configuration>

@@ -1,7 +1,33 @@
+/*
+ * Copyright (C) 2003-2014 eXo Platform SEA.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see<http://www.gnu.org/licenses/>.
+ */
+
 package org.exoplatform.blog;
 
+import junit.framework.TestCase;
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.util.Util;
+import org.exoplatform.container.StandaloneContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.IdentityConstants;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
@@ -15,50 +41,54 @@ import java.util.List;
  * exo@exoplatform.com
  * Aug 7, 2014
  */
-public class TestBlogService extends TestBlog {
+public class TestBlogService extends TestCase {
+  private Log log = ExoLogger.getExoLogger(TestBlogService.class);
+
+  private static StandaloneContainer container;
   private static BlogService blogService;
 
-  static {
+  private static final String BLOG_NODE = "exo:blog";
 
+  static {
+    initContainer();
   }
 
-  public void setUp() throws Exception {
-    super.setUp();
+  /**
+   * Set current container
+   */
+  private void begin() {
+    RequestLifeCycle.begin(container);
+  }
+
+  /**
+   * Clear current container
+   */
+  protected void tearDown() throws Exception {
+    RequestLifeCycle.end();
+  }
+
+  private static void initContainer() {
+    try {
+      String containerConf = Thread.currentThread()
+              .getContextClassLoader()
+              .getResource("conf/standalone/configuration.xml")
+              .toString();
+      StandaloneContainer.addConfigurationURL(containerConf);
+      String loginConf = Thread.currentThread().getContextClassLoader().getResource("conf/standalone/login.conf").toString();
+      System.setProperty("java.security.auth.login.config", loginConf);
+      container = StandaloneContainer.getInstance();
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to initialize standalone container: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  protected void setUp() throws Exception {
+    begin();
+    Identity systemIdentity = new Identity(IdentityConstants.SYSTEM);
+    ConversationState.setCurrent(new ConversationState(systemIdentity));
     reset();
-    System.out.println("----------------------------INIT-----------------------------");
-//    2014
-    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
-    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
-    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
-    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
-    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
-
-    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
-    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
-    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
-    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
-    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
-
-    addBlog("Post-004", "Post-004 Title", "Post-004 Summary", new GregorianCalendar(2014, 04, 04));
-//    2013
-    addBlog("Post-000-2013001", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
-
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 02, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 02, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 02, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 03, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 03, 01));
-
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
-    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
-
-//    blogService = WCMCoreUtils.getService(BlogService.class);
+    init();
     blogService = (BlogService) container.getComponentInstanceOfType(BlogService.class);
   }
 
@@ -70,7 +100,7 @@ public class TestBlogService extends TestBlog {
     for (int year : years) {
       System.out.println(year);
     }
-//    assertEquals("Test get year failed", 2, years.size());
+    assertEquals("Test get year failed", 2, years.size());
   }
 
   public void testGetMonth() {
@@ -132,9 +162,9 @@ public class TestBlogService extends TestBlog {
   }
 
 
-  public void testAddBlog() throws Exception{
+  public void testAddBlog() throws Exception {
     //total blog of 2014/08 before create a new post
-    int postCountBefore = blogService.getArchivesCountInMonth(2014,7);
+    int postCountBefore = blogService.getArchivesCountInMonth(2014, 7);
     //add 5 post
     printBlogArchive();
     System.out.println("-----------------------------testAddBlog--------------------------------");
@@ -149,16 +179,14 @@ public class TestBlogService extends TestBlog {
     blogService.addBlog(node3);
     blogService.addBlog(node4);
     blogService.addBlog(node5);
-//    blogService = (BlogService) container.getComponentInstanceOfType(BlogService.class);
-
     printBlogArchive();
-    int postCountAfter = blogService.getArchivesCountInMonth(2014,7);
+    int postCountAfter = blogService.getArchivesCountInMonth(2014, 7);
 
     int denta = postCountAfter - postCountBefore;
     assertTrue("Increate blog cached table", denta == 5);
   }
 
-  public void testRemoveBlog() throws Exception{
+  public void testRemoveBlog() throws Exception {
     System.out.println("--------------------testRemoveBlog--------------------");
 //    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
     printBlogArchive();
@@ -170,7 +198,7 @@ public class TestBlogService extends TestBlog {
     Node node = blog.getNode("Post-000-2013001");
     blogService.removeBlog(node);
     int monthPostTotalAfter = blogService.getArchivesCountInMonth(2013, 01);
-    int denta = monthPostTotalBefore-monthPostTotalAfter;
+    int denta = monthPostTotalBefore - monthPostTotalAfter;
 
     assertTrue("Test remove blog failed ", (denta == 1));
     printBlogArchive();
@@ -185,7 +213,6 @@ public class TestBlogService extends TestBlog {
     node.setProperty("exo:title", title);
     node.setProperty("exo:summary", summary);
     node.setProperty("exo:dateCreated", date);
-//    blogService.addBlog(node);
     session.save();
     return node;
   }
@@ -196,5 +223,46 @@ public class TestBlogService extends TestBlog {
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     blog.remove();
     rootNode.save();
+  }
+
+  protected Session getSession() throws Exception {
+    RepositoryService repoService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
+    return repoService.getCurrentRepository().login();
+  }
+
+  private void init() throws Exception {
+    System.out.println("----------------------------INIT-----------------------------");
+//    2014
+    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+
+    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
+    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
+    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
+    addBlog("Post-002", "Post-002 Title", "Post-002 Summary", new GregorianCalendar(2014, 02, 02));
+
+    addBlog("Post-004", "Post-004 Title", "Post-004 Summary", new GregorianCalendar(2014, 04, 04));
+//    2013
+    addBlog("Post-000-2013001", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
+
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 02, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 02, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 02, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 03, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 03, 01));
+
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
+    addBlog("Post-000-2013", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 04, 01));
+
   }
 }

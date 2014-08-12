@@ -20,13 +20,14 @@ package org.exoplatform.com.blog.service.impl;
 
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.entity.BlogArchive;
-import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.services.cms.drives.DriveData;
 import org.exoplatform.services.cms.drives.ManageDriveService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.log.ExoLogger;
+import org.exoplatform.services.log.Log;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -43,7 +44,7 @@ import java.util.*;
  * Aug 4, 2014
  */
 public class BlogServiceImpl implements BlogService {
-
+  private Log log = ExoLogger.getExoLogger(BlogService.class);
 
   private static final String BLOG_NODE = "exo:blog";
   private static final String DRIVER_PATH = "Blog";
@@ -98,7 +99,9 @@ public class BlogServiceImpl implements BlogService {
       this.repo = repoService.getCurrentRepository().getConfiguration().getName();
       this.ws = repoService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
     } catch (Exception ex) {
-      Util.log("Using default repository & workspace", ex.getMessage());
+      if(log.isErrorEnabled()) {
+         log.error("Using default repository & workspace", ex.getMessage());
+      }
     }
     initBlogArchive();
     setInitData(false);
@@ -116,7 +119,9 @@ public class BlogServiceImpl implements BlogService {
           add(_year, _month);
         }
       } catch (Exception ex) {
-        Util.log("", ex.getMessage());
+        if(log.isErrorEnabled()) {
+          log.error(ex.getMessage());
+        }
       }
     }
   }
@@ -134,7 +139,7 @@ public class BlogServiceImpl implements BlogService {
    */
   @Override
   public List<Integer> getArchiveYears() {
-    return new ArrayList<Integer>(blogArchives.keySet());
+    return new ArrayList(blogArchives.keySet());
   }
 
   /**
@@ -144,9 +149,11 @@ public class BlogServiceImpl implements BlogService {
   public List<Integer> getArchiveMonths(int year) {
     try {
       BlogArchive month = this.blogArchives.get(year);
-      return new ArrayList<Integer>(month.getMonth().keySet());
+      return new ArrayList(month.getMonth().keySet());
     } catch (Exception ex) {
-      Util.log("Not found any month by year: " + year, ex.getMessage());
+      if(log.isErrorEnabled()) {
+        log.error("Not found any month by year: " + year, ex.getMessage());
+      }
     }
     return null;
   }
@@ -180,7 +187,9 @@ public class BlogServiceImpl implements BlogService {
     try {
       return getAllNode(BLOG_NODE, getStrFirstDayOfMonth(year, month), getStrLastDayOfMonth(year, month));
     } catch (Exception ex) {
-      Util.log("", ex.getMessage());
+      if(log.isErrorEnabled()) {
+        log.error(ex.getMessage());
+      }
     }
     return null;
   }
@@ -206,7 +215,9 @@ public class BlogServiceImpl implements BlogService {
         }
       }
     } catch (Exception ex) {
-      Util.log("", ex.getMessage());
+      if(log.isErrorEnabled()) {
+        log.error(ex.getMessage());
+      }
     }
   }
 
@@ -229,7 +240,9 @@ public class BlogServiceImpl implements BlogService {
         }
       }
     } catch (Exception ex) {
-      Util.log("", ex.getMessage());
+      if(log.isErrorEnabled()) {
+        log.error(ex.getMessage());
+      }
     }
   }
 
@@ -240,7 +253,7 @@ public class BlogServiceImpl implements BlogService {
    * @return
    * @throws Exception
    */
-  private List<Node> getAllNode(String nodeElement) throws Exception {
+  private List<Node> getAllNode(String nodeElement) throws Exception{
     Session session = getSession();
     String searchPath = getDriverPath();
     List<Node> rs = new ArrayList<Node>();
@@ -315,7 +328,7 @@ public class BlogServiceImpl implements BlogService {
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
 
-  private String getDriverPath() throws Exception {
+  private String getDriverPath() throws Exception{
       DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
       String driverPath = driveData.getHomePath();
       driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);

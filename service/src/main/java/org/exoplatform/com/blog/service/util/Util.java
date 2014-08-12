@@ -57,13 +57,4 @@ public class Util {
     return "";
   }
 
-  /**
-   *
-   * @param info message
-   * @param error message
-   */
-  public static void log(String info, String error){
-    if(log.isErrorEnabled()) log.error(error);
-    if(log.isInfoEnabled()) log.info(info);
-  }
 }
