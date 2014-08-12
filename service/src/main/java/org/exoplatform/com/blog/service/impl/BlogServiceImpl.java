@@ -28,10 +28,7 @@ import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
+import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import java.text.SimpleDateFormat;
@@ -170,7 +167,7 @@ public class BlogServiceImpl implements BlogService {
   @Override
   public int getArchivesCountInMonth(int year, int month) {
     BlogArchive monthByYear = this.blogArchives.get(year);
-    if (monthByYear != null && monthByYear.getMonth() != null && monthByYear.getMonth().get(month)!=null)
+    if (monthByYear != null && monthByYear.getMonth() != null && monthByYear.getMonth().get(month) != null)
       return monthByYear.getMonth().get(month);
     return 0;
   }
@@ -220,14 +217,23 @@ public class BlogServiceImpl implements BlogService {
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         BlogArchive _blogYearArchive = blogArchives.get(year);
+
+        if (_blogYearArchive == null) return;
+
+        //decrease year
         blogArchives.get(year).setYear_post(_blogYearArchive.getYear_post() - 1);
         Map<Integer, Integer> monthByYear = _blogYearArchive.getMonth();
 
+        //decrease month
         if (monthByYear.containsKey(month)) {
           blogArchives.get(year).getMonth().put(month, monthByYear.get(month) - 1);
         }
       }
-    } catch (Exception ex) {
+    } catch (PathNotFoundException ex) {
+      if (log.isErrorEnabled()) {
+        log.error(ex.getMessage());
+      }
+    } catch (RepositoryException ex) {
       if (log.isErrorEnabled()) {
         log.error(ex.getMessage());
       }
