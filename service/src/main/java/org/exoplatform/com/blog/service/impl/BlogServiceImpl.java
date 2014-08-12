@@ -15,7 +15,6 @@
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
 
-
 package org.exoplatform.com.blog.service.impl;
 
 import org.exoplatform.com.blog.service.BlogService;
@@ -48,6 +47,7 @@ public class BlogServiceImpl implements BlogService {
 
   private static final String BLOG_NODE = "exo:blog";
   private static final String DRIVER_PATH = "Blog";
+  private static final String EXO_DATE_CREATED = "exo:dateCreated";
 
   private boolean initData = true;
   private String repo = "repository";
@@ -55,7 +55,7 @@ public class BlogServiceImpl implements BlogService {
 
   private RepositoryService repoService;
   private SessionProviderService sessionProviderService;
-  private ManageDriveService manageDriveService;//= WCMCoreUtils.getService(ManageDriveService.class);
+  private ManageDriveService manageDriveService;
 
   private Map<Integer, BlogArchive> blogArchives = new HashMap<Integer, BlogArchive>();
 
@@ -99,8 +99,8 @@ public class BlogServiceImpl implements BlogService {
       this.repo = repoService.getCurrentRepository().getConfiguration().getName();
       this.ws = repoService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
     } catch (Exception ex) {
-      if(log.isErrorEnabled()) {
-         log.error("Using default repository & workspace", ex.getMessage());
+      if (log.isErrorEnabled()) {
+        log.error("Using default repository & workspace", ex.getMessage());
       }
     }
     initBlogArchive();
@@ -113,13 +113,13 @@ public class BlogServiceImpl implements BlogService {
         List<Node> allNode = getAllNode(BLOG_NODE);
         Calendar cal = null;
         for (Node node : allNode) {
-          cal = node.getProperty("exo:dateCreated").getValue().getDate();
+          cal = node.getProperty(EXO_DATE_CREATED).getValue().getDate();
           int _year = cal.get(Calendar.YEAR);
           int _month = cal.get(Calendar.MONTH);
           add(_year, _month);
         }
       } catch (Exception ex) {
-        if(log.isErrorEnabled()) {
+        if (log.isErrorEnabled()) {
           log.error(ex.getMessage());
         }
       }
@@ -139,7 +139,7 @@ public class BlogServiceImpl implements BlogService {
    */
   @Override
   public List<Integer> getArchiveYears() {
-    return new ArrayList(blogArchives.keySet());
+    return new ArrayList<Integer>(blogArchives.keySet());
   }
 
   /**
@@ -147,15 +147,9 @@ public class BlogServiceImpl implements BlogService {
    */
   @Override
   public List<Integer> getArchiveMonths(int year) {
-    try {
-      BlogArchive month = this.blogArchives.get(year);
-      return new ArrayList(month.getMonth().keySet());
-    } catch (Exception ex) {
-      if(log.isErrorEnabled()) {
-        log.error("Not found any month by year: " + year, ex.getMessage());
-      }
-    }
-    return null;
+    BlogArchive monthByYear = this.blogArchives.get(year);
+    if (monthByYear != null) return new ArrayList<Integer>(monthByYear.getMonth().keySet());
+    return new ArrayList<Integer>();
   }
 
   /**
@@ -172,11 +166,9 @@ public class BlogServiceImpl implements BlogService {
    */
   @Override
   public int getArchivesCountInMonth(int year, int month) {
-    try {
-      return this.blogArchives.get(year).getMonth().get(month);
-    } catch (Exception ex) {
-      return 0;
-    }
+    BlogArchive monthByYear = this.blogArchives.get(year);
+    if (monthByYear != null && monthByYear.getMonth()!=null) return monthByYear.getMonth().get(month);
+    return 0;
   }
 
   /**
@@ -187,7 +179,7 @@ public class BlogServiceImpl implements BlogService {
     try {
       return getAllNode(BLOG_NODE, getStrFirstDayOfMonth(year, month), getStrLastDayOfMonth(year, month));
     } catch (Exception ex) {
-      if(log.isErrorEnabled()) {
+      if (log.isErrorEnabled()) {
         log.error(ex.getMessage());
       }
     }
@@ -215,7 +207,7 @@ public class BlogServiceImpl implements BlogService {
         }
       }
     } catch (Exception ex) {
-      if(log.isErrorEnabled()) {
+      if (log.isErrorEnabled()) {
         log.error(ex.getMessage());
       }
     }
@@ -240,7 +232,7 @@ public class BlogServiceImpl implements BlogService {
         }
       }
     } catch (Exception ex) {
-      if(log.isErrorEnabled()) {
+      if (log.isErrorEnabled()) {
         log.error(ex.getMessage());
       }
     }
@@ -253,7 +245,7 @@ public class BlogServiceImpl implements BlogService {
    * @return
    * @throws Exception
    */
-  private List<Node> getAllNode(String nodeElement) throws Exception{
+  private List<Node> getAllNode(String nodeElement) throws Exception {
     Session session = getSession();
     String searchPath = getDriverPath();
     List<Node> rs = new ArrayList<Node>();
@@ -328,11 +320,11 @@ public class BlogServiceImpl implements BlogService {
     return formatDateTime.format(cal.getTime()) + TIME_FORMAT_TAIL;
   }
 
-  private String getDriverPath() throws Exception{
-      DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
-      String driverPath = driveData.getHomePath();
-      driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
-      driverPath += "%";
-      return driverPath;
+  private String getDriverPath() throws Exception {
+    DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
+    String driverPath = driveData.getHomePath();
+    driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
+    driverPath += "%";
+    return driverPath;
   }
 }
