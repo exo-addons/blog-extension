@@ -37,11 +37,6 @@ def rcontext = _ctx.getRequestContext() ;
 def jsManager = rcontext.getJavascriptManager();
 jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.intShare();");
 %>
-<!--
-<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-<script type="text/javascript">var switchTo5x=true;</script>
-<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
--->
 <style>
 
     .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
@@ -180,8 +175,10 @@ if (comments.size > 1) plural = "s"
     .commentList .commentItem .ContentBlock {
     word-wrap: break-word;
     }
+	.disapproved{text-decoration: line-through;}
+	.approved{text-decoration: none;}
 </style>
-<h5 class="title">${comments.size} comment${plural}</h5>
+<h5 class="title">${comments.size} comment ${plural}</h5>
 <div class="commentList">
     <div>
         <%
@@ -196,11 +193,16 @@ if (comments.size > 1) plural = "s"
         def commentContent = comment.getProperty("exo:commentContent").string
         def commentDate = formatter.format(comment.getProperty("exo:commentDate").date.time)
         def isOwner = (commentor == viewer)
+				def cmtPath = comment.getPath();
+				def timeId = comment.getProperty("exo:commentDate").date.time.time;
+
+				def approve = false;
+
+				try{
+					approve = comment.getProperty("exo:blogStatus").getBoolean();
+				}catch(Exception ex){}
         %>
-
-
         <div class="commentItem" id="comment-${comment.name}">
-
             <div class="commmentLeft">
                 <a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
                     <img alt="$commentorName" src="$commentorAvatar">
@@ -209,18 +211,23 @@ if (comments.size > 1) plural = "s"
             <div class="commentRight">
                 <div class="author">
                     <a href="/portal/intranet/profile/$commentor">$commentorName</a>
-                    <span class="dateTime">$commentDate</span>
+                    <span class="dateTime">$commentDate </span>
+                    <span id="approve-$timeId" style="padding-left: 500px;">
+												<%if(!approve){%>
+											<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath');" value="Approve" />
+												<%}else{%>
+											<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath');" value="Disapprove" />
+												<%}%>
+										</span>
                 </div>
-                <p class="contentComment"></p><p class="ContentBlock">$commentContent</p><p></p>
+                <p class="contentComment"></p>
+							<p id="$timeId" class="ContentBlock <%if(!approve){%>disapproved<%}%>" >$commentContent</p><p></p>
             </div><!--end commentRight-->
-
         </div><!--end commentItem-->
-
         <%
-
         } catch (Exception e) {
-        print e
-        continue; //skip broken comments
+        	print e
+        	continue; //skip broken comments
         }
         } // end loop on comments
         %>

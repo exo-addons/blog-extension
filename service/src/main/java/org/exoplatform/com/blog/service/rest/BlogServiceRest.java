@@ -23,10 +23,12 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.annotation.security.RolesAllowed;
 import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -37,7 +39,7 @@ import java.util.List;
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
+ * exo@exoplatform.com
  * Aug 7, 2014
  */
 @Path("/blog/service")
@@ -54,7 +56,7 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/get-blogs")
   @RolesAllowed("users")
   public Response getBlogs(@QueryParam("year") Integer year, @QueryParam("month") Integer month) {
-    if(year==null || month==null) return Response.ok("false").build();
+    if (year == null || month == null) return Response.ok("false").build();
     JSONArray result = new JSONArray();
     List<Node> blogs = blogService.getBlogs(year, month);
     try {
@@ -65,9 +67,33 @@ public class BlogServiceRest implements ResourceContainer {
         result.put(obj);
       }
       return Response.ok(result.toString(), MediaType.APPLICATION_JSON).build();
-    }catch(Exception ex){
+    } catch (Exception ex) {
       log.error(ex.getMessage());
     }
     return Response.ok("false").build();
+  }
+
+  @POST
+  @Path("/changeStatus")
+  @RolesAllowed("users")
+  public Response getBlogs(@QueryParam("nodePath") String nodePath) {
+    Node rs = blogService.changeStatus(nodePath);
+    JSONObject obj = new JSONObject();
+    try {
+      try {
+        if (rs.hasProperty("exo:blogStatus")) {
+          obj.put("result", rs.getProperty("exo:blogStatus").getBoolean());
+        } else {
+          obj.put("result", -1);
+        }
+        return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+      } catch (RepositoryException ex) {
+        if (log.isErrorEnabled()) log.error(ex.getMessage());
+      }
+      obj.put("result", -1);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
   }
 }

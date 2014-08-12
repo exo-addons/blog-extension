@@ -78,4 +78,9 @@ public interface BlogService {
    */
   public void removeBlog(Node blogNode);
 
+  /**
+   * Update post status
+   * @param nodePath
+   */
+  public Node changeStatus(String nodePath);
 }
