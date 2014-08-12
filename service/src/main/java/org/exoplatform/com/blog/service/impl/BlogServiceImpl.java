@@ -148,7 +148,7 @@ public class BlogServiceImpl implements BlogService {
   @Override
   public List<Integer> getArchiveMonths(int year) {
     BlogArchive monthByYear = this.blogArchives.get(year);
-    if (monthByYear != null) return new ArrayList<Integer>(monthByYear.getMonth().keySet());
+    if (monthByYear != null && monthByYear.getMonth()!=null) return new ArrayList<Integer>(monthByYear.getMonth().keySet());
     return new ArrayList<Integer>();
   }
 
@@ -159,7 +159,6 @@ public class BlogServiceImpl implements BlogService {
   public int getArchivesCountInYear(int year) {
     return this.blogArchives.get(year).getYear_post();
   }
-
 
   /**
    * {@inheritDoc}
