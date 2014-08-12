@@ -30,6 +30,7 @@ import org.exoplatform.services.log.Log;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
@@ -48,6 +49,8 @@ public class BlogServiceImpl implements BlogService {
   private static final String BLOG_NODE = "exo:blog";
   private static final String DRIVER_PATH = "Blog";
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
+  private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
+  private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
 
   private boolean initData = true;
   private String repo = "repository";
@@ -58,9 +61,6 @@ public class BlogServiceImpl implements BlogService {
   private ManageDriveService manageDriveService;
 
   private Map<Integer, BlogArchive> blogArchives = new HashMap<Integer, BlogArchive>();
-
-  private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
-  private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
 
   static {
     formatDateTime.applyPattern("yyyy-MM-dd");
@@ -170,7 +170,8 @@ public class BlogServiceImpl implements BlogService {
   @Override
   public int getArchivesCountInMonth(int year, int month) {
     BlogArchive monthByYear = this.blogArchives.get(year);
-    if (monthByYear != null && monthByYear.getMonth() != null) return monthByYear.getMonth().get(month);
+    if (monthByYear != null && monthByYear.getMonth() != null && monthByYear.getMonth().get(month)!=null)
+      return monthByYear.getMonth().get(month);
     return 0;
   }
 
@@ -199,17 +200,9 @@ public class BlogServiceImpl implements BlogService {
         Calendar cal = new GregorianCalendar();
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
-        BlogArchive _blogYearArchive = blogArchives.get(year);
-        blogArchives.get(year).setYear_post(_blogYearArchive.getYear_post() + 1);
-        Map<Integer, Integer> monthByYear = _blogYearArchive.getMonth();
-
-        if (monthByYear.containsKey(month)) {
-          blogArchives.get(year).getMonth().put(month, monthByYear.get(month) + 1);
-        } else {
-          blogArchives.get(year).getMonth().put(month, 1);
-        }
+        add(year, month);
       }
-    } catch (Exception ex) {
+    } catch (RepositoryException ex) {
       if (log.isErrorEnabled()) {
         log.error(ex.getMessage());
       }

@@ -12,7 +12,7 @@
     <module>webapp</module>
     <module>config</module>
     <module>service</module>
-    <module>component</module>
+    <module>webui</module>
   </modules>
   <scm>
     <connection>scm:git:git://github.com/exo-addons/blog-extension.git</connection>

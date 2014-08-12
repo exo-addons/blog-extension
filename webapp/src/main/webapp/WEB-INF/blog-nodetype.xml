@@ -14,4 +14,11 @@
       </propertyDefinition>
     </propertyDefinitions>
   </nodeType>
+
+  <nodeType name="exo:blogApprove" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+    <propertyDefinitions>
+      <propertyDefinition name="exo:blogStatus" autoCreated="false" mandatory="false" multiple="false" onParentVersion="COPY" protected="false" requiredType="Integer" ></propertyDefinition>
+    </propertyDefinitions>
+  </nodeType>
+
 </nodeTypes>

@@ -77,4 +77,5 @@ public interface BlogService {
    * @param blogNode
    */
   public void removeBlog(Node blogNode);
+
 }
