@@ -91,4 +91,11 @@ public interface BlogService {
    * @return
    */
   public Node getPost(String postPath);
+
+  /**
+   * Update vote on blog-vote
+   * @param postNodePath
+   * @return
+   */
+  public Node updateVote(String postNodePath, int score);
 }

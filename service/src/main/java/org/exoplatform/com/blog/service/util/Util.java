@@ -57,4 +57,21 @@ public class Util {
     return "";
   }
 
+  public static int getInt(String value, int defaultValue){
+    try{
+      return Integer.parseInt(value);
+    }catch(NumberFormatException ex){
+      return defaultValue;
+    }
+  }
+
+//  public static Node getNode(String postPath) {
+//    try {
+//      Session session = getSession();
+//      return (Node)session.getItem(postPath);
+//    }catch(Exception ex){if(log.isErrorEnabled()){log.error(ex.getMessage());}}
+//    return null;
+//  }
+
+
 }

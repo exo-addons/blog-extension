@@ -47,6 +47,9 @@ public class BlogServiceImpl implements BlogService {
   private static final String DRIVER_PATH = "Blog";
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_APPROVE_NODE = "exo:blogApprove";
+  private static final String BLOG_VOTE_NODE = "exo:blogVote";
+  private static final String BLOG_VOTE_POINT_PROPERTY = "exo:blogVotePoint";
+  private static final String BLOG_VOTE_TOTAL_PROPERTY = "exo:blogVoteTotal";
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
 
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
@@ -280,6 +283,33 @@ public class BlogServiceImpl implements BlogService {
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Node updateVote(String postNodePath, int score) {
+    try {
+      Session session = getSession();
+      if(postNodePath.startsWith("/")) postNodePath = postNodePath.substring(1);
+      Node nodeUpdate = session.getRootNode().getNode(postNodePath);
+
+      if(nodeUpdate.canAddMixin(BLOG_VOTE_NODE)){
+        nodeUpdate.addMixin(BLOG_VOTE_NODE);
+        nodeUpdate.setProperty(BLOG_VOTE_POINT_PROPERTY, 1);
+        nodeUpdate.setProperty(BLOG_VOTE_TOTAL_PROPERTY, score);
+      }else {
+        int _currentVotePoint = Integer.parseInt(nodeUpdate.getProperty(BLOG_VOTE_POINT_PROPERTY).getString());
+        int _currentVoteTotal = Integer.parseInt(nodeUpdate.getProperty(BLOG_VOTE_TOTAL_PROPERTY).getString());
+        nodeUpdate.setProperty(BLOG_VOTE_POINT_PROPERTY, _currentVotePoint+1);
+        nodeUpdate.setProperty(BLOG_VOTE_TOTAL_PROPERTY, _currentVoteTotal+score);
+      }
+      session.save();
+      return nodeUpdate;
+    }catch(Exception ex){
+      if(log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return null;
+  }
 
   /**
    * Get All node of element
@@ -341,7 +371,7 @@ public class BlogServiceImpl implements BlogService {
    */
   private Session getSession() throws Exception {
     ManageableRepository repository = repoService.getRepository(this.repo);
-    SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
     Session session = sessionProvider.getSession(this.ws, repository);
 
     return session;

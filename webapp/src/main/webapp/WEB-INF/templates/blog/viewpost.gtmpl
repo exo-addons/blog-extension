@@ -102,6 +102,21 @@ def isAdmin = Utils.isAdministratorUser();
                     <span class='st_pinterest' displayText='Pinterest'></span>
                     <span class='st_email' displayText='Email'></span>
 
+                  <div class="blog-vote">
+
+                    <div style="float: right;position: absolute;padding-left: 600px;">Avg. Rating: 0.0 Votes: 0 </div>
+                    <div class="rate-wrapper">
+
+                      <input type="hidden" value="someuniqid">
+                      <a class="score-1" href="#">1</a>
+                      <a class="score-2" href="#">2</a>
+                      <a class="score-3" href="#">3</a>
+                      <a class="score-4" href="#">4</a>
+                      <a class="score-5" href="#">5</a>
+                      <span class="rate-current-score">23</span>
+                    </div>
+                  </div>
+
                 </footer> <!-- end article footer -->
 
             </article> <!-- end article -->
@@ -207,48 +222,46 @@ if (comments.size > 1) plural = "s"
         %>
         <div class="commentItem" id="comment-${comment.name}">
 					<%if(isAdmin || viewer==poster){%>
-						<div class="commmentLeft">
-							<a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
-								<img alt="$commentorName" src="$commentorAvatar">
-							</a>
-						</div><!--end commentLeft-->
-						<div class="commentRight">
-
-							<div class="author">
-								<a href="/portal/intranet/profile/$commentor">$commentorName</a>
-								<span class="dateTime">$commentDate </span>
-								<span id="approve-$timeId" style="padding-left: 500px;">
-									<%if(!approve){%>
-										<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Approve" />
-									<%}else{%>
-										<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Disapprove" />
-									<%}%>
-								</span>
-							</div>
-						<p class="contentComment"></p>
-              <p id="$timeId" class="ContentBlock
-						<%if(!approve){%>
-							disapproved
-						<%}%>
-						" > $commentContent</p>
-					<%}else{%>
-
-							<%if(approve){%>
-								<div class="commmentLeft">
-									<a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
-										<img alt="$commentorName" src="$commentorAvatar">
-									</a>
-								</div><!--end commentLeft-->
-								<div class="commentRight">
+							<div class="commmentLeft">
+								<a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
+									<img alt="$commentorName" src="$commentorAvatar">
+								</a>
+							</div><!--end commentLeft-->
+							<div class="commentRight">
 									<div class="author">
 										<a href="/portal/intranet/profile/$commentor">$commentorName</a>
 										<span class="dateTime">$commentDate </span>
+											<span id="approve-$timeId" style="margin-right:10px; float:right;">
+												<%if(!approve){%>
+													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Approve" />
+												<%}else{%>
+													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Disapprove" />
+												<%}%>
+											</span>
 									</div>
 									<p class="contentComment"></p>
-									<p id="$timeId" class="ContentBlock" >$commentContent</p>
-								</div><!--end commentRight-->
-              <%}
-						}%>
+									<p id="$timeId" class="ContentBlock
+									<%if(!approve){%>
+										disapproved
+									<%}%>
+									" > $commentContent</p>
+							</div><!--end commentRight-->
+					<%}else{%>
+          <%if(approve){%>
+          <div class="commmentLeft">
+            <a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
+              <img alt="$commentorName" src="$commentorAvatar">
+            </a>
+          </div><!--end commentLeft-->
+          <div class="commentRight">
+            <div class="author">
+              <a href="/portal/intranet/profile/$commentor">$commentorName</a>
+              <span class="dateTime">$commentDate </span>
+            </div>
+            <p class="contentComment"></p>
+            <p id="$timeId" class="ContentBlock" >$commentContent</p>
+          </div><!--end commentRight-->
+          <%}}%>
         </div><!--end commentItem-->
         <%
         } catch (Exception e) {

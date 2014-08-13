@@ -28,4 +28,19 @@
     </propertyDefinitions>
   </nodeType>
 
+  <nodeType name="exo:blogVote" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+    <propertyDefinitions>
+
+      <propertyDefinition name="exo:blogVotePoint" requiredType="Integer" protected="false"
+                          autoCreated="false" mandatory="false" multiple="false" onParentVersion="COPY">
+        <valueConstraints/>
+      </propertyDefinition>
+
+      <propertyDefinition name="exo:blogVoteTotal" requiredType="Integer" protected="false"
+                          autoCreated="false" mandatory="false" multiple="false" onParentVersion="COPY">
+        <valueConstraints/>
+      </propertyDefinition>
+
+    </propertyDefinitions>
+  </nodeType>
 </nodeTypes>

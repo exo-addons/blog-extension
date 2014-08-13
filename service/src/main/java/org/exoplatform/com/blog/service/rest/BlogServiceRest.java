@@ -19,16 +19,17 @@
 package org.exoplatform.com.blog.service.rest;
 
 import org.exoplatform.com.blog.service.BlogService;
+import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.security.ConversationState;
 
 import javax.annotation.security.RolesAllowed;
 import javax.jcr.Node;
@@ -125,5 +126,27 @@ public class BlogServiceRest implements ResourceContainer {
       e.printStackTrace();
     }
     return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+  }
+
+  @POST
+  @Path("/updateVote")
+  @RolesAllowed("users")
+  public Response updateVote(MultivaluedMap<String, String> data) {
+    String postPath = data.getFirst("postPath");
+    int score = Util.getInt(data.getFirst("score"), 0);
+    Node nodeUpdate = blogService.updateVote(postPath, score);
+    long result = 0;
+      try {
+        if (nodeUpdate.hasProperty("exo:blogVoteTotal")) {
+          long _voteTotal = nodeUpdate.getProperty("exo:blogVoteTotal").getLong();
+          long _votePoint = nodeUpdate.getProperty("exo:blogVotePoint").getLong();
+
+          result = _voteTotal / _votePoint;
+          return Response.ok(result, MediaType.TEXT_PLAIN).build();
+        }
+      } catch (RepositoryException ex) {
+        if (log.isErrorEnabled()) log.info(ex.getMessage());
+      }
+    return Response.ok("failed").build();
   }
 }
