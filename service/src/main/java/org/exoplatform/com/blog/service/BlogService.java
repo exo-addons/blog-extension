@@ -79,8 +79,16 @@ public interface BlogService {
   public void removeBlog(Node blogNode);
 
   /**
-   * Update post status
+   * Update status to approve|disapprove a post
    * @param nodePath
    */
   public Node changeStatus(String nodePath);
+
+  /**
+   * Get Node by path,
+   * return null if path not exits
+   * @param postPath
+   * @return
+   */
+  public Node getPost(String postPath);
 }

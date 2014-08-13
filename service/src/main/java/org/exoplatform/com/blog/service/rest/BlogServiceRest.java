@@ -19,12 +19,16 @@
 package org.exoplatform.com.blog.service.rest;
 
 import org.exoplatform.com.blog.service.BlogService;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.security.ConversationState;
 
 import javax.annotation.security.RolesAllowed;
 import javax.jcr.Node;
@@ -33,6 +37,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -76,7 +81,32 @@ public class BlogServiceRest implements ResourceContainer {
   @POST
   @Path("/changeStatus")
   @RolesAllowed("users")
-  public Response getBlogs(@QueryParam("nodePath") String nodePath) {
+  public Response getBlogs(MultivaluedMap<String, String> data) {
+
+    UserACL userACL = WCMCoreUtils.getService(UserACL.class);
+    Identity identity = ConversationState.getCurrent().getIdentity();
+
+    boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
+    String viewer = identity.getUserId();
+
+    String postPath = data.getFirst("postPath");
+    String nodePath = data.getFirst("nodePath");
+
+    Node postNode = blogService.getPost(postPath);
+
+    try {
+      if (postNode != null && postNode.hasProperty("exo:owner")) {
+        String postOwner = postNode.getProperty("exo:owner").getString();
+        if (!(isAdmin || postOwner.equals(viewer))) {
+          return Response.ok("Permission denied !", MediaType.APPLICATION_JSON).build();
+        }
+      }
+      //continue
+    } catch (RepositoryException ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+      return Response.ok("Post is not exits!", MediaType.APPLICATION_JSON).build();
+    }
+
     Node rs = blogService.changeStatus(nodePath);
     JSONObject obj = new JSONObject();
     try {

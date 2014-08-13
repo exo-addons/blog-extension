@@ -157,11 +157,15 @@
     sharethis.stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});
   };
   // approve a post
-  blog.prototype.changeStatus = function(elId, nodePath){
+  blog.prototype.changeStatus = function(elId, nodePath, postPath){
     if(confirm("Are u sure?")){
+      var obj = new Object();
+      obj.nodePath=nodePath;
+      obj.postPath = postPath;
       gj.ajax({
-        url: "/portal/rest/blog/service/changeStatus?nodePath=" + nodePath,
+        url: "/portal/rest/blog/service/changeStatus",
         dataType: "text",
+        data: obj,
         type: "POST"
       })
           .success(function (data) {
@@ -169,7 +173,7 @@
             console.log(data);
 
             var btn = '<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus(\''+elId+'\', \''+nodePath+'\');"';
-            if(rs.result){
+            if(!rs.result){
               btn+=' value="Approve"';
               gj('#'+elId).removeClass('approved');
               gj('#'+elId).addClass('disapproved');

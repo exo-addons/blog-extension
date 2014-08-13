@@ -268,6 +268,17 @@ public class BlogServiceImpl implements BlogService {
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Node getPost(String postPath) {
+    try {
+      Session session = getSession();
+      return (Node)session.getItem(postPath);
+    }catch(Exception ex){if(log.isErrorEnabled()){log.error(ex.getMessage());}}
+    return null;
+  }
 
 
   /**

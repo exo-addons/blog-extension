@@ -19,7 +19,6 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.wcm.webui.Utils;
 
-
 def node = uicomponent.node
 def post = uicomponent.originalNode
 def uuid = post.getUUID()
@@ -28,7 +27,7 @@ def title = post.getProperty("exo:title").string
 def poster = post.getProperty("exo:owner").string
 def author = fullName(poster)
 def avatar = avatarUrl(poster)
-
+def postPath = post.getPath();
 
 def formatter =  new SimpleDateFormat("MMM d, yyyy")
 def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
@@ -36,6 +35,8 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 def rcontext = _ctx.getRequestContext() ;
 def jsManager = rcontext.getJavascriptManager();
 jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.intShare();");
+
+def isAdmin = Utils.isAdministratorUser();
 %>
 <style>
 
@@ -68,8 +69,8 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.intShare();");
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
                 <header>
-
-                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title</h3></div>
+                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title
+										</h3></div>
                     <p class="meta">
                     <div style="float:left">
                         <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
@@ -136,7 +137,9 @@ try {
 def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(post, null)
 def formatter =  new SimpleDateFormat("'on' MMM d, yyyy 'at' h:mm a")
 def viewer = _ctx.getRequestContext().getRemoteUser()
-
+def poster = post.getProperty("exo:owner").string
+def postPath = post.getPath();
+def isAdmin = Utils.isAdministratorUser();
 if (comments) {
 def plural=""
 if (comments.size > 1) plural = "s"
@@ -195,34 +198,57 @@ if (comments.size > 1) plural = "s"
         def isOwner = (commentor == viewer)
 				def cmtPath = comment.getPath();
 				def timeId = comment.getProperty("exo:commentDate").date.time.time;
-
 				def approve = false;
-
 				try{
 					approve = comment.getProperty("exo:blogStatus").getBoolean();
-				}catch(Exception ex){}
+				}catch(Exception ex){
+					approve=true;
+				}
         %>
         <div class="commentItem" id="comment-${comment.name}">
-            <div class="commmentLeft">
-                <a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
-                    <img alt="$commentorName" src="$commentorAvatar">
-                </a>
-            </div><!--end commentLeft-->
-            <div class="commentRight">
-                <div class="author">
-                    <a href="/portal/intranet/profile/$commentor">$commentorName</a>
-                    <span class="dateTime">$commentDate </span>
-                    <span id="approve-$timeId" style="padding-left: 500px;">
-												<%if(!approve){%>
-											<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath');" value="Approve" />
-												<%}else{%>
-											<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath');" value="Disapprove" />
-												<%}%>
-										</span>
-                </div>
-                <p class="contentComment"></p>
-							<p id="$timeId" class="ContentBlock <%if(!approve){%>disapproved<%}%>" >$commentContent</p><p></p>
-            </div><!--end commentRight-->
+					<%if(isAdmin || viewer==poster){%>
+						<div class="commmentLeft">
+							<a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
+								<img alt="$commentorName" src="$commentorAvatar">
+							</a>
+						</div><!--end commentLeft-->
+						<div class="commentRight">
+
+							<div class="author">
+								<a href="/portal/intranet/profile/$commentor">$commentorName</a>
+								<span class="dateTime">$commentDate </span>
+								<span id="approve-$timeId" style="padding-left: 500px;">
+									<%if(!approve){%>
+										<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Approve" />
+									<%}else{%>
+										<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Disapprove" />
+									<%}%>
+								</span>
+							</div>
+						<p class="contentComment"></p>
+              <p id="$timeId" class="ContentBlock
+						<%if(!approve){%>
+							disapproved
+						<%}%>
+						" > $commentContent</p>
+					<%}else{%>
+
+							<%if(approve){%>
+								<div class="commmentLeft">
+									<a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
+										<img alt="$commentorName" src="$commentorAvatar">
+									</a>
+								</div><!--end commentLeft-->
+								<div class="commentRight">
+									<div class="author">
+										<a href="/portal/intranet/profile/$commentor">$commentorName</a>
+										<span class="dateTime">$commentDate </span>
+									</div>
+									<p class="contentComment"></p>
+									<p id="$timeId" class="ContentBlock" >$commentContent</p>
+								</div><!--end commentRight-->
+              <%}
+						}%>
         </div><!--end commentItem-->
         <%
         } catch (Exception e) {
@@ -284,11 +310,11 @@ def avt = avatarUrl(viewer)
 <div class="commentList inputContainer inputContainerShow" style="display: block;">
     <div class="commentItem commentFormBox" id="respond-$uuid">
 
-        <div class="commmentLeft">
+        <!--div class="commmentLeft">
             <a class="avatarXShttp://localhost:8080/portal/intranet/mall" rel="tooltip" data-placement="bottom" href="/portal/intranet/profile/$viewer" data-original-title="$fme">
                 <img src="$avt" alt="$fme">
             </a>
-        </div><!--end commentLeft-->
+        </div--><!--end commentLeft-->
         <div class="commentRight">
             <div class="commentInputBox ">
                 <form class="form-inline" id="commentform-$uuid" name="commentform-$uuid">
