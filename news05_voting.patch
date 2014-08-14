@@ -1,0 +1,119 @@
+diff --git a/service/src/main/java/org/exoplatform/com/blog/service/BlogService.java b/service/src/main/java/org/exoplatform/com/blog/service/BlogService.java
+index 2e98c3d..0589f47 100644
+--- a/service/src/main/java/org/exoplatform/com/blog/service/BlogService.java
++++ b/service/src/main/java/org/exoplatform/com/blog/service/BlogService.java
+@@ -98,4 +98,36 @@ public interface BlogService {
+    * @return
+    */
+   public Node updateVote(String postNodePath, int score);
++
++  /**
++   * Vote a post by username
++   * @param document
++   * @param rate
++   * @param userName
++   * @return
++   */
++  public boolean vote(Node document, double rate, String userName);
++
++  /**
++   * Get total vote of post
++   * @param node
++   * @return
++   */
++  public long getVoteTotal(Node node);
++
++  /**
++   * Get vote of post status
++   * @param node
++   * @param userName
++   * @return
++   */
++  public boolean isVoted(Node node, String userName);
++
++  /**
++   * Get Vote of post by user
++   * @param node
++   * @param userName
++   * @return
++   */
++  public double getVoteValueOfUser(Node node, String userName);
+ }
+diff --git a/service/src/main/java/org/exoplatform/com/blog/service/impl/BlogServiceImpl.java b/service/src/main/java/org/exoplatform/com/blog/service/impl/BlogServiceImpl.java
+index 06bc273..e0dd404 100644
+--- a/service/src/main/java/org/exoplatform/com/blog/service/impl/BlogServiceImpl.java
++++ b/service/src/main/java/org/exoplatform/com/blog/service/impl/BlogServiceImpl.java
+@@ -311,6 +311,26 @@ public class BlogServiceImpl implements BlogService {
+     return null;
+   }
+ 
++  @Override
++  public boolean vote(Node document, double rate, String userName) {
++    return false;
++  }
++
++  @Override
++  public long getVoteTotal(Node node) {
++    return 0;
++  }
++
++  @Override
++  public boolean isVoted(Node node, String userName) {
++    return false;
++  }
++
++  @Override
++  public double getVoteValueOfUser(Node node, String userName) {
++    return 0;
++  }
++
+   /**
+    * Get All node of element
+    *
+diff --git a/webapp/src/main/webapp/WEB-INF/blog-nodetype.xml b/webapp/src/main/webapp/WEB-INF/blog-nodetype.xml
+index eb45583..8a4780c 100644
+--- a/webapp/src/main/webapp/WEB-INF/blog-nodetype.xml
++++ b/webapp/src/main/webapp/WEB-INF/blog-nodetype.xml
+@@ -29,18 +29,31 @@
+   </nodeType>
+ 
+   <nodeType name="exo:blogVote" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+-    <propertyDefinitions>
++    <propertyDefinition name="exo:blogVotingRate" requiredType="Double" autoCreated="true" mandatory="false"
++                        onParentVersion="COPY" protected="false" multiple="false">
++      <valueConstraints/>
++      <defaultValues>
++        <defaultValue>0</defaultValue>
++      </defaultValues>
++    </propertyDefinition>
+ 
+-      <propertyDefinition name="exo:blogVotePoint" requiredType="Integer" protected="false"
+-                          autoCreated="false" mandatory="false" multiple="false" onParentVersion="COPY">
+-        <valueConstraints/>
+-      </propertyDefinition>
++    <propertyDefinition name="exo:blogVoteTotal" requiredType="Long" autoCreated="true" mandatory="false"
++                        onParentVersion="COPY" protected="false" multiple="false">
++      <valueConstraints/>
++      <defaultValues>
++        <defaultValue>0</defaultValue>
++      </defaultValues>
++    </propertyDefinition>
+ 
+-      <propertyDefinition name="exo:blogVoteTotal" requiredType="Integer" protected="false"
+-                          autoCreated="false" mandatory="false" multiple="false" onParentVersion="COPY">
+-        <valueConstraints/>
+-      </propertyDefinition>
++    <propertyDefinition name="exo:blogVoter" requiredType="String" autoCreated="true" mandatory="false"
++                        onParentVersion="COPY" protected="false" multiple="true">
++    </propertyDefinition>
++
++    <propertyDefinition name="exo:blogVoterVoteValues" requiredType="String" autoCreated="true" mandatory="false"
++                        onParentVersion="COPY" protected="false" multiple="true">
++    </propertyDefinition>
+ 
+-    </propertyDefinitions>
+   </nodeType>
++
++
+ </nodeTypes>
+\ No newline at end of file

@@ -98,4 +98,36 @@ public interface BlogService {
    * @return
    */
   public Node updateVote(String postNodePath, int score);
+
+  /**
+   * Vote a post by username
+   * @param document
+   * @param rate
+   * @param userName
+   * @return
+   */
+  public boolean vote(Node document, double rate, String userName);
+
+  /**
+   * Get total vote of post
+   * @param node
+   * @return
+   */
+  public long getVoteTotal(Node node);
+
+  /**
+   * Get vote of post status
+   * @param node
+   * @param userName
+   * @return
+   */
+  public boolean isVoted(Node node, String userName);
+
+  /**
+   * Get Vote of post by user
+   * @param node
+   * @param userName
+   * @return
+   */
+  public double getVoteValueOfUser(Node node, String userName);
 }

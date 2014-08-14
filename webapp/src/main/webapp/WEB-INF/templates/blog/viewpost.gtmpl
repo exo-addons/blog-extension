@@ -34,7 +34,9 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 
 def rcontext = _ctx.getRequestContext() ;
 def jsManager = rcontext.getJavascriptManager();
-jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.intShare();");
+jsManager.require("SHARED/blogjs", "blogjs")
+.addScripts("blogjs.intShare();")
+.addScripts("blogjs.initScroll();");
 
 def isAdmin = Utils.isAdministratorUser();
 %>
@@ -131,15 +133,14 @@ def isAdmin = Utils.isAdministratorUser();
         </div> <!-- end of m ain -->
         <div class="span1" id="sidebar">
             <%
-
             // show edit button
             if ((poster == viewer) && (uicomponent.class.name =="org.exoplatform.wcm.webui.scv.UIPresentation")) {
             %>
-
             <a class="btn btn-mini" href="/portal/intranet/blog/admin?edit=true&path=/collaboration/Groups/platform/users/Documents/Blog/${post.name}&backto=/portal/intranet/blog"><i class="icon-pencil"></i> Edit</a>
             <%
             } // end edit button
             %>
+          <a class="btn btn-mini" href="/portal/intranet/blog" title="Back to top" ><i class="uiIconEcmsGoBack uiIconEcmsLightGray" ></i> Back</a>
         </div> <!-- end sidebar -->
 
     </div> <!-- end #content -->

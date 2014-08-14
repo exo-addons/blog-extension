@@ -168,9 +168,9 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 				<h5 class="title">Meta</h5>
 				<div style="padding: 7px">
 						<ul>
-								<li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Quick Post</a></li>
-								<li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Admin</a></li>
-								<li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Entries RSS</a></li>
+								<li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Add Post</a></li>
+								<li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Manager Post</a></li>
+								<li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Follow RSS</a></li>
 						</ul>
 				</div>
 		</div>
@@ -182,12 +182,15 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 				<%
 				def currentYear = Calendar.getInstance().get(Calendar.YEAR);
 				def archiveYears = blogService.getArchiveYears();
+			%>
+			<%
 				for(year in archiveYears){
 				def yearPostCount = blogService.getArchivesCountInYear(year);
 				def archiveMonthByYear = blogService.getArchiveMonths(year);
 				def active="";
 				if(currentYear==year){active="acc_active";}
 				%>
+
 				<div class="accordion_in $active">
 						<div class="acc_head"><div class="acc_icon_expand"></div>$year ($yearPostCount)</div>
 						<div class="acc_content" style="display: block;">
@@ -201,7 +204,6 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 									<div id="month-$year-$month" class="blog-archive-post-link" ></div>
 								</p>
 								<%}%>
-
 						</div>
 				</div>
 				<%}%>
