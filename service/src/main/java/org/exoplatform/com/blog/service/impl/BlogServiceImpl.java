@@ -19,6 +19,7 @@ package org.exoplatform.com.blog.service.impl;
 
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.entity.BlogArchive;
+import org.exoplatform.services.cms.comments.CommentsService;
 import org.exoplatform.services.cms.drives.DriveData;
 import org.exoplatform.services.cms.drives.ManageDriveService;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -27,6 +28,7 @@ import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 
 import javax.jcr.*;
 import javax.jcr.query.Query;
@@ -52,6 +54,10 @@ public class BlogServiceImpl implements BlogService {
   private static final String BLOG_VOTE_TOTAL_PROPERTY = "exo:blogVoteTotal";
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
 
+  //comment
+  private final static String COMMENT_CREATED_DATE = "exo:commentDate";
+  private final static String COMMENT_MESSAGE = "exo:commentContent";
+
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
 
@@ -62,6 +68,7 @@ public class BlogServiceImpl implements BlogService {
   private RepositoryService repoService;
   private SessionProviderService sessionProviderService;
   private ManageDriveService manageDriveService;
+  private CommentsService commentsService;
 
   private Map<Integer, BlogArchive> blogArchives = new HashMap<Integer, BlogArchive>();
 
@@ -98,6 +105,8 @@ public class BlogServiceImpl implements BlogService {
     this.manageDriveService = managerDriverService;
     this.repoService = repoService;
     this.sessionProviderService = sessionProviderService;
+    this.commentsService = WCMCoreUtils.getService(CommentsService.class);
+
     try {
       this.repo = repoService.getCurrentRepository().getConfiguration().getName();
       this.ws = repoService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
@@ -113,7 +122,8 @@ public class BlogServiceImpl implements BlogService {
   void initBlogArchive() {
     if (isInitData()) {
       try {
-        List<Node> allNode = getAllNode(BLOG_NODE);
+        Session session = getSystemSession();
+        List<Node> allNode = getAllNode(BLOG_NODE, session);
         Calendar cal = null;
         for (Node node : allNode) {
           cal = node.getProperty(EXO_DATE_CREATED).getValue().getDate();
@@ -253,20 +263,20 @@ public class BlogServiceImpl implements BlogService {
   public Node changeStatus(String nodePath) {
     try {
       Session session = getSession();
-      if(nodePath.startsWith("/")) nodePath = nodePath.substring(1);
+      if (nodePath.startsWith("/")) nodePath = nodePath.substring(1);
 
       Node nodeUpdate = session.getRootNode().getNode(nodePath);
-      if(nodeUpdate.canAddMixin(BLOG_APPROVE_NODE)){
+      if (nodeUpdate.canAddMixin(BLOG_APPROVE_NODE)) {
         nodeUpdate.addMixin(BLOG_APPROVE_NODE);
         nodeUpdate.setProperty(BLOG_STATUS_PROPERTY, true);
-      }else {
+      } else {
         boolean status = nodeUpdate.getProperty(BLOG_STATUS_PROPERTY).getBoolean();
         nodeUpdate.setProperty(BLOG_STATUS_PROPERTY, !status);
       }
       session.save();
       return nodeUpdate;
-    }catch(Exception ex){
-      if(log.isErrorEnabled()) log.error(ex.getMessage());
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
     return null;
   }
@@ -278,8 +288,12 @@ public class BlogServiceImpl implements BlogService {
   public Node getPost(String postPath) {
     try {
       Session session = getSession();
-      return (Node)session.getItem(postPath);
-    }catch(Exception ex){if(log.isErrorEnabled()){log.error(ex.getMessage());}}
+      return (Node) session.getItem(postPath);
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) {
+        log.error(ex.getMessage());
+      }
+    }
     return null;
   }
 
@@ -290,25 +304,51 @@ public class BlogServiceImpl implements BlogService {
   public Node updateVote(String postNodePath, int score) {
     try {
       Session session = getSession();
-      if(postNodePath.startsWith("/")) postNodePath = postNodePath.substring(1);
+      if (postNodePath.startsWith("/")) postNodePath = postNodePath.substring(1);
       Node nodeUpdate = session.getRootNode().getNode(postNodePath);
 
-      if(nodeUpdate.canAddMixin(BLOG_VOTE_NODE)){
+      if (nodeUpdate.canAddMixin(BLOG_VOTE_NODE)) {
         nodeUpdate.addMixin(BLOG_VOTE_NODE);
         nodeUpdate.setProperty(BLOG_VOTE_POINT_PROPERTY, 1);
         nodeUpdate.setProperty(BLOG_VOTE_TOTAL_PROPERTY, score);
-      }else {
+      } else {
         int _currentVotePoint = Integer.parseInt(nodeUpdate.getProperty(BLOG_VOTE_POINT_PROPERTY).getString());
         int _currentVoteTotal = Integer.parseInt(nodeUpdate.getProperty(BLOG_VOTE_TOTAL_PROPERTY).getString());
-        nodeUpdate.setProperty(BLOG_VOTE_POINT_PROPERTY, _currentVotePoint+1);
-        nodeUpdate.setProperty(BLOG_VOTE_TOTAL_PROPERTY, _currentVoteTotal+score);
+        nodeUpdate.setProperty(BLOG_VOTE_POINT_PROPERTY, _currentVotePoint + 1);
+        nodeUpdate.setProperty(BLOG_VOTE_TOTAL_PROPERTY, _currentVoteTotal + score);
       }
       session.save();
       return nodeUpdate;
-    }catch(Exception ex){
-      if(log.isErrorEnabled()) log.error(ex.getMessage());
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
     return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean editComment(String nodePath, String newComment) {
+    Node nodeEdit = getPost(nodePath);
+    try {
+      commentsService.updateComment(nodeEdit, newComment);
+      return true;
+    }catch(Exception ex){if(log.isErrorEnabled())log.error(ex.getMessage());}
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean delComment(String nodePath) {
+    Node nodeDelete = getPost(nodePath);
+    try {
+      commentsService.deleteComment(nodeDelete);
+      return true;
+    }catch(Exception ex){if(log.isErrorEnabled())log.error(ex.getMessage());}
+    return false;
   }
 
   @Override
@@ -338,8 +378,8 @@ public class BlogServiceImpl implements BlogService {
    * @return
    * @throws Exception
    */
-  private List<Node> getAllNode(String nodeElement) throws Exception {
-    Session session = getSession();
+  private List<Node> getAllNode(String nodeElement, Session session) throws Exception {
+//    Session session = getSession();
     String searchPath = getDriverPath();
     List<Node> rs = new ArrayList<Node>();
     StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);
@@ -391,9 +431,15 @@ public class BlogServiceImpl implements BlogService {
    */
   private Session getSession() throws Exception {
     ManageableRepository repository = repoService.getRepository(this.repo);
+    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
+    Session session = sessionProvider.getSession(this.ws, repository);
+    return session;
+  }
+
+  private Session getSystemSession() throws Exception {
+    ManageableRepository repository = repoService.getRepository(this.repo);
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(this.ws, repository);
-
     return session;
   }
 
@@ -416,7 +462,7 @@ public class BlogServiceImpl implements BlogService {
   private String getDriverPath() throws Exception {
     DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
     String driverPath = driveData.getHomePath();
-    if(driverPath!=null) driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
+    if (driverPath != null) driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
     driverPath += "%";
     return driverPath;
   }

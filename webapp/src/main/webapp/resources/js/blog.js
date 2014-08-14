@@ -664,6 +664,18 @@
     gj( ".scrollToTop" ).attr("title", "Back to top");
   }
 
+  //edit comment
+  blog.prototype.loadToEdit = function(commentPath){
+    console.log('load Edit: '+commentPath);
+  }
+
+  //delete comment
+  blog.prototype.deleteComment = function(commentPath){
+    if (confirm("Are u sure?")) {
+      console.log('path delete: '+commentPath);
+    }
+  }
+
   eXo.ecm.blog = new blog();
   return eXo.ecm.blog;
   //-------------------------------------------------------------------------//

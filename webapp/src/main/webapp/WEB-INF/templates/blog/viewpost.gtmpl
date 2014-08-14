@@ -245,7 +245,12 @@ if (comments.size > 1) plural = "s"
 									<%if(!approve){%>
 										disapproved
 									<%}%>
-									" > $commentContent</p>
+									" > $commentContent
+									<span>
+										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath')"><i class="icon-pencil"></i></a>
+										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath')"><i class="uiIconEcmsDelete" style="this:hover:none;"></i></a>
+									</span>
+									</p>
 							</div><!--end commentRight-->
 					<%}else{%>
           <%if(approve){%>

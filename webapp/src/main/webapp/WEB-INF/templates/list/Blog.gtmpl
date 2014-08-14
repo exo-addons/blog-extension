@@ -168,9 +168,9 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 				<h5 class="title">Meta</h5>
 				<div style="padding: 7px">
 						<ul>
-								<li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'>Add Post</a></li>
-								<li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts">Manager Post</a></li>
-								<li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed">Follow RSS</a></li>
+								<li><i class="icon-pencil"></i><a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'><%=_ctx.appRes("Blog.Meta.AddPost")%></a></li>
+								<li><i class="icon-wrench"></i><a href="/portal/intranet/blog/admin?path=Blog/Groups/platform/users/Documents/Blog&backto=/portal/intranet/blog" class="cat-item" title="Manage Posts"><%=_ctx.appRes("Blog.Meta.ManagerPost")%></a></li>
+								<li><i class="icon-star"></i><a href="${uicomponent.rssLink}" class="cat-item" title="RSS feed"><%=_ctx.appRes("Blog.Meta.FollowRss")%></a></li>
 						</ul>
 				</div>
 		</div>

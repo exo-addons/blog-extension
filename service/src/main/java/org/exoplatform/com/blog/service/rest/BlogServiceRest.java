@@ -149,4 +149,50 @@ public class BlogServiceRest implements ResourceContainer {
       }
     return Response.ok("failed").build();
   }
+
+  @POST
+  @Path("/editComment")
+  @RolesAllowed("users")
+  public Response editComment(MultivaluedMap<String, String> data) {
+    UserACL userACL = WCMCoreUtils.getService(UserACL.class);
+    Identity identity = ConversationState.getCurrent().getIdentity();
+
+    boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
+    String viewer = identity.getUserId();
+
+    String commentPath = data.getFirst("commentPath");
+    String newComment = data.getFirst("newComment");
+
+    boolean result = blogService.editComment(commentPath, newComment);
+
+    JSONObject obj = new JSONObject();
+    try {
+          obj.put("result", result);
+        return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return Response.ok("failed", MediaType.APPLICATION_JSON).build();
+  }
+
+  @POST
+  @Path("/delComment")
+  @RolesAllowed("users")
+  public Response delComment(@QueryParam("nodePath") String nodePath) {
+    UserACL userACL = WCMCoreUtils.getService(UserACL.class);
+    Identity identity = ConversationState.getCurrent().getIdentity();
+
+    boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
+    String viewer = identity.getUserId();
+
+    boolean result = blogService.delComment(nodePath);
+    JSONObject obj = new JSONObject();
+    try {
+      obj.put("result", result);
+      return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    return Response.ok("failed", MediaType.APPLICATION_JSON).build();
+  }
 }

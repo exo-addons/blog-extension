@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <configuration
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
-   xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd http://www.exoplatform.org/xml/ns/kernel_1_2.xsd"
+        xmlns="http://www.exoplatform.org/xml/ns/kernel_1_2.xsd">
 
 
-<!-- CLV Templates -->
+  <!-- CLV Templates -->
   <external-component-plugins>
     <target-component>org.exoplatform.services.cms.views.ApplicationTemplateManagerService</target-component>
     <component-plugin>
@@ -15,6 +15,7 @@
       <type>org.exoplatform.services.cms.views.PortletTemplatePlugin</type>
       <description>This plugin is used to import views templates for Content List Viewer</description>
       <init-params>
+
         <value-param>
           <name>portletName</name>
           <value>content-list-viewer</value>
@@ -39,8 +40,8 @@
     </component-plugin>
   </external-component-plugins>
 
-<!-- Blog Node Type -->
-    <external-component-plugins>
+  <!-- Blog Node Type -->
+  <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
     <component-plugin>
       <name>add.nodeType</name>
@@ -57,7 +58,7 @@
     </component-plugin>
   </external-component-plugins>
 
-   <!-- Blog Document Type -->  
+  <!-- Blog Document Type -->
   <external-component-plugins>
     <target-component>org.exoplatform.services.cms.templates.TemplateService</target-component>
 
@@ -123,9 +124,6 @@
                     </field>
                   </object>
                 </value>
-
-               
-
               </collection>
             </field>
           </object>
@@ -133,5 +131,4 @@
       </init-params>
     </component-plugin>
   </external-component-plugins>
-
 </configuration>

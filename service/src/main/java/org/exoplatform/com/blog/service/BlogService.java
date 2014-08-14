@@ -130,4 +130,21 @@ public interface BlogService {
    * @return
    */
   public double getVoteValueOfUser(Node node, String userName);
+
+  /**
+   * Edit a comment of post
+   * @param nodePath
+   * @param newComment
+   * @return
+   */
+  public boolean editComment(String nodePath, String newComment);
+
+  /**
+   * Delete a comment
+   *
+   * @param nodePath
+   * @return
+   */
+  public boolean delComment(String nodePath);
+
 }
