@@ -135,6 +135,11 @@
   blog.prototype.postComment = function (uuid) {
     var aform = gj("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
+    if(comment===''){
+      alert('Comment message count empty!');
+      aform.find('input[name="comment"]').focus();
+      return false;
+    }
     var path = aform.find('input[name="jcrPath"]').val();
     gj.ajax({
       type: "POST",
@@ -153,7 +158,7 @@
 
   //sharethis
   blog.prototype.intShare = function () {
-    var switchTo5x = true;
+    var switchTo5x= true;
     sharethis.stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});
   };
   // approve a post
@@ -665,15 +670,63 @@
   }
 
   //edit comment
-  blog.prototype.loadToEdit = function(commentPath){
-    console.log('load Edit: '+commentPath);
+  blog.prototype.loadToEdit = function(commentPath, postUUID, timeId){
+    gj.ajax({
+      url: "/portal/rest/blog/service/getComment?nodePath=" + commentPath,
+      dataType: "text",
+      type: "POST"
+    })
+        .success(function (data) {
+          var _result = gj.parseJSON(data);
+          if(_result.result){
+            gj('#commentform-'+postUUID+' input[name=comment]').val(_result.commentContent);
+            gj('#commentform-'+postUUID+' input[name=commentPath]').val(_result.commentPath);
+            gj('#commentform-'+postUUID+' input[name=timeId]').val(timeId);
+
+            gj('#commentform-'+postUUID+' input[type=button]').attr("value","Update Comment");
+            gj('#commentform-'+postUUID+' input[type=button]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"', '"+timeId+"')");
+          }else{
+            alert('Comment in '+commentPath+ ' doesnt exist!');
+          }
+        })
+
   }
 
-  //delete comment
-  blog.prototype.deleteComment = function(commentPath){
+  blog.prototype.deleteComment = function(commentPath, commendId){
     if (confirm("Are u sure?")) {
-      console.log('path delete: '+commentPath);
+      gj.ajax({
+        type: "POST",
+        url: "/portal/rest/blog/service/delComment?nodePath="+commentPath,
+        success: function (data) {
+          if(data.result){
+            gj('#comment-'+commendId).remove();
+          }else{
+            alert('Delete comment failed. Please retry again!.');
+          }
+        }
+      }); // end ajax
     }
+  }
+
+  blog.prototype.editComment = function(uuid, timeId){
+    var aform = gj("#commentform-" + uuid);
+    var comment = aform.find('input[name="comment"]').val();
+    var path = aform.find('input[name="commentPath"]').val();
+    var obj = new Object();
+    obj.commentPath = path;
+    obj.newComment = comment;
+    gj.ajax({
+      type: "POST",
+      url: "/portal/rest/blog/service/editComment",
+      data: obj,
+      success: function (data) {
+        if(data.result){
+          gj('#'+timeId).html(comment);
+        }else{
+          alert('Edit comment failed. Please retry again!.');
+        }
+      }
+    }); // end ajax
   }
 
   eXo.ecm.blog = new blog();

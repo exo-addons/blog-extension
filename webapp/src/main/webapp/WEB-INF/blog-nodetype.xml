@@ -28,34 +28,35 @@
     </propertyDefinitions>
   </nodeType>
 
-  <!--<nodeType name="exo:blogVote" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">-->
-    <!--<propertyDefinition name="exo:blogVotingRate" requiredType="Double" autoCreated="true" mandatory="false"-->
-                        <!--onParentVersion="COPY" protected="false" multiple="false" >-->
-      <!--<valueConstraints/>-->
-      <!--<defaultValues>-->
-        <!--<defaultValue>0</defaultValue>-->
-      <!--</defaultValues>-->
-    <!--</propertyDefinition>-->
+  <nodeType name="exo:blogVote" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+    <propertyDefinitions>
+      <propertyDefinition name="exo:blogVotingRate" requiredType="Double" autoCreated="true" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+        <defaultValues>
+          <defaultValue>0</defaultValue>
+        </defaultValues>
+      </propertyDefinition>
 
-    <!--<propertyDefinition name="exo:blogVoteTotal" requiredType="Long" autoCreated="true" mandatory="false"-->
-                        <!--onParentVersion="COPY" protected="false" multiple="false">-->
-      <!--<valueConstraints/>-->
-      <!--<defaultValues>-->
-        <!--<defaultValue>0</defaultValue>-->
-      <!--</defaultValues>-->
-    <!--</propertyDefinition>-->
+      <propertyDefinition name="exo:blogVoteTotal" requiredType="Long" autoCreated="true" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+        <defaultValues>
+          <defaultValue>0</defaultValue>
+        </defaultValues>
+      </propertyDefinition>
 
-    <!--<propertyDefinition name="exo:blogVoter" requiredType="String" autoCreated="true" mandatory="false"-->
-                        <!--onParentVersion="COPY" protected="false" multiple="true">-->
-      <!--<valueConstraints/>-->
-    <!--</propertyDefinition>-->
+      <propertyDefinition name="exo:blogVoter" requiredType="String" autoCreated="true" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="true">
+        <valueConstraints/>
+      </propertyDefinition>
 
-    <!--<propertyDefinition name="exo:blogVoterVoteValues" requiredType="String" autoCreated="true" mandatory="false"-->
-                        <!--onParentVersion="COPY" protected="false" multiple="true">-->
-      <!--<valueConstraints/>-->
-    <!--</propertyDefinition>-->
-
-  <!--</nodeType>-->
+      <propertyDefinition name="exo:blogVoterVoteValues" requiredType="Long" autoCreated="true" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="true">
+        <valueConstraints/>
+      </propertyDefinition>
+    </propertyDefinitions>
+  </nodeType>
 
 
 </nodeTypes>

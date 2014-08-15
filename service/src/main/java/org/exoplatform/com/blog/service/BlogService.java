@@ -87,60 +87,21 @@ public interface BlogService {
   /**
    * Get Node by path,
    * return null if path not exits
-   * @param postPath
+   * @param nodePath
    * @return
    */
-  public Node getPost(String postPath);
-
-  /**
-   * Update vote on blog-vote
-   * @param postNodePath
-   * @return
-   */
-  public Node updateVote(String postNodePath, int score);
-
-  /**
-   * Vote a post by username
-   * @param document
-   * @param rate
-   * @param userName
-   * @return
-   */
-  public boolean vote(Node document, double rate, String userName);
-
-  /**
-   * Get total vote of post
-   * @param node
-   * @return
-   */
-  public long getVoteTotal(Node node);
-
-  /**
-   * Get vote of post status
-   * @param node
-   * @param userName
-   * @return
-   */
-  public boolean isVoted(Node node, String userName);
-
-  /**
-   * Get Vote of post by user
-   * @param node
-   * @param userName
-   * @return
-   */
-  public double getVoteValueOfUser(Node node, String userName);
+  public Node getNode(String nodePath);
 
   /**
    * Edit a comment of post
-   * @param nodePath
+   * @param nodeEdit
    * @param newComment
    * @return
    */
-  public boolean editComment(String nodePath, String newComment);
+  public boolean editComment(Node nodeEdit, String newComment);
 
   /**
-   * Delete a comment
+   * Delete a comment of post
    *
    * @param nodePath
    * @return

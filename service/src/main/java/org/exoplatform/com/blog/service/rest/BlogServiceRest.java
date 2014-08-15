@@ -21,6 +21,7 @@ package org.exoplatform.com.blog.service.rest;
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.portal.config.UserACL;
+import org.exoplatform.services.cms.voting.VotingService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
@@ -53,6 +54,7 @@ public class BlogServiceRest implements ResourceContainer {
   private Log log = ExoLogger.getExoLogger(BlogServiceRest.class);
 
   private BlogService blogService;
+  private VotingService votingService = WCMCoreUtils.getService(VotingService.class);
 
   public BlogServiceRest(BlogService blogService) {
     this.blogService = blogService;
@@ -93,7 +95,7 @@ public class BlogServiceRest implements ResourceContainer {
     String postPath = data.getFirst("postPath");
     String nodePath = data.getFirst("nodePath");
 
-    Node postNode = blogService.getPost(postPath);
+    Node postNode = blogService.getNode(postPath);
 
     try {
       if (postNode != null && postNode.hasProperty("exo:owner")) {
@@ -123,7 +125,7 @@ public class BlogServiceRest implements ResourceContainer {
       }
       obj.put("result", -1);
     } catch (JSONException e) {
-      e.printStackTrace();
+      if (log.isErrorEnabled()) log.error(e.getMessage());
     }
     return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
   }
@@ -133,21 +135,16 @@ public class BlogServiceRest implements ResourceContainer {
   @RolesAllowed("users")
   public Response updateVote(MultivaluedMap<String, String> data) {
     String postPath = data.getFirst("postPath");
-    int score = Util.getInt(data.getFirst("score"), 0);
-    Node nodeUpdate = blogService.updateVote(postPath, score);
-    long result = 0;
-      try {
-        if (nodeUpdate.hasProperty("exo:blogVoteTotal")) {
-          long _voteTotal = nodeUpdate.getProperty("exo:blogVoteTotal").getLong();
-          long _votePoint = nodeUpdate.getProperty("exo:blogVotePoint").getLong();
-
-          result = _voteTotal / _votePoint;
-          return Response.ok(result, MediaType.TEXT_PLAIN).build();
-        }
-      } catch (RepositoryException ex) {
-        if (log.isErrorEnabled()) log.info(ex.getMessage());
-      }
-    return Response.ok("failed").build();
+    double score = Util.getDouble(data.getFirst("score"), 0);
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    Node nodeToVote = blogService.getNode(postPath);
+    try {
+      votingService.vote(nodeToVote, score, identity.getUserId(), "");
+      return Response.ok("{\"result\": true}", MediaType.TEXT_PLAIN).build();
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return Response.ok("Failed", MediaType.TEXT_PLAIN).build();
   }
 
   @POST
@@ -162,15 +159,25 @@ public class BlogServiceRest implements ResourceContainer {
 
     String commentPath = data.getFirst("commentPath");
     String newComment = data.getFirst("newComment");
-
-    boolean result = blogService.editComment(commentPath, newComment);
-
+    Node nodeEdit = blogService.getNode(commentPath);
     JSONObject obj = new JSONObject();
     try {
-          obj.put("result", result);
+      if (nodeEdit != null && nodeEdit.hasProperty("exo:commentor")) {
+        if (!(isAdmin || viewer.equals(nodeEdit.getProperty("exo:commentor").getString()))) {
+          return Response.ok("Permission denied!", MediaType.TEXT_PLAIN).build();
+        }
+        boolean result = blogService.editComment(nodeEdit, newComment);
+        obj.put("result", result);
         return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+      }
+    } catch (RepositoryException ex) {
+      if (log.isErrorEnabled()) {
+        log.error(ex.getMessage());
+      }
     } catch (JSONException e) {
-      e.printStackTrace();
+      if (log.isErrorEnabled()) {
+        log.error(e.getMessage());
+      }
     }
     return Response.ok("failed", MediaType.APPLICATION_JSON).build();
   }
@@ -192,6 +199,27 @@ public class BlogServiceRest implements ResourceContainer {
       return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
     } catch (JSONException e) {
       e.printStackTrace();
+    }
+    return Response.ok("failed", MediaType.APPLICATION_JSON).build();
+  }
+
+  @POST
+  @Path("/getComment")
+  @RolesAllowed("users")
+  public Response getComment(@QueryParam("nodePath") String nodePath) {
+    Node node = blogService.getNode(nodePath);
+    JSONObject obj = new JSONObject();
+    try {
+      if (node != null && node.hasProperty("exo:commentContent")) {
+        obj.put("result", true);
+        obj.put("commentContent", node.getProperty("exo:commentContent").getString());
+        obj.put("commentPath", node.getPath());
+        return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+      }
+    } catch (JSONException e) {
+      e.printStackTrace();
+    } catch (RepositoryException ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
     return Response.ok("failed", MediaType.APPLICATION_JSON).build();
   }

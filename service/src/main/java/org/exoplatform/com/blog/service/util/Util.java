@@ -57,9 +57,9 @@ public class Util {
     return "";
   }
 
-  public static int getInt(String value, int defaultValue){
+  public static double getDouble(String value, double defaultValue){
     try{
-      return Integer.parseInt(value);
+      return Double.parseDouble(value);
     }catch(NumberFormatException ex){
       return defaultValue;
     }

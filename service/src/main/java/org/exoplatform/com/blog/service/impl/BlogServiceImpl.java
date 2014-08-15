@@ -49,15 +49,15 @@ public class BlogServiceImpl implements BlogService {
   private static final String DRIVER_PATH = "Blog";
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_APPROVE_NODE = "exo:blogApprove";
+
   private static final String BLOG_VOTE_NODE = "exo:blogVote";
-  private static final String BLOG_VOTE_POINT_PROPERTY = "exo:blogVotePoint";
+  private static final String BLOG_VOTE_RATE_PROPERTY = "exo:blogVotingRate";
   private static final String BLOG_VOTE_TOTAL_PROPERTY = "exo:blogVoteTotal";
+  private static final String BLOG_VOTE_VOTER_PROPERTY = "exo:blogVoter";
+  private static final String BLOG_VOTE_VOTER_VALUE_PROPERTY = "exo:blogVoterVoteValues";
+  private static final String BLOG_VOTE_PARTEN = "exoBlog";
+
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
-
-  //comment
-  private final static String COMMENT_CREATED_DATE = "exo:commentDate";
-  private final static String COMMENT_MESSAGE = "exo:commentContent";
-
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
 
@@ -285,10 +285,10 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public Node getPost(String postPath) {
+  public Node getNode(String nodePath) {
     try {
       Session session = getSession();
-      return (Node) session.getItem(postPath);
+      return (Node) session.getItem(nodePath);
     } catch (Exception ex) {
       if (log.isErrorEnabled()) {
         log.error(ex.getMessage());
@@ -297,44 +297,18 @@ public class BlogServiceImpl implements BlogService {
     return null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Node updateVote(String postNodePath, int score) {
-    try {
-      Session session = getSession();
-      if (postNodePath.startsWith("/")) postNodePath = postNodePath.substring(1);
-      Node nodeUpdate = session.getRootNode().getNode(postNodePath);
-
-      if (nodeUpdate.canAddMixin(BLOG_VOTE_NODE)) {
-        nodeUpdate.addMixin(BLOG_VOTE_NODE);
-        nodeUpdate.setProperty(BLOG_VOTE_POINT_PROPERTY, 1);
-        nodeUpdate.setProperty(BLOG_VOTE_TOTAL_PROPERTY, score);
-      } else {
-        int _currentVotePoint = Integer.parseInt(nodeUpdate.getProperty(BLOG_VOTE_POINT_PROPERTY).getString());
-        int _currentVoteTotal = Integer.parseInt(nodeUpdate.getProperty(BLOG_VOTE_TOTAL_PROPERTY).getString());
-        nodeUpdate.setProperty(BLOG_VOTE_POINT_PROPERTY, _currentVotePoint + 1);
-        nodeUpdate.setProperty(BLOG_VOTE_TOTAL_PROPERTY, _currentVoteTotal + score);
-      }
-      session.save();
-      return nodeUpdate;
-    } catch (Exception ex) {
-      if (log.isErrorEnabled()) log.error(ex.getMessage());
-    }
-    return null;
-  }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean editComment(String nodePath, String newComment) {
-    Node nodeEdit = getPost(nodePath);
+  public boolean editComment(Node nodeEdit, String newComment) {
     try {
       commentsService.updateComment(nodeEdit, newComment);
       return true;
-    }catch(Exception ex){if(log.isErrorEnabled())log.error(ex.getMessage());}
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
     return false;
   }
 
@@ -343,32 +317,14 @@ public class BlogServiceImpl implements BlogService {
    */
   @Override
   public boolean delComment(String nodePath) {
-    Node nodeDelete = getPost(nodePath);
+    Node nodeDelete = getNode(nodePath);
     try {
       commentsService.deleteComment(nodeDelete);
       return true;
-    }catch(Exception ex){if(log.isErrorEnabled())log.error(ex.getMessage());}
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
     return false;
-  }
-
-  @Override
-  public boolean vote(Node document, double rate, String userName) {
-    return false;
-  }
-
-  @Override
-  public long getVoteTotal(Node node) {
-    return 0;
-  }
-
-  @Override
-  public boolean isVoted(Node node, String userName) {
-    return false;
-  }
-
-  @Override
-  public double getVoteValueOfUser(Node node, String userName) {
-    return 0;
   }
 
   /**
@@ -379,7 +335,6 @@ public class BlogServiceImpl implements BlogService {
    * @throws Exception
    */
   private List<Node> getAllNode(String nodeElement, Session session) throws Exception {
-//    Session session = getSession();
     String searchPath = getDriverPath();
     List<Node> rs = new ArrayList<Node>();
     StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);

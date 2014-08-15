@@ -1,5 +1,4 @@
 <%
-
   import javax.jcr.Node;
   import org.exoplatform.webui.application.WebuiRequestContext;
   import org.apache.commons.lang.time.DateFormatUtils;

@@ -18,6 +18,9 @@ import org.exoplatform.services.cms.taxonomy.TaxonomyService;
 import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.wcm.webui.Utils;
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
+import org.exoplatform.services.cms.voting.VotingService;
+
 
 def node = uicomponent.node
 def post = uicomponent.originalNode
@@ -35,36 +38,18 @@ def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 def rcontext = _ctx.getRequestContext() ;
 def jsManager = rcontext.getJavascriptManager();
 jsManager.require("SHARED/blogjs", "blogjs")
-.addScripts("blogjs.intShare();")
 .addScripts("blogjs.initScroll();");
-
 def isAdmin = Utils.isAdministratorUser();
+
+VotingService votingService = WCMCoreUtils.getService(VotingService.class);
+def voteValueOfUser = votingService.getVoteValueOfUser(post, viewer, "en");
+def voteTotal = votingService.getVoteTotal(post);
+
+def voteAvg = post.getProperty("exo:votingRate").getValue().getDouble();
 %>
-<style>
-
-    .dropdown-menu li > a:hover, .dropdown-menu .active > a, .dropdown-menu .active > a:hover {
-    background-color: #0088CC;
-    }
-
-
-    .dropdown-menu a{
-    color: #555555 !important;
-    }
-
-
-    #main article {
-    border-bottom: none;
-    }
-
-
-
-
-    a.tag {
-    color: white;
-    }
-
-
-</style>
+<script type="text/javascript">var switchTo5x=true;</script>
+<script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
 <div class="container-fluid" style="padding: 20px">
     <div id="content" class="clearfix row-fluid">
         <div id="main" class="span11 clearfix" role="main">
@@ -97,25 +82,26 @@ def isAdmin = Utils.isAdministratorUser();
                     <p class="tags"><% tags(post)
                         %></p>
 										<!--share this-->
-                    <span class='st_facebook' displayText='Facebook'></span>
-                    <span class='st_googleplus' displayText='Google +'></span>
-                    <span class='st_twitter' displayText='Tweet'></span>
-                    <span class='st_linkedin' displayText='LinkedIn'></span>
-                    <span class='st_pinterest' displayText='Pinterest'></span>
-                    <span class='st_email' displayText='Email'></span>
+                  <span class='st_googleplus_hcount' displayText='Google +'></span>
+                  <span class='st_sharethis_hcount' displayText='ShareThis'></span>
+                  <span class='st_facebook_hcount' displayText='Facebook'></span>
+                  <span class='st_twitter_hcount' displayText='Tweet'></span>
+                  <span class='st_linkedin_hcount' displayText='LinkedIn'></span>
+                  <span class='st_pinterest_hcount' displayText='Pinterest'></span>
+                  <span class='st_email_hcount' displayText='Email'></span>
 
                   <div class="blog-vote">
 
-                    <div style="float: right;position: absolute;padding-left: 600px;">Avg. Rating: 0.0 Votes: 0 </div>
+                    <div style="float: right;position: absolute;padding-left: 600px;">Avg. Rating: $voteAvg Votes: $voteTotal </div>
                     <div class="rate-wrapper">
 
-                      <input type="hidden" value="someuniqid">
+                      <input type="hidden" name="postPath" value="$postPath">
                       <a class="score-1" href="#">1</a>
                       <a class="score-2" href="#">2</a>
                       <a class="score-3" href="#">3</a>
                       <a class="score-4" href="#">4</a>
                       <a class="score-5" href="#">5</a>
-                      <span class="rate-current-score">23</span>
+                      <span class="rate-current-score"><%=voteValueOfUser*20%></span>
                     </div>
                   </div>
 
@@ -160,49 +146,11 @@ if (comments) {
 def plural=""
 if (comments.size > 1) plural = "s"
 %>
-
-<style>
-    /* TODO : we should reuse activity stream comments style instead of redeclaring*/
-
-    .commentList {
-    padding: 15px 15px 0 15px;
-    }
-    .commentList .commentItem {
-    position: relative;
-    }
-    .commentList .commentItem .commmentLeft {
-    float: left;
-    }
-    .commentRight {
-    margin-left: 45px;
-    paddin-top: 7px
-    }
-    .author a {
-    font-family: "Helvetica Neue Bold",Helvetica,Lucida,Arial,sans-serif;
-    font-weight: bold;
-    word-wrap: break-word;
-    color: #2f5e92;
-    text-decoration: none;
-    }
-    .author a+span {
-    margin-left: 10px;
-    color: #999;
-    }
-    .contentComment {
-    word-wrap: break-word;
-    }
-    .commentList .commentItem .ContentBlock {
-    word-wrap: break-word;
-    }
-	.disapproved{text-decoration: line-through;}
-	.approved{text-decoration: none;}
-</style>
 <h5 class="title">${comments.size} comment ${plural}</h5>
 <div class="commentList">
     <div>
         <%
         int i=0;
-
         for (comment in comments) {
         try {
         def rem = ((i++)%2 == 0)?"even":"odd"
@@ -215,6 +163,8 @@ if (comments.size > 1) plural = "s"
 				def cmtPath = comment.getPath();
 				def timeId = comment.getProperty("exo:commentDate").date.time.time;
 				def approve = false;
+				def postUuid = post.getUUID();
+
 				try{
 					approve = comment.getProperty("exo:blogStatus").getBoolean();
 				}catch(Exception ex){
@@ -247,8 +197,8 @@ if (comments.size > 1) plural = "s"
 									<%}%>
 									" > $commentContent
 									<span>
-										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath')"><i class="icon-pencil"></i></a>
-										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath')"><i class="uiIconEcmsDelete" style="this:hover:none;"></i></a>
+										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId')"><i class="icon-pencil"></i></a>
+										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}')"><i class="uiIconEcmsDelete" style="this:hover:none;"></i></a>
 									</span>
 									</p>
 							</div><!--end commentRight-->
@@ -300,47 +250,23 @@ def viewer = _ctx.getRequestContext().getRemoteUser()
 def fme = fullName(viewer)
 def avt = avatarUrl(viewer)
 %>
-
-<style>
-    /* TODO : we should reuse activity stream comment form style instead of copying*/
-    .inputContainer .commentItem {
-        padding-bottom: 15px;
-    }
-    .inputContainer {
-        padding-top: 0;
-    }
-
-    .commentList .commentItem .commmentLeft {
-        float: left;
-    }
-    .commentRight {
-        margin-left: 45px;
-        padding-top: 7px;
-    }
-    .commentList .commentItem .commentInputBox {
-        padding: 3px 0 0;
-    }
-    .commentList .commentItem .commentInputBox .commentInput {
-        margin-right: 112px;
-    }
-
-</style>
-
 <div class="commentList inputContainer inputContainerShow" style="display: block;">
     <div class="commentItem commentFormBox" id="respond-$uuid">
 
-        <!--div class="commmentLeft">
+        <div class="commmentLeft">
             <a class="avatarXShttp://localhost:8080/portal/intranet/mall" rel="tooltip" data-placement="bottom" href="/portal/intranet/profile/$viewer" data-original-title="$fme">
                 <img src="$avt" alt="$fme">
             </a>
-        </div--><!--end commentLeft-->
+        </div><!--end commentLeft-->
+
         <div class="commentRight">
-            <div class="commentInputBox ">
+            <div class="commentInputBox " id="commentInputBox">
                 <form class="form-inline" id="commentform-$uuid" name="commentform-$uuid">
                     <input name="jcrPath" type="hidden" value="/repository/collaboration${post.path}"/>
-
+                    <input name="commentPath" type="hidden" value="${post.path}"/>
+                    <input name="timeId" type="hidden" value=""/>
                     <input type="text" name="comment" id="comment-$uuid" placeholder="Your Comment Here…"  style="margin-bottom: 7px; height: 28px; resize: none; max-height: 28px;"  tabindex="0" />
-                    <input type="submit" value="Post Comment" class="btn btn-primary" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment" onclick="eXo.ecm.blog.postComment('$uuid')" />
+                    <input type="button" value="Post Comment" class="btn btn-primary" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment" onclick="eXo.ecm.blog.postComment('$uuid')" />
                 </form>
             </div>
         </div><!--end commentRight-->
