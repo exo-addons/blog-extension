@@ -50,13 +50,6 @@ public class BlogServiceImpl implements BlogService {
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_APPROVE_NODE = "exo:blogApprove";
 
-  private static final String BLOG_VOTE_NODE = "exo:blogVote";
-  private static final String BLOG_VOTE_RATE_PROPERTY = "exo:blogVotingRate";
-  private static final String BLOG_VOTE_TOTAL_PROPERTY = "exo:blogVoteTotal";
-  private static final String BLOG_VOTE_VOTER_PROPERTY = "exo:blogVoter";
-  private static final String BLOG_VOTE_VOTER_VALUE_PROPERTY = "exo:blogVoterVoteValues";
-  private static final String BLOG_VOTE_PARTEN = "exoBlog";
-
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
