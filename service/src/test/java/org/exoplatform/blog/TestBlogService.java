@@ -16,7 +16,6 @@
  */
 
 package org.exoplatform.blog;
-
 import junit.framework.TestCase;
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.util.Util;
@@ -31,6 +30,8 @@ import org.exoplatform.services.security.IdentityConstants;
 
 import javax.jcr.Node;
 import javax.jcr.Session;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -48,6 +49,7 @@ public class TestBlogService extends TestCase {
   private static BlogService blogService;
 
   private static final String BLOG_NODE = "exo:blog";
+
 
   static {
     initContainer();
@@ -217,6 +219,11 @@ public class TestBlogService extends TestCase {
     return node;
   }
 
+  public void testSession(){
+    HttpSession httpSession = org.exoplatform.portal.webui.util.Util.getPortalRequestContext().getRequest().getSession();
+//    httpSession.setAttribute("nodeName");
+    httpSession.getAttribute("nodeName");
+  }
   private void reset() throws Exception {
     Session session = getSession();
     Node rootNode = session.getRootNode();
@@ -231,6 +238,7 @@ public class TestBlogService extends TestCase {
   }
 
   private void init() throws Exception {
+    HttpServletRequest request = org.exoplatform.portal.webui.util.Util.getPortalRequestContext().getRequest();
     System.out.println("----------------------------INIT-----------------------------");
 //    2014
     addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));

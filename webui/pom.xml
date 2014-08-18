@@ -20,5 +20,27 @@
       <version>3.5.x-PLF-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.exoplatform.ecms</groupId>
+      <artifactId>ecms-core-services</artifactId>
+      <version>4.1.x-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.exoplatform.commons</groupId>
+      <artifactId>commons-webui-ext</artifactId>
+      <version>4.1.x-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.exoplatform.ecms</groupId>
+      <artifactId>ecms-core-webui-explorer</artifactId>
+      <version>4.1.x-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+
+
   </dependencies>
 </project>

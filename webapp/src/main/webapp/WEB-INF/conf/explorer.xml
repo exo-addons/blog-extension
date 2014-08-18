@@ -47,6 +47,7 @@
             </field>
           </object>
         </object-param>
+
 		<object-param>	      
           <name>Blog</name>
           <description>Template to display post list in backoffice</description>

@@ -49,11 +49,12 @@ public class BlogServiceImpl implements BlogService {
   private static final String DRIVER_PATH = "Blog";
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_APPROVE_NODE = "exo:blogApprove";
+  private static final String BLOG_POST_VIEWCOUNT_NODE = "exo:blogView";
+  private static final String BLOG_POST_VIEWCOUNT_PROPERTY = "exo:blogViewCount";
 
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
-
   private boolean initData = true;
   private String repo = "repository";
   private String ws = "collaboration";
@@ -321,6 +322,43 @@ public class BlogServiceImpl implements BlogService {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void increasePostView(String nodePath) {
+    try {
+      Node nodeToupdate = getNode(nodePath);
+      if (nodeToupdate.canAddMixin(BLOG_POST_VIEWCOUNT_NODE)) {
+        nodeToupdate.addMixin(BLOG_POST_VIEWCOUNT_NODE);
+        nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, 1);
+      } else {
+        long currentViewCount = nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
+        nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, ++currentViewCount);
+      }
+
+      nodeToupdate.save();
+    } catch (RepositoryException ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long getPostViewCount(String nodePath) {
+    try {
+      Node nodeToupdate = getNode(nodePath);
+      if (nodeToupdate.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY))
+        return nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
+      return 0;
+    } catch (RepositoryException ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return 0;
+  }
+
+  /**
    * Get All node of element
    *
    * @param nodeElement
@@ -384,6 +422,12 @@ public class BlogServiceImpl implements BlogService {
     return session;
   }
 
+  /**
+   * Get system session, only for init data.
+   * Please NOT use for navigate JCR data
+   * @return
+   * @throws Exception
+   */
   private Session getSystemSession() throws Exception {
     ManageableRepository repository = repoService.getRepository(this.repo);
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);

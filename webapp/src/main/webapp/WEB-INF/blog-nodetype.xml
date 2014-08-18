@@ -27,4 +27,18 @@
       </propertyDefinition>
     </propertyDefinitions>
   </nodeType>
+
+  <nodeType name="exo:blogView" isMixin="true" hasOrderableChildNodes="false" primaryItemName="" >
+    <propertyDefinitions>
+      <propertyDefinition name="exo:blogViewCount" autoCreated="true" mandatory="false" multiple="false"
+                          onParentVersion="COPY" protected="false" requiredType="Long" >
+        <valueConstraints/>
+        <defaultValues>
+          <defaultValue>1</defaultValue>
+        </defaultValues>
+      </propertyDefinition>
+
+    </propertyDefinitions>
+
+  </nodeType>
 </nodeTypes>

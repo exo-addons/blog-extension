@@ -108,4 +108,16 @@ public interface BlogService {
    */
   public boolean delComment(String nodePath);
 
+  /**
+   * To increase a blog-post view count when user visited article
+   * @param nodePath
+   */
+  public void increasePostView(String nodePath);
+
+  /**
+   * Get total visited of blog-post
+   * @param nodePath
+   * @return
+   */
+  public long getPostViewCount(String nodePath);
 }

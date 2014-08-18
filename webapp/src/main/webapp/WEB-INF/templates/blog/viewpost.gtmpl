@@ -2,9 +2,7 @@
 import java.util.HashSet;
 import java.util.List;
 import java.text.SimpleDateFormat;
-
 import javax.jcr.Node;
-
 import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
@@ -20,6 +18,9 @@ import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvide
 import org.exoplatform.wcm.webui.Utils;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.services.cms.voting.VotingService;
+import org.exoplatform.com.blog.service.BlogService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 
 def node = uicomponent.node
@@ -46,6 +47,16 @@ def voteValueOfUser = votingService.getVoteValueOfUser(post, viewer, "en");
 def voteTotal = votingService.getVoteTotal(post);
 
 def voteAvg = post.getProperty("exo:votingRate").getValue().getDouble();
+def blogService = WCMCoreUtils.getService(BlogService.class);
+HttpSession httpSession = Util.getPortalRequestContext().getRequest().getSession();
+def visitedPost = 0;
+def currentPostVisited = httpSession.getAttribute(uuid);
+
+if(currentPostVisited != uuid){
+	// increase post visited
+	blogService.increasePostView(postPath);
+	httpSession.setAttribute(uuid, uuid);
+}
 %>
 <script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
