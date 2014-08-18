@@ -80,8 +80,9 @@
             <field name="name">
               <string>Unpublish</string>
             </field>
+
             <field name="component">
-              <string>org.exoplatform.com.blog.component.BlogPublishActionComponent</string>
+              <string>org.exoplatform.com.blog.component.PublishManageActionComponent</string>
             </field>
           </object>
         </object-param>

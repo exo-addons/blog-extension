@@ -19,13 +19,19 @@
 
 package org.exoplatform.com.blog.component;
 
+import org.exoplatform.ecm.webui.component.explorer.UIJCRExplorer;
 import org.exoplatform.ecm.webui.component.explorer.control.listener.UIActionBarActionListener;
+import org.exoplatform.services.ecm.publication.PublicationService;
+import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.UIApplication;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.event.Event;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 
 /**
  * Created by The eXo Platform SAS
@@ -35,8 +41,8 @@ import org.exoplatform.webui.event.Event;
  */
 
 @ComponentConfig(
-        events = {@EventConfig(listeners = BlogPublishActionComponent.BlogUnpublishActionComponent.class)})
-public class BlogPublishActionComponent extends UIComponent {
+        events = {@EventConfig(listeners = PublishManageActionComponent.UnpublishActionListener.class)})
+public class PublishManageActionComponent extends UIComponent {
 
   public static final String NON_PUBLISHED = "non published";
   public static final String PUBLISHED = "published";
@@ -49,15 +55,22 @@ public class BlogPublishActionComponent extends UIComponent {
             ApplicationMessage.INFO));
   }
 
-  public static class BlogUnpublishActionComponent extends UIActionBarActionListener<BlogPublishActionComponent> {
+  public static class UnpublishActionListener extends UIActionBarActionListener<PublishManageActionComponent> {
     @Override
-    protected void processEvent(Event<BlogPublishActionComponent> event) throws Exception {
-      BlogPublishActionComponent demoActionComponent = event.getSource();
-      demoActionComponent.showMsg("checking..........");
-//      PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
-//      UIJCRExplorer uiExplorer = demoActionComponent.getAncestorOfType(UIJCRExplorer.class);
-//      Node node = uiExplorer.getCurrentNode();
-//      publicationService.changeState(node, NON_PUBLISHED, new HashMap<String,String>());
+    protected void processEvent(Event<PublishManageActionComponent> event) throws Exception {
+      PublishManageActionComponent demoActionComponent = event.getSource();
+
+      PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
+      UIJCRExplorer uiExplorer = demoActionComponent.getAncestorOfType(UIJCRExplorer.class);
+      Node node = uiExplorer.getCurrentNode();
+      publicationService.unsubcribeLifecycle(node);
+      String title="";
+      if(node.hasProperty("exo:title")){
+        try {
+          title = node.getProperty("exo:title").getString();
+        }catch(RepositoryException ex){}
+      }
+      demoActionComponent.showMsg(title+ " have been unpublished!");
     }
   }
 }
