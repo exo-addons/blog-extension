@@ -4,15 +4,28 @@
         xmlns:jcr="http://www.jcp.org/jcr/1.0"
         xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">
 
-  <nodeType name="exo:blog" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="exo:blog" isMixin="false" hasOrderableChildNodes="false" primaryItemName=""  >
+
     <supertypes>
-      <supertype>exo:webContent</supertype>
+      <supertype>nt:b</supertype>
     </supertypes>
+
     <propertyDefinitions>
       <propertyDefinition name="exo:title" requiredType="String" autoCreated="false" mandatory="false"
                           onParentVersion="COPY" protected="false" multiple="false">
         <valueConstraints/>
       </propertyDefinition>
+
+      <propertyDefinition name="exo:blogContent" requiredType="String" autoCreated="false" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+
+      <propertyDefinition name="exo:blogSummary" requiredType="String" autoCreated="false" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+
     </propertyDefinitions>
   </nodeType>
 

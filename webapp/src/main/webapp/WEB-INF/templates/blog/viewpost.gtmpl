@@ -58,17 +58,17 @@ if(currentPostVisited != uuid){
 	httpSession.setAttribute(uuid, uuid);
 }
 %>
-<script type="text/javascript">var switchTo5x=true;</script>
+<!--script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script-->
+
 <div class="container-fluid" style="padding: 20px">
     <div id="content" class="clearfix row-fluid">
         <div id="main" class="span11 clearfix" role="main">
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
                 <header>
-                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title
-										</h3></div>
+                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title </h3></div>
                     <p class="meta">
                     <div style="float:left">
                         <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
@@ -327,15 +327,18 @@ if (i++ < (tags.size-1)) print " "
 
 /* (only display  viewable webcontents here */
 boolean isValidBlogEntry(def node) {
-def frozen = node.primaryNodeType.name == "nt:frozenNode"
-if (frozen) {
-def viewable = Utils.isViewable(node)
-def type = node.getProperty("jcr:frozenPrimaryType").string
-if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
 return true;
-}
-}
-return false;
+/*
+	def frozen = node.primaryNodeType.name == "nt:frozenNode"
+	if (frozen) {
+	def viewable = Utils.isViewable(node)
+	def type = node.getProperty("jcr:frozenPrimaryType").string
+	if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
+	return true;
+	}
+	}
+	return false;
+*/
 }
 
 /* render a blog entry */
@@ -353,8 +356,9 @@ if (excerpt) {
 } // end if excerpt
 
 // print the main content
-def html = entry.getNode("default.html/jcr:content").getProperty("jcr:data").string
-print uicomponent.getInlineEditingField(entry, "default.html/jcr:content/jcr:data", html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
+
+def blogContent = entry.getProperty("exo:blogContent").string;
+print uicomponent.getInlineEditingField(entry, blogContent, '', "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
 %>
 <%
 
@@ -376,19 +380,23 @@ return false;
 
 /* get summary or desription */
 String getSummary(Node node) throws Exception {
-String desc = null;
-if (node.hasProperty("exo:summary")) {
-desc = node.getProperty("exo:summary").getValue().getString();
-} else if (node.hasNode("jcr:content")) {
-Node content = node.getNode("jcr:content");
-if (content.hasProperty("dc:description")) {
-try {
-desc = content.getProperty("dc:description").getValues()[0].getString();
-} catch (Exception ex) {
-return null;
-}
-}
-}
+String desc = "";
+
+	//if (node.hasProperty("exo:blogContent")) {
+		desc = node.getProperty("exo:blogContent").string;
+	//}
+/*
+else if (node.hasNode("exo:blogContent")) {
+	Node content = node.getNode("exoontent");
+		if (content.hasProperty("dc:description")) {
+			try {
+			desc = content.getProperty("dc:description").getValues()[0].getString();
+			} catch (Exception ex) {
+			return null;
+			}
+		}
+	}
+*/
 return desc;
 }  // end getSummary
 

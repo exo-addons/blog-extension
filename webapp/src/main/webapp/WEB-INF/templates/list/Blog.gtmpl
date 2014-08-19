@@ -70,7 +70,7 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
         String uuid = entry.getProperty("jcr:frozenUuid").getString()
         def originalNode = entry.getSession().getNodeByUUID(uuid)
         def link = uicomponent.getURL(entry)
-        def title = uicomponent.getTitle(entry)
+        def title = originalNode.getProperty("exo:title").string;
         def username = uicomponent.getAuthor(entry)
         def author = fullName(username)
         def poster = username
@@ -257,66 +257,67 @@ return avatar
 
 // (only display  viewable webcontents here)
 boolean isValidBlogEntry(def entry) {
-def frozen = entry.primaryNodeType.name == "nt:frozenNode"
-if (frozen) {
-def viewable = Utils.isViewable(entry)
-def type = entry.getProperty("jcr:frozenPrimaryType").string
-if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
+		/*
+	def frozen = entry.primaryNodeType.name == "nt:frozenNode"
+	if (frozen) {
+	def viewable = Utils.isViewable(entry)
+	def type = entry.getProperty("jcr:frozenPrimaryType").string
+	if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
+	return true;
+	}
+	}
+		*/
 return true;
-}
-}
-return false;
 }
 
 // render a blog entry
 void renderPost(def entry) {
-try {
+	try {
 
-def cssOption = "CSSData=";
-def excerpt = uicomponent.getSummary(entry);
-def html = entry.getNode("default.html/jcr:content").getProperty("jcr:data").string
-// if there is no summary, we use an inline marker
-if (!excerpt) {
-def marker = "<!-- more -->";
+	def cssOption = "CSSData=";
+	def excerpt = uicomponent.getSummary(entry);
+	def html = entry.getProperty("exo:blogSummary").getString();
+	// if there is no summary, we use an inline marker
+	if (!excerpt) {
+	def marker = "<!-- more -->";
 
-if (html.contains(marker)) {
-def idx = html.indexOf(marker)
-excerpt = html.substring(0,idx)
-html = html.substring(idx + marker.length(), html.length())
-}
-}
-if (excerpt) {
-%>
-	$excerpt &nbsp;<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
-    <i class="icon-hand-right"></i>
-    Read full article</a>
+	if (html.contains(marker)) {
+	def idx = html.indexOf(marker)
+	excerpt = html.substring(0,idx)
+	html = html.substring(idx + marker.length(), html.length())
+	}
+	}
+	if (excerpt) {
+	%>
 
-<%
-} else {
-print uicomponent.getInlineEditingField(entry, "default.html/jcr:content/jcr:data", html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
+		$excerpt &nbsp;<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
+			<i class="icon-hand-right"></i>
+			Read full article</a>
+	<%
+	} else {
+    def blogSummary = entry.getProperty("exo:blogSummary").getString();
+	print uicomponent.getInlineEditingField(entry, blogSummary, html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
 
-}
+	}
 
-} catch (Exception e) {
-print e;
-}
-} // end render post
+	} catch (Exception e) {
+	print e;
+	}
+	} // end render post
 
-void bloggers() {
-def bloggers = new HashSet();
-def entries = uicomponent.getCurrentPageData()
-entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
-int maxbloggers = 5
-for (blogger in bloggers) {
-if (maxbloggers-- == 0) break;
-def author = fullName(blogger)
-def avatar = avatarUrl(blogger)
-%>
-<a class="avatarXSmall" href="/portal/intranet/profile/$blogger" style="display: inline-block;">
-    <img src="$avatar" alt="$author">
-</a>
-<%
-}
+	void bloggers() {
+	def bloggers = new HashSet();
+	def entries = uicomponent.getCurrentPageData()
+	entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
+	int maxbloggers = 5
+	for (blogger in bloggers) {
+	if (maxbloggers-- == 0) break;
+	def author = fullName(blogger)
+	def avatar = avatarUrl(blogger)
+	%>
+	<a class="avatarXSmall" href="/portal/intranet/profile/$blogger" style="display: inline-block;"> <img src="$avatar" alt="$author"> </a>
+	<%
+	}
 
 }
 

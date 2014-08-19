@@ -19,9 +19,9 @@
 
 package org.exoplatform.com.blog.component;
 
+import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.ecm.webui.component.explorer.UIJCRExplorer;
 import org.exoplatform.ecm.webui.component.explorer.control.listener.UIActionBarActionListener;
-import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
@@ -60,17 +60,19 @@ public class PublishManageActionComponent extends UIComponent {
     protected void processEvent(Event<PublishManageActionComponent> event) throws Exception {
       PublishManageActionComponent demoActionComponent = event.getSource();
 
-      PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
+      BlogService blogService = WCMCoreUtils.getService(BlogService.class);
       UIJCRExplorer uiExplorer = demoActionComponent.getAncestorOfType(UIJCRExplorer.class);
-      Node node = uiExplorer.getCurrentNode();
-      publicationService.unsubcribeLifecycle(node);
+      Node currentNode = uiExplorer.getCurrentNode();
+      Node node = blogService.unpublish(currentNode);
       String title="";
-      if(node.hasProperty("exo:title")){
+      if(node !=null && node.hasProperty("exo:title")){
         try {
           title = node.getProperty("exo:title").getString();
         }catch(RepositoryException ex){}
+        demoActionComponent.showMsg(title+ " have been unpublished!");
+      }else{
+        demoActionComponent.showMsg(title + " couldn't unpublished!");
       }
-      demoActionComponent.showMsg(title+ " have been unpublished!");
     }
   }
 }

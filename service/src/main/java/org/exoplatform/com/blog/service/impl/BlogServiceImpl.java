@@ -22,6 +22,8 @@ import org.exoplatform.com.blog.service.entity.BlogArchive;
 import org.exoplatform.services.cms.comments.CommentsService;
 import org.exoplatform.services.cms.drives.DriveData;
 import org.exoplatform.services.cms.drives.ManageDriveService;
+import org.exoplatform.services.ecm.publication.NotInPublicationLifecycleException;
+import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
@@ -359,6 +361,23 @@ public class BlogServiceImpl implements BlogService {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Node unpublish(Node node) {
+    PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
+    try {
+      publicationService.unsubcribeLifecycle(node);
+      return node;
+    } catch (NotInPublicationLifecycleException ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return null;
+  }
+
+  /**
    * Get All node of element
    *
    * @param nodeElement
@@ -425,6 +444,7 @@ public class BlogServiceImpl implements BlogService {
   /**
    * Get system session, only for init data.
    * Please NOT use for navigate JCR data
+   *
    * @return
    * @throws Exception
    */

@@ -76,40 +76,22 @@
 						typeActionLink = "Ascending;";
 						}
 					%>
+
 					<div class="columnIcon" style="width: 20px;" onclick="<%= uicomponent.event("Sort", typeActionLink + "Type")%>" style="cursor:pointer;">
-							<%
-								if (selectedSortType.equals("Type")) {
-									%>
-										<i class="uiIconArrow${sortOrder} uiIconLightGrey"></i>
-									<%
-								}
-							%>
-						</div>
+							<% if (selectedSortType.equals("Type")) { %> <i class="uiIconArrow${sortOrder} uiIconLightGrey"></i> <% } %>
+          </div>
 		<!-- Title -->
 						<div class="columnName" style="width: 300px;" onclick="<%=uicomponent.event("Sort", typeActionLink + "Alphabetic")%>" style="cursor:pointer;">
 							<%
 								if (selectedSortType.equals("Alphabetic")) {
-									%>
-										<i class="uiIconArrow${sortOrder} uiIconLightGrey pull-right"></i>
-										Title
-									<%
-								} else {
-									%>Title<%
-								}
-							%>
+									%> <i class="uiIconArrow${sortOrder} uiIconLightGrey pull-right"></i> Title <%
+          			}else { %>Title<% }
+          		%>
 						</div>
-				<%if(componentId == "UIDocumentInfo"){%>
+        <%if(componentId == "UIDocumentInfo"){%>
 					<div class="columnStatus column" style="width: 93px;"><i class="uiIconEcmsAddCategory uiIconEcmsLightGray"></i>Categories</div>
 					<div class="columnStatus column" style="width: 93px;"><i class="uiIconComment"></i>Comments</div>
 					<div class="columnStatus column" style="width: 93px;"><i class="uiIconViewCount"></i>Views</div>
-				<%}else{%>
-					<div class="lineLeft" onmousedown="eXo.ecm.UIListView.resizeColumn(this, event);" onkeydown="eXo.ecm.UIListView.resizeColumn(this, event);"><span></span></div>
-					<!-- Date created -->
-					<div class="columnDatetime column" style="width: 200px;" onclick="<%=uicomponent.event("Sort", typeActionLink + "exo:dateCreated")%>" style="cursor:pointer;">
-					<% if (selectedSortType.equals("exo:dateCreated")) { %>
-      			<i class="uiIconArrow${sortOrder} uiIconLightGrey pull-right"></i> Last Change
-					<% } else { %>Last Change<% } %>
-					</div>
 				<%}%>
 			</div>
 					<div style="position: relative; top: 0px; left: 0px; width: 0px; height: 0px">
@@ -382,18 +364,6 @@
 										</div>
 								</div>
 
-	<%}else{%>
-							<div class="lineLeftItem" style="height:55px;"><span></span></div>
-							<!-- Title-->
-							<div class="columnName" style="width:45%;height: 40px;">
-								<div class="nodeLabel" style="$hiddenStyle" rel="tooltip" data-placement="bottom" title="$title $lockedLabel"><span class="nodeName"><strong><%=title%></strong><%if ("draft".equals(status)) {%> - <span class="label label-important"><%=statusLabel%></span><%}%></span>
-									<br/><small><span class="muted">by <%=author%></span></small></div>
-							</div>
-							<div class="lineLeftItem" style="height:55px;"><span></span></div>
-							<!-- Date created -->
-							<div class="columnDatetime column" style="width: 200px;">
-								<div class="nodeLabel" rel="tooltip" data-placement="bottom" title="<%= datetime %>"><%=datevent%> on <%= datetime %></div>
-							</div>
 	<%}%>
 		</div>
 						<%

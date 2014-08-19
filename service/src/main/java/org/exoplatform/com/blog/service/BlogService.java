@@ -120,4 +120,11 @@ public interface BlogService {
    * @return
    */
   public long getPostViewCount(String nodePath);
+
+  /**
+   * To Un publish a post
+   * @param node
+   * @return
+   */
+  public Node unpublish(Node node);
 }
