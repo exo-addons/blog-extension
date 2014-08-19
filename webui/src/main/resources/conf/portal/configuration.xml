@@ -29,34 +29,12 @@
               <boolean>true</boolean>
             </field>
             <field name="component">
-              <string>org.exoplatform.com.blog.component.TopNavigatorActionComponent</string>
+              <string>org.exoplatform.com.blog.component.BlogNavigatorActionComponent</string>
             </field>
           </object>
         </object-param>
       </init-params>
     </component-plugin>
-
-    <!--<component-plugin>-->
-      <!--<name>Add Actions</name>-->
-      <!--<set-method>registerUIExtensionPlugin</set-method>-->
-      <!--<type>org.exoplatform.webui.ext.UIExtensionPlugin</type>-->
-      <!--<init-params>-->
-        <!--<object-param>-->
-          <!--<name>Unpublish</name>-->
-          <!--<object type="org.exoplatform.webui.ext.UIExtension">-->
-            <!--<field name="type">-->
-              <!--<string>org.exoplatform.ecm.dms.UIActionBar</string>-->
-            <!--</field>-->
-            <!--<field name="name">-->
-              <!--<string>ViewNodeType</string>-->
-            <!--</field>-->
-            <!--<field name="component">-->
-              <!--<string>org.exoplatform.com.blog.component.BlogPublishActionComponent</string>-->
-            <!--</field>-->
-          <!--</object>-->
-        <!--</object-param>-->
-      <!--</init-params>-->
-    <!--</component-plugin>-->
 
   </external-component-plugins>
 
@@ -82,13 +60,30 @@
             </field>
 
             <field name="component">
-              <string>org.exoplatform.com.blog.component.PublishManageActionComponent</string>
+              <string>org.exoplatform.com.blog.component.UnpublishActionComponent</string>
             </field>
+
+            <!-- The external filters -->
+            <field name="extendedFilters">
+              <collection type="java.util.ArrayList">
+                <value>
+                  <object type="org.exoplatform.webui.ext.filter.impl.UserACLFilter">
+                    <field name="permissions">
+                      <collection type="java.util.ArrayList">
+                        <value>
+                          <string>*:/platform/web-contributors</string>
+                        </value>
+                      </collection>
+                    </field>
+                  </object>
+                </value>
+              </collection>
+            </field>
+
           </object>
         </object-param>
       </init-params>
     </component-plugin>
-
   </external-component-plugins>
 
 

@@ -31,5 +31,5 @@ import org.exoplatform.webui.core.UIComponent;
 @ComponentConfig(
         template = "classpath:templates/TopNavigatorBarActionComponent.gtmpl"
 )
-public class TopNavigatorActionComponent extends UIComponent {
+public class BlogNavigatorActionComponent extends UIComponent {
 }

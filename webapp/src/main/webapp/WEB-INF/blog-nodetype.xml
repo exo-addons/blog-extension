@@ -7,7 +7,7 @@
   <nodeType name="exo:blog" isMixin="false" hasOrderableChildNodes="false" primaryItemName=""  >
 
     <supertypes>
-      <supertype>nt:b</supertype>
+      <supertype>nt:base</supertype>
     </supertypes>
 
     <propertyDefinitions>
@@ -26,10 +26,18 @@
         <valueConstraints/>
       </propertyDefinition>
 
+      <propertyDefinition name="exo:blogViewCount" autoCreated="true" mandatory="false" multiple="false"
+                          onParentVersion="COPY" protected="false" requiredType="Long" >
+        <valueConstraints/>
+        <defaultValues>
+          <defaultValue>1</defaultValue>
+        </defaultValues>
+      </propertyDefinition>
+
     </propertyDefinitions>
   </nodeType>
 
-  <nodeType name="exo:blogApprove" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="exo:commentStatus" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
     <propertyDefinitions>
       <propertyDefinition name="exo:blogStatus" autoCreated="true" mandatory="false" multiple="false"
                           onParentVersion="COPY" protected="false" requiredType="Boolean">
@@ -41,17 +49,4 @@
     </propertyDefinitions>
   </nodeType>
 
-  <nodeType name="exo:blogView" isMixin="true" hasOrderableChildNodes="false" primaryItemName="" >
-    <propertyDefinitions>
-      <propertyDefinition name="exo:blogViewCount" autoCreated="true" mandatory="false" multiple="false"
-                          onParentVersion="COPY" protected="false" requiredType="Long" >
-        <valueConstraints/>
-        <defaultValues>
-          <defaultValue>1</defaultValue>
-        </defaultValues>
-      </propertyDefinition>
-
-    </propertyDefinitions>
-
-  </nodeType>
 </nodeTypes>

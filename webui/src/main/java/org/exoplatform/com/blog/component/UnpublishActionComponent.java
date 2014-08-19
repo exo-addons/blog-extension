@@ -19,8 +19,10 @@
 
 package org.exoplatform.com.blog.component;
 
+import org.exoplatform.com.blog.component.filter.UnpublishActionFilter;
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.ecm.webui.component.explorer.UIJCRExplorer;
+import org.exoplatform.ecm.webui.component.explorer.control.filter.IsNotLockedFilter;
 import org.exoplatform.ecm.webui.component.explorer.control.listener.UIActionBarActionListener;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.web.application.ApplicationMessage;
@@ -29,9 +31,13 @@ import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.UIApplication;
 import org.exoplatform.webui.core.UIComponent;
 import org.exoplatform.webui.event.Event;
+import org.exoplatform.webui.ext.filter.UIExtensionFilter;
+import org.exoplatform.webui.ext.filter.UIExtensionFilters;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by The eXo Platform SAS
@@ -41,11 +47,8 @@ import javax.jcr.RepositoryException;
  */
 
 @ComponentConfig(
-        events = {@EventConfig(listeners = PublishManageActionComponent.UnpublishActionListener.class)})
-public class PublishManageActionComponent extends UIComponent {
-
-  public static final String NON_PUBLISHED = "non published";
-  public static final String PUBLISHED = "published";
+        events = {@EventConfig(listeners = UnpublishActionComponent.UnpublishActionListener.class)})
+public class UnpublishActionComponent extends UIComponent {
 
   public void showMsg(String msg) {
     String msgLog = msg + "";
@@ -55,13 +58,13 @@ public class PublishManageActionComponent extends UIComponent {
             ApplicationMessage.INFO));
   }
 
-  public static class UnpublishActionListener extends UIActionBarActionListener<PublishManageActionComponent> {
+  public static class UnpublishActionListener extends UIActionBarActionListener<UnpublishActionComponent> {
     @Override
-    protected void processEvent(Event<PublishManageActionComponent> event) throws Exception {
-      PublishManageActionComponent demoActionComponent = event.getSource();
+    protected void processEvent(Event<UnpublishActionComponent> event) throws Exception {
+      UnpublishActionComponent unpublishComponent = event.getSource();
 
       BlogService blogService = WCMCoreUtils.getService(BlogService.class);
-      UIJCRExplorer uiExplorer = demoActionComponent.getAncestorOfType(UIJCRExplorer.class);
+      UIJCRExplorer uiExplorer = unpublishComponent.getAncestorOfType(UIJCRExplorer.class);
       Node currentNode = uiExplorer.getCurrentNode();
       Node node = blogService.unpublish(currentNode);
       String title="";
@@ -69,10 +72,19 @@ public class PublishManageActionComponent extends UIComponent {
         try {
           title = node.getProperty("exo:title").getString();
         }catch(RepositoryException ex){}
-        demoActionComponent.showMsg(title+ " have been unpublished!");
+        unpublishComponent.showMsg(title + " have been unpublished!");
       }else{
-        demoActionComponent.showMsg(title + " couldn't unpublished!");
+        unpublishComponent.showMsg(title + " couldn't unpublished!");
       }
     }
+  }
+
+  private static final List<UIExtensionFilter> FILTERS = Arrays.asList(
+          new UIExtensionFilter[] {
+                  new IsNotLockedFilter(), new UnpublishActionFilter() });
+
+  @UIExtensionFilters
+  public List<UIExtensionFilter> getFilters() {
+    return FILTERS;
   }
 }

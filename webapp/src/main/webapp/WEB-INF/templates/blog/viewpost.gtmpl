@@ -52,15 +52,15 @@ HttpSession httpSession = Util.getPortalRequestContext().getRequest().getSession
 def visitedPost = 0;
 def currentPostVisited = httpSession.getAttribute(uuid);
 
-if(currentPostVisited != uuid){
+if(currentPostVisited==null || currentPostVisited != uuid){
 	// increase post visited
 	blogService.increasePostView(postPath);
 	httpSession.setAttribute(uuid, uuid);
 }
 %>
-<!--script type="text/javascript">var switchTo5x=true;</script>
+<script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script-->
+<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
 
 <div class="container-fluid" style="padding: 20px">
     <div id="content" class="clearfix row-fluid">
@@ -68,7 +68,7 @@ if(currentPostVisited != uuid){
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
                 <header>
-                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title </h3></div>
+                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title visited: $currentPostVisited </h3></div>
                     <p class="meta">
                     <div style="float:left">
                         <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
@@ -85,8 +85,7 @@ if(currentPostVisited != uuid){
                 </header> <!-- end article header -->
 
                 <section class="post_content clearfix">
-                    <% renderPost(node)
-                    %>
+                    <% renderPost(post) %>
                 </section> <!-- end article section -->
 
                 <footer>

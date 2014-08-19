@@ -67,7 +67,7 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
         // if blog entry
         if (isValidBlogEntry(entry)) {
         count ++ ;
-        String uuid = entry.getProperty("jcr:frozenUuid").getString()
+        String uuid = entry.getUUID();// entry.getProperty("jcr:frozenUuid").getString()
         def originalNode = entry.getSession().getNodeByUUID(uuid)
         def link = uicomponent.getURL(entry)
         def title = originalNode.getProperty("exo:title").string;

@@ -51,7 +51,6 @@ public class BlogServiceImpl implements BlogService {
   private static final String DRIVER_PATH = "Blog";
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_APPROVE_NODE = "exo:blogApprove";
-  private static final String BLOG_POST_VIEWCOUNT_NODE = "exo:blogView";
   private static final String BLOG_POST_VIEWCOUNT_PROPERTY = "exo:blogViewCount";
 
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
@@ -330,14 +329,12 @@ public class BlogServiceImpl implements BlogService {
   public void increasePostView(String nodePath) {
     try {
       Node nodeToupdate = getNode(nodePath);
-      if (nodeToupdate.canAddMixin(BLOG_POST_VIEWCOUNT_NODE)) {
-        nodeToupdate.addMixin(BLOG_POST_VIEWCOUNT_NODE);
-        nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, 1);
-      } else {
+      if (nodeToupdate.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY)) {
         long currentViewCount = nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
         nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, ++currentViewCount);
+      }else{
+        nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, 1);
       }
-
       nodeToupdate.save();
     } catch (RepositoryException ex) {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
@@ -367,7 +364,9 @@ public class BlogServiceImpl implements BlogService {
   public Node unpublish(Node node) {
     PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
     try {
+      String lifeCycleName = publicationService.getNodeLifecycleName(node);
       publicationService.unsubcribeLifecycle(node);
+      publicationService.enrollNodeInLifecycle(node, lifeCycleName);
       return node;
     } catch (NotInPublicationLifecycleException ex) {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
