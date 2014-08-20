@@ -7,7 +7,7 @@
   <portal-skin>
     <skin-name>Default</skin-name>
     <skin-module>Blogskin</skin-module>
-    <css-path>/resources/css/blog.css</css-path>
+    <css-path>/skin/css/blog.css</css-path>
     <overwrite>false</overwrite>
   </portal-skin>
 
