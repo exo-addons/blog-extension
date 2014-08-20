@@ -88,11 +88,9 @@
           			}else { %>Title<% }
           		%>
 						</div>
-        <%if(componentId == "UIDocumentInfo"){%>
 					<div class="columnStatus column" style="width: 93px;"><i class="uiIconEcmsAddCategory uiIconEcmsLightGray"></i>Categories</div>
 					<div class="columnStatus column" style="width: 93px;"><i class="uiIconComment"></i>Comments</div>
 					<div class="columnStatus column" style="width: 93px;"><i class="uiIconViewCount"></i>Views</div>
-				<%}%>
 			</div>
 					<div style="position: relative; top: 0px; left: 0px; width: 0px; height: 0px">
 						<div class="Mask" style="position: absolute; top: 0px; left: 0px; width: 0px; height: 0px"></div>
@@ -209,9 +207,9 @@
 
 					def visitedPost = 0;
 					try{
-						visitedPost = blogService.getPostViewCount(nodePath);
+						visitedPost = blogService.getPostViewCount(targetNode.getPath());
 					}catch (Exception e) {
-						//print(e.getMessage())
+						print(e)
 					}
 				//  Comment Count
 				def commentCount = 0;
@@ -248,6 +246,7 @@
 					try {
 						mimeType=data.getNode("jcr:content").getProperty("jcr:mimeType").getString();
 					} catch (Exception e) {
+						print e;
 					}
 					// This escape "'" for js
 					String webDavPath = data.getPath().contains("%27") ? data.getPath().replaceAll("%27","%2527") : data.getPath();
@@ -363,22 +362,10 @@
 											<span class="label label-info">$visitedPost</span>
 										</div>
 								</div>
-
 	<%}%>
 		</div>
-						<%
-						// Make css for odd and event rows
-						oddEvenClassRow = (oddEvenClassRow.equals("odd"))? "even" : "odd";
-					}
-				%>
+						<% oddEvenClassRow = (oddEvenClassRow.equals("odd"))? "even" : "odd"; } %>
 	</div> <!--end componentid div-->
-
-
-
-
-
-
-
 	</div>
 			<%
 				//re-initialize action

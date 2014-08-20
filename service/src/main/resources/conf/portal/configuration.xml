@@ -82,12 +82,6 @@
           <description>The properties files of the portal , those file will be merged into one ResoruceBundle properties </description>
           <value>locale.blog.Blogs</value>
         </values-param>
-
-        <values-param>
-          <name>init.resources</name>
-          <value>locale.blog.Unpublish</value>
-        </values-param>
-
       </init-params>
     </component-plugin>
   </external-component-plugins>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundle>
+  <UITabForm>
+    <label>
+      <Unpublish>Un Publish</Unpublish>
+    </label>
+  </UITabForm>
+
+  <UIActionBar>
+    <tooltip>
+      <Unpublish>Un Publish</Unpublish>
+    </tooltip>
+  </UIActionBar>
+</bundle>

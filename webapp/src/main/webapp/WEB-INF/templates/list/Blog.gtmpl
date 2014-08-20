@@ -118,14 +118,8 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
         %>
         <!-- Paginator-->
         <div class="CaptionFunc ClearFix">
-            <%
-            if (uicomponent.showPaginator()) {
-
-            uicomponent.renderChild(UICustomizeablePaginator.class)
-
-            }
-            %>
-        </div>
+            <% if (uicomponent.showPaginator()) { uicomponent.renderChild(UICustomizeablePaginator.class) } %>
+				</div>
 
     </div>
 

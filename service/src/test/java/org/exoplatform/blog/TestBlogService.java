@@ -92,11 +92,8 @@ public class TestBlogService extends TestCase {
     blogService = (BlogService) container.getComponentInstanceOfType(BlogService.class);
   }
 
-  public void testA(){
-    assertEquals("eeee", 1,1);
-  }
-//  public void testGetYearArchives() {
-//    printBlogArchive();
+  public void testGetYearArchives() {
+    printBlogArchive();
 //    List<Integer> years = blogService.getArchiveYears();
 //    // return 2 year: 2013, 2014
 //    System.out.println("testGetYearArchives() YEAR: " + years.size());
@@ -104,7 +101,7 @@ public class TestBlogService extends TestCase {
 //      System.out.println(year);
 //    }
 //    assertEquals("Test get year failed", 2, years.size());
-//  }
+  }
 
 //  public void testGetMonth() {
 //    //get 2014 --> 3 months: 01, 02, 03
