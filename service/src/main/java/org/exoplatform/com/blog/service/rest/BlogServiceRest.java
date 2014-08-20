@@ -54,10 +54,11 @@ public class BlogServiceRest implements ResourceContainer {
   private Log log = ExoLogger.getExoLogger(BlogServiceRest.class);
 
   private BlogService blogService;
-  private VotingService votingService = WCMCoreUtils.getService(VotingService.class);
+  private VotingService votingService;
 
-  public BlogServiceRest(BlogService blogService) {
+  public BlogServiceRest(BlogService blogService, VotingService votingService) {
     this.blogService = blogService;
+    this.votingService = votingService;
   }
 
   @POST

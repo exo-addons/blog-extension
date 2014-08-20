@@ -10,10 +10,66 @@
     <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
   </component>
 
+  <!--<component>-->
+    <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
+  <!--</component>-->
+
   <component>
-    <type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>
+    <key>org.exoplatform.services.cms.voting.impl.VotingService</key>
+    <type>org.exoplatform.services.cms.voting.VotingServiceImpl</type>
   </component>
 
+  <component>
+    <key>org.exoplatform.services.cms.comments.CommentsService</key>
+    <type>org.exoplatform.services.cms.comments.impl.CommentsServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.cms.i18n.MultiLanguageService</key>
+    <type>org.exoplatform.services.cms.i18n.impl.MultiLanguageServiceImpl</type>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.cms.CmsService</key>
+    <type>org.exoplatform.services.cms.impl.CmsServiceImpl</type>
+  </component>
+
+  <component>
+    <type>org.exoplatform.services.cms.jcrext.activity.ActivityCommonService</type>
+    <init-params>
+      <value-param>
+        <name>acceptedNodeTypes</name>
+        <value>{exo:accessibleMedia}{acme:contact_us}{exo:webContent}{exo:pictureOnHeadWebcontent}{exo:link}{acme:product}</value>
+      </value-param>
+      <value-param>
+        <name>acceptedProperties</name>
+        <value>{dc:title}{dc:description}{dc:creator}{dc:source}{exo:summary}{exo:title}{exo:text}</value>
+      </value-param>
+      <value-param>
+        <name>acceptedFileProperties</name>
+        <value>{dc:title}{dc:description}{dc:creator}{dc:source}{exo:summary}{exo:title}{exo:language}{jcr:data}</value>
+      </value-param>
+    </init-params>
+  </component>
+
+  <component>
+    <key>org.exoplatform.services.cache.CacheService</key>
+    <jmx-name>cache:type=CacheService</jmx-name>
+    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
+    <init-params>
+      <object-param>
+        <name>cache.config.default</name>
+        <object type="org.exoplatform.services.cache.ExoCacheConfig">
+          <field name="name"><string>default</string></field>
+          <field name="maxSize"><int>30000</int></field>
+          <field name="liveTime"><long>60000</long></field>
+          <field name="distributed"><boolean>false</boolean></field>
+          <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
+        </object>
+      </object-param>
+    </init-params>
+  </component>
+  
   <external-component-plugins>
     <target-component>org.exoplatform.services.jcr.impl.ext.action.SessionActionCatalog</target-component>
     <component-plugin>

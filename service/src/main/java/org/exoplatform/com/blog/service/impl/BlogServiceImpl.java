@@ -50,7 +50,7 @@ public class BlogServiceImpl implements BlogService {
   private static final String BLOG_NODE = "exo:blog";
   private static final String DRIVER_PATH = "Blog";
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
-  private static final String BLOG_APPROVE_NODE = "exo:blogApprove";
+  private static final String BLOG_APPROVE_NODE = "exo:commentStatus";
   private static final String BLOG_POST_VIEWCOUNT_PROPERTY = "exo:blogViewCount";
 
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
@@ -96,11 +96,11 @@ public class BlogServiceImpl implements BlogService {
   }
 
   public BlogServiceImpl(RepositoryService repoService, SessionProviderService sessionProviderService,
-                         ManageDriveService managerDriverService) {
+                         ManageDriveService managerDriverService, CommentsService commentsService) {
     this.manageDriveService = managerDriverService;
     this.repoService = repoService;
     this.sessionProviderService = sessionProviderService;
-    this.commentsService = WCMCoreUtils.getService(CommentsService.class);
+    this.commentsService = commentsService;
 
     try {
       this.repo = repoService.getCurrentRepository().getConfiguration().getName();
@@ -258,6 +258,7 @@ public class BlogServiceImpl implements BlogService {
   public Node changeStatus(String nodePath) {
     try {
       Session session = getSession();
+//      Session session = getSystemSession();
       if (nodePath.startsWith("/")) nodePath = nodePath.substring(1);
 
       Node nodeUpdate = session.getRootNode().getNode(nodePath);
@@ -332,7 +333,7 @@ public class BlogServiceImpl implements BlogService {
       if (nodeToupdate.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY)) {
         long currentViewCount = nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
         nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, ++currentViewCount);
-      }else{
+      } else {
         nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, 1);
       }
       nodeToupdate.save();
@@ -409,7 +410,8 @@ public class BlogServiceImpl implements BlogService {
    * @throws Exception
    */
   private List<Node> getAllNode(String nodeElement, String firstDayOfMonth, String lastDayOfMonth) throws Exception {
-    Session session = getSession();
+//    Session session = getSession();
+    Session session = getSystemSession();
     List<Node> rs = new ArrayList<Node>();
     String searchPath = getDriverPath();
     StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);

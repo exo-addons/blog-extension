@@ -92,8 +92,8 @@ public class TestBlogService extends TestCase {
     blogService = (BlogService) container.getComponentInstanceOfType(BlogService.class);
   }
 
-  public void testGetYearArchives() {
-    printBlogArchive();
+//  public void testGetYearArchives() {
+//    printBlogArchive();
 //    List<Integer> years = blogService.getArchiveYears();
 //    // return 2 year: 2013, 2014
 //    System.out.println("testGetYearArchives() YEAR: " + years.size());
@@ -101,8 +101,8 @@ public class TestBlogService extends TestCase {
 //      System.out.println(year);
 //    }
 //    assertEquals("Test get year failed", 2, years.size());
-  }
-
+//  }
+//
 //  public void testGetMonth() {
 //    //get 2014 --> 3 months: 01, 02, 03
 //    List<Integer> months = blogService.getArchiveMonths(2014);
@@ -113,7 +113,7 @@ public class TestBlogService extends TestCase {
 //    }
 //    assertEquals("Test get month failed ", 3, months.size());
 //  }
-
+//
   public void printBlogArchive() {
     List<Integer> years = blogService.getArchiveYears();
     // print blog-archive cached table;
@@ -125,14 +125,14 @@ public class TestBlogService extends TestCase {
       }
     }
   }
-
+//
 //  public void testGetBlog() {
 //    int year = 2014;
-//    int month = 1;
+//    int month = 0;
 //    // Time: 2014/02 -->return 6 posts
 //    List<Node> nodes = blogService.getBlogs(year, month);
 //    printBlogArchive();
-//    System.out.println("testGetBlog() Nodes By Year/Month: 2014/02: " + nodes.size());
+//    System.out.println("testGetBlog() Nodes By Year/Month: 2014/02: " + nodes.size() );
 //    for (Node node : nodes) {
 //      String _name = "";
 //      try {
@@ -144,7 +144,7 @@ public class TestBlogService extends TestCase {
 //    }
 //    assertEquals("Get blog time 2014/02 failed", 6, nodes.size());
 //  }
-
+//
 //  public void testGetArchivesCountInYear() {
 //    //2013 --> return 14 post
 //    printBlogArchive();
@@ -160,48 +160,66 @@ public class TestBlogService extends TestCase {
 //    System.out.println("testGetArchivesCountInMonth(2013, 02): " + monthPostTotal);
 //    assertEquals("Count post by year failed ", 5, monthPostTotal);
 //  }
-
-
-//  public void testAddBlog() throws Exception {
-//    //total blog of 2014/08 before create a new post
-//    int postCountBefore = blogService.getArchivesCountInMonth(2014, 7);
-//    //add 5 post
-//    printBlogArchive();
-//    System.out.println("-----------------------------testAddBlog--------------------------------");
-//    Node node1 = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-//    Node node2 = addBlog("Post-001-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-//    Node node3 = addBlog("Post-002-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-//    Node node4 = addBlog("Post-003-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-//    Node node5 = addBlog("Post-004-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
 //
-//    blogService.addBlog(node1);
-//    blogService.addBlog(node2);
-//    blogService.addBlog(node3);
-//    blogService.addBlog(node4);
-//    blogService.addBlog(node5);
-//    printBlogArchive();
-//    int postCountAfter = blogService.getArchivesCountInMonth(2014, 7);
 //
-//    int denta = postCountAfter - postCountBefore;
-//    assertTrue("Increate blog cached table", denta == 5);
-//  }
+  public void testAddBlog() throws Exception {
+    //total blog of 2014/08 before create a new post
+    int postCountBefore = blogService.getArchivesCountInMonth(2014, 7);
+    //add 5 post
+    printBlogArchive();
+    System.out.println("-----------------------------testAddBlog--------------------------------");
+    Node node1 = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
+    Node node2 = addBlog("Post-001-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
+    Node node3 = addBlog("Post-002-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
+    Node node4 = addBlog("Post-003-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
+    Node node5 = addBlog("Post-004-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
 
-//  public void testRemoveBlog() throws Exception {
-//    System.out.println("--------------------testRemoveBlog--------------------");
-////    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
-//    printBlogArchive();
-//    int monthPostTotalBefore = blogService.getArchivesCountInMonth(2013, 01);
+    blogService.addBlog(node1);
+    blogService.addBlog(node2);
+    blogService.addBlog(node3);
+    blogService.addBlog(node4);
+    blogService.addBlog(node5);
+    printBlogArchive();
+    int postCountAfter = blogService.getArchivesCountInMonth(2014, 7);
+
+    int denta = postCountAfter - postCountBefore;
+    assertTrue("Increate blog cached table", denta == 5);
+  }
+
+  public void testRemoveBlog() throws Exception {
+    System.out.println("--------------------testRemoveBlog--------------------");
+//    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+    printBlogArchive();
+    int monthPostTotalBefore = blogService.getArchivesCountInMonth(2013, 01);
+    Session session = getSession();
+    Node rootNode = session.getRootNode();
+    Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
+    //("Post-000-2013001", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
+    Node node = blog.getNode("Post-000-2013001");
+    blogService.removeBlog(node);
+    int monthPostTotalAfter = blogService.getArchivesCountInMonth(2013, 01);
+    int denta = monthPostTotalBefore - monthPostTotalAfter;
+
+    assertTrue("Test remove blog failed ", (denta == 1));
+    printBlogArchive();
+  }
+
+//  public void testChangeStatus() throws Exception{
+//    System.out.println("Test changeStatus()");
 //    Session session = getSession();
 //    Node rootNode = session.getRootNode();
 //    Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
-//    //("Post-000-2013001", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
 //    Node node = blog.getNode("Post-000-2013001");
-//    blogService.removeBlog(node);
-//    int monthPostTotalAfter = blogService.getArchivesCountInMonth(2013, 01);
-//    int denta = monthPostTotalBefore - monthPostTotalAfter;
+//    Node nodeAfter = blogService.changeStatus(node.getPath());
 //
-//    assertTrue("Test remove blog failed ", (denta == 1));
-//    printBlogArchive();
+//    boolean before = false;
+//    if(node.hasProperty("exo:blogStatus")) {
+//      before = node.getProperty("exo:blogStatus").getBoolean();
+//    }
+//
+//    boolean after = nodeAfter.getProperty("exo:blogStatus").getBoolean();
+//
+//    assertTrue("Test change status failed", before && !after);
 //  }
 
   public Node addBlog(String name, String title, String summary, Calendar date) throws Exception {
@@ -211,9 +229,10 @@ public class TestBlogService extends TestCase {
     Node node = blog.addNode(name, BLOG_NODE);
 
     node.setProperty("exo:title", title);
-    node.setProperty("exo:summary", summary);
+    node.setProperty("exo:blogSummary", summary);
     node.setProperty("exo:dateCreated", date);
     session.save();
+    System.out.println("added: "+title);
     return node;
   }
 
