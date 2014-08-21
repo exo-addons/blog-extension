@@ -56,6 +56,31 @@
   
   <external-component-plugins>
 		<target-component>org.exoplatform.services.jcr.RepositoryService</target-component>
+
+    <component-plugin>
+      <name>add.namespaces</name>
+      <set-method>addPlugin</set-method>
+      <type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
+      <init-params>
+        <properties-param>
+          <name>namespaces</name>
+          <property name="mix" value="http://exoplatform.org/mix/1.0/"/>
+        </properties-param>
+      </init-params>
+    </component-plugin>
+
+      <component-plugin>
+          <name>add.namespaces</name>
+          <set-method>addPlugin</set-method>
+          <type>org.exoplatform.services.jcr.impl.AddNamespacesPlugin</type>
+          <init-params>
+              <properties-param>
+                  <name>namespaces</name>
+                  <property name="publication" value="http://exoplatform.org/publication/1.0/"/>
+              </properties-param>
+          </init-params>
+      </component-plugin>
+
 		<component-plugin>
 			<name>add.nodeType</name>
 			<set-method>addPlugin</set-method>

@@ -19,9 +19,11 @@ package org.exoplatform.com.blog.service.impl;
 
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.entity.BlogArchive;
+import org.exoplatform.portal.config.UserACL;
 import org.exoplatform.services.cms.comments.CommentsService;
 import org.exoplatform.services.cms.drives.DriveData;
 import org.exoplatform.services.cms.drives.ManageDriveService;
+import org.exoplatform.services.cms.voting.VotingService;
 import org.exoplatform.services.ecm.publication.NotInPublicationLifecycleException;
 import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -30,6 +32,8 @@ import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 
 import javax.jcr.*;
@@ -52,7 +56,7 @@ public class BlogServiceImpl implements BlogService {
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_APPROVE_NODE = "exo:commentStatus";
   private static final String BLOG_POST_VIEWCOUNT_PROPERTY = "exo:blogViewCount";
-
+  private static final String BLOG_DEFAULT_LANGUAGE="en";
   private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
@@ -64,6 +68,10 @@ public class BlogServiceImpl implements BlogService {
   private SessionProviderService sessionProviderService;
   private ManageDriveService manageDriveService;
   private CommentsService commentsService;
+  private UserACL userACL;
+  private PublicationService publicationService;
+  private VotingService votingService;
+
 
   private Map<Integer, BlogArchive> blogArchives = new HashMap<Integer, BlogArchive>();
 
@@ -95,12 +103,20 @@ public class BlogServiceImpl implements BlogService {
     }
   }
 
-  public BlogServiceImpl(RepositoryService repoService, SessionProviderService sessionProviderService,
-                         ManageDriveService managerDriverService, CommentsService commentsService) {
+  public BlogServiceImpl(RepositoryService repoService,
+                         SessionProviderService sessionProviderService,
+                         ManageDriveService managerDriverService,
+                         CommentsService commentsService,
+                         UserACL userACL,
+                         PublicationService publicationService,
+                         VotingService votingService) {
     this.manageDriveService = managerDriverService;
     this.repoService = repoService;
     this.sessionProviderService = sessionProviderService;
     this.commentsService = commentsService;
+    this.userACL = userACL;
+    this.publicationService = publicationService;
+    this.votingService = votingService;
 
     try {
       this.repo = repoService.getCurrentRepository().getConfiguration().getName();
@@ -115,6 +131,7 @@ public class BlogServiceImpl implements BlogService {
   }
 
   void initBlogArchive() {
+    System.out.println("init blogservice form data");
     if (isInitData()) {
       try {
         Session session = getSystemSession();
@@ -255,13 +272,19 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public Node changeStatus(String nodePath) {
-    try {
-      Session session = getSession();
-//      Session session = getSystemSession();
-      if (nodePath.startsWith("/")) nodePath = nodePath.substring(1);
+  public boolean changeStatus(String postPath, String nodePath) {
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
 
-      Node nodeUpdate = session.getRootNode().getNode(nodePath);
+    String viewer = identity.getUserId();
+    try {
+      Node postNode = getNode(postPath);
+      if (postNode != null && postNode.hasProperty("exo:owner")) {
+        String postOwner = postNode.getProperty("exo:owner").getString();
+        if (!(isAdmin || postOwner.equals(viewer))) return false;
+      }
+      Session session = getSession();
+      Node nodeUpdate = (Node) session.getItem(nodePath);
       if (nodeUpdate.canAddMixin(BLOG_APPROVE_NODE)) {
         nodeUpdate.addMixin(BLOG_APPROVE_NODE);
         nodeUpdate.setProperty(BLOG_STATUS_PROPERTY, true);
@@ -270,18 +293,30 @@ public class BlogServiceImpl implements BlogService {
         nodeUpdate.setProperty(BLOG_STATUS_PROPERTY, !status);
       }
       session.save();
-      return nodeUpdate;
+      return true;
     } catch (Exception ex) {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
-    return null;
+    return false;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Node getNode(String nodePath) {
+  public boolean vote(String postPath, double score) {
+    Node nodeToVote = getNode(postPath);
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    try {
+      votingService.vote(nodeToVote, score, identity.getUserId(), BLOG_DEFAULT_LANGUAGE);
+      return true;
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return false;
+  }
+
+  private Node getNode(String nodePath) {
     try {
       Session session = getSession();
       return (Node) session.getItem(nodePath);
@@ -293,13 +328,18 @@ public class BlogServiceImpl implements BlogService {
     return null;
   }
 
+  @Override
+  public Node getCommentNode(String nodePath) {
+    return getNode(nodePath);
+  }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean editComment(Node nodeEdit, String newComment) {
+  public boolean editComment(String nodeToEditPath, String newComment) {
     try {
+      Node nodeEdit = getNode(nodeToEditPath);
       commentsService.updateComment(nodeEdit, newComment);
       return true;
     } catch (Exception ex) {
@@ -327,9 +367,8 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public void increasePostView(String nodePath) {
+  public void increasePostView(Node nodeToupdate) {
     try {
-      Node nodeToupdate = getNode(nodePath);
       if (nodeToupdate.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY)) {
         long currentViewCount = nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
         nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, ++currentViewCount);
@@ -346,9 +385,8 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public long getPostViewCount(String nodePath) {
+  public long getPostViewCount(Node nodeToupdate) {
     try {
-      Node nodeToupdate = getNode(nodePath);
       if (nodeToupdate.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY))
         return nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
       return 0;

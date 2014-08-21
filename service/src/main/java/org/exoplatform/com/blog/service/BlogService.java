@@ -82,23 +82,30 @@ public interface BlogService {
    * Update status to approve|disapprove a post
    * @param nodePath
    */
-  public Node changeStatus(String nodePath);
+  public boolean changeStatus(String postPath, String nodePath);
 
   /**
-   * Get Node by path,
-   * return null if path not exits
+   * Vote a post of blog by user/language
+   * @param postPath
+   * @param score
+   * @return
+   */
+  public boolean vote(String postPath, double score);
+
+  /**
+   * get a comment of post by comment path
    * @param nodePath
    * @return
    */
-  public Node getNode(String nodePath);
+  public Node getCommentNode(String nodePath);
 
   /**
    * Edit a comment of post
-   * @param nodeEdit
+   * @param nodeToEdit
    * @param newComment
    * @return
    */
-  public boolean editComment(Node nodeEdit, String newComment);
+  public boolean editComment(String nodeToEdit, String newComment);
 
   /**
    * Delete a comment of post
@@ -110,16 +117,16 @@ public interface BlogService {
 
   /**
    * To increase a blog-post view count when user visited article
-   * @param nodePath
+   * @param nodeToUpdate
    */
-  public void increasePostView(String nodePath);
+  public void increasePostView(Node nodeToUpdate);
 
   /**
    * Get total visited of blog-post
-   * @param nodePath
+   * @param nodeToUpdate
    * @return
    */
-  public long getPostViewCount(String nodePath);
+  public long getPostViewCount(Node nodeToUpdate);
 
   /**
    * To Un publish a post

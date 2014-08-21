@@ -20,13 +20,9 @@ package org.exoplatform.com.blog.service.rest;
 
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.util.Util;
-import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.services.cms.voting.VotingService;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
-import org.exoplatform.services.security.ConversationState;
-import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,13 +49,10 @@ import java.util.List;
 public class BlogServiceRest implements ResourceContainer {
   private Log log = ExoLogger.getExoLogger(BlogServiceRest.class);
 
-  private BlogService blogService;
-  private VotingService votingService;
+  private BlogService blogService = WCMCoreUtils.getService(BlogService.class);
 
-  public BlogServiceRest(BlogService blogService, VotingService votingService) {
-    this.blogService = blogService;
-    this.votingService = votingService;
-  }
+  public BlogServiceRest(){
+    }
 
   @POST
   @Path("/get-blogs")
@@ -86,45 +79,13 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/changeStatus")
   @RolesAllowed("users")
   public Response getBlogs(MultivaluedMap<String, String> data) {
-
-    UserACL userACL = WCMCoreUtils.getService(UserACL.class);
-    Identity identity = ConversationState.getCurrent().getIdentity();
-
-    boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
-    String viewer = identity.getUserId();
-
     String postPath = data.getFirst("postPath");
     String nodePath = data.getFirst("nodePath");
 
-    Node postNode = blogService.getNode(postPath);
-
-    try {
-      if (postNode != null && postNode.hasProperty("exo:owner")) {
-        String postOwner = postNode.getProperty("exo:owner").getString();
-        if (!(isAdmin || postOwner.equals(viewer))) {
-          return Response.ok("Permission denied !", MediaType.APPLICATION_JSON).build();
-        }
-      }
-      //continue
-    } catch (RepositoryException ex) {
-      if (log.isErrorEnabled()) log.error(ex.getMessage());
-      return Response.ok("Post is not exits!", MediaType.APPLICATION_JSON).build();
-    }
-
-    Node rs = blogService.changeStatus(nodePath);
+    boolean rs = blogService.changeStatus(postPath, nodePath);
     JSONObject obj = new JSONObject();
     try {
-      try {
-        if (rs.hasProperty("exo:blogStatus")) {
-          obj.put("result", rs.getProperty("exo:blogStatus").getBoolean());
-        } else {
-          obj.put("result", -1);
-        }
-        return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
-      } catch (RepositoryException ex) {
-        if (log.isErrorEnabled()) log.error(ex.getMessage());
-      }
-      obj.put("result", -1);
+      obj.put("result", rs);
     } catch (JSONException e) {
       if (log.isErrorEnabled()) log.error(e.getMessage());
     }
@@ -137,44 +98,21 @@ public class BlogServiceRest implements ResourceContainer {
   public Response updateVote(MultivaluedMap<String, String> data) {
     String postPath = data.getFirst("postPath");
     double score = Util.getDouble(data.getFirst("score"), 0);
-    Identity identity = ConversationState.getCurrent().getIdentity();
-    Node nodeToVote = blogService.getNode(postPath);
-    try {
-      votingService.vote(nodeToVote, score, identity.getUserId(), "");
-      return Response.ok("{\"result\": true}", MediaType.TEXT_PLAIN).build();
-    } catch (Exception ex) {
-      if (log.isErrorEnabled()) log.error(ex.getMessage());
-    }
-    return Response.ok("Failed", MediaType.TEXT_PLAIN).build();
+    boolean result = blogService.vote(postPath, score);
+    return Response.ok("{\"result\": " + result + "}", MediaType.TEXT_PLAIN).build();
   }
 
   @POST
   @Path("/editComment")
   @RolesAllowed("users")
   public Response editComment(MultivaluedMap<String, String> data) {
-    UserACL userACL = WCMCoreUtils.getService(UserACL.class);
-    Identity identity = ConversationState.getCurrent().getIdentity();
-
-    boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
-    String viewer = identity.getUserId();
-
     String commentPath = data.getFirst("commentPath");
     String newComment = data.getFirst("newComment");
-    Node nodeEdit = blogService.getNode(commentPath);
     JSONObject obj = new JSONObject();
     try {
-      if (nodeEdit != null && nodeEdit.hasProperty("exo:commentor")) {
-        if (!(isAdmin || viewer.equals(nodeEdit.getProperty("exo:commentor").getString()))) {
-          return Response.ok("Permission denied!", MediaType.TEXT_PLAIN).build();
-        }
-        boolean result = blogService.editComment(nodeEdit, newComment);
-        obj.put("result", result);
-        return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
-      }
-    } catch (RepositoryException ex) {
-      if (log.isErrorEnabled()) {
-        log.error(ex.getMessage());
-      }
+      boolean result = blogService.editComment(commentPath, newComment);
+      obj.put("result", result);
+      return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
     } catch (JSONException e) {
       if (log.isErrorEnabled()) {
         log.error(e.getMessage());
@@ -183,16 +121,11 @@ public class BlogServiceRest implements ResourceContainer {
     return Response.ok("failed", MediaType.APPLICATION_JSON).build();
   }
 
+
   @POST
   @Path("/delComment")
   @RolesAllowed("users")
   public Response delComment(@QueryParam("nodePath") String nodePath) {
-    UserACL userACL = WCMCoreUtils.getService(UserACL.class);
-    Identity identity = ConversationState.getCurrent().getIdentity();
-
-    boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
-    String viewer = identity.getUserId();
-
     boolean result = blogService.delComment(nodePath);
     JSONObject obj = new JSONObject();
     try {
@@ -208,7 +141,7 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/getComment")
   @RolesAllowed("users")
   public Response getComment(@QueryParam("nodePath") String nodePath) {
-    Node node = blogService.getNode(nodePath);
+    Node node = blogService.getCommentNode(nodePath);
     JSONObject obj = new JSONObject();
     try {
       if (node != null && node.hasProperty("exo:commentContent")) {

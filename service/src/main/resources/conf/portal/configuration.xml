@@ -5,141 +5,158 @@
         http://www.exoplatform.org/xml/ns/kernel_1_1.xsd"
         xmlns="http://www.exoplatform.org/xml/ns/kernel_1_1.xsd">
 
-  <component>
-    <key>org.exoplatform.com.blog.service.BlogService</key>
-    <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
-  </component>
+    <component>
+        <key>org.exoplatform.com.blog.service.BlogService</key>
+        <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
+    </component>
 
-  <!--<component>-->
-    <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
-  <!--</component>-->
+    <!--<component>-->
+        <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
+    <!--</component>-->
 
-  <component>
-    <key>org.exoplatform.services.cms.voting.impl.VotingService</key>
-    <type>org.exoplatform.services.cms.voting.VotingServiceImpl</type>
-  </component>
+    <component>
+        <key>org.exoplatform.services.cms.comments.CommentsService</key>
+        <type>org.exoplatform.services.cms.comments.impl.CommentsServiceImpl</type>
+    </component>
 
-  <component>
-    <key>org.exoplatform.services.cms.comments.CommentsService</key>
-    <type>org.exoplatform.services.cms.comments.impl.CommentsServiceImpl</type>
-  </component>
+    <component>
+        <key>org.exoplatform.services.cms.i18n.MultiLanguageService</key>
+        <type>org.exoplatform.services.cms.i18n.impl.MultiLanguageServiceImpl</type>
+    </component>
 
-  <component>
-    <key>org.exoplatform.services.cms.i18n.MultiLanguageService</key>
-    <type>org.exoplatform.services.cms.i18n.impl.MultiLanguageServiceImpl</type>
-  </component>
+    <component>
+        <key>org.exoplatform.services.cms.CmsService</key>
+        <type>org.exoplatform.services.cms.impl.CmsServiceImpl</type>
+    </component>
 
-  <component>
-    <key>org.exoplatform.services.cms.CmsService</key>
-    <type>org.exoplatform.services.cms.impl.CmsServiceImpl</type>
-  </component>
+    <component>
+        <type>org.exoplatform.services.cms.jcrext.activity.ActivityCommonService</type>
+        <init-params>
+            <value-param>
+                <name>acceptedNodeTypes</name>
+                <value>{exo:accessibleMedia}{acme:contact_us}{exo:webContent}{exo:pictureOnHeadWebcontent}{exo:link}{acme:product}</value>
+            </value-param>
+            <value-param>
+                <name>acceptedProperties</name>
+                <value>{dc:title}{dc:description}{dc:creator}{dc:source}{exo:summary}{exo:title}{exo:text}</value>
+            </value-param>
+            <value-param>
+                <name>acceptedFileProperties</name>
+                <value>{dc:title}{dc:description}{dc:creator}{dc:source}{exo:summary}{exo:title}{exo:language}{jcr:data}</value>
+            </value-param>
+        </init-params>
+    </component>
 
-  <component>
-    <type>org.exoplatform.services.cms.jcrext.activity.ActivityCommonService</type>
-    <init-params>
-      <value-param>
-        <name>acceptedNodeTypes</name>
-        <value>{exo:accessibleMedia}{acme:contact_us}{exo:webContent}{exo:pictureOnHeadWebcontent}{exo:link}{acme:product}</value>
-      </value-param>
-      <value-param>
-        <name>acceptedProperties</name>
-        <value>{dc:title}{dc:description}{dc:creator}{dc:source}{exo:summary}{exo:title}{exo:text}</value>
-      </value-param>
-      <value-param>
-        <name>acceptedFileProperties</name>
-        <value>{dc:title}{dc:description}{dc:creator}{dc:source}{exo:summary}{exo:title}{exo:language}{jcr:data}</value>
-      </value-param>
-    </init-params>
-  </component>
+    <component>
+        <key>org.exoplatform.portal.config.UserACL</key>
+        <type>org.exoplatform.portal.config.UserACL</type>
+        <init-params>
+            <value-param>
+                <name>super.user</name>
+                <value>root</value>
+            </value-param>
+            <value-param>
+                <name>guests.group</name>
+                <value>/platform/guests</value>
+            </value-param>
+            <value-param>
+                <name>navigation.creator.membership.type</name>
+                <value>manager</value>
+            </value-param>
+        </init-params>
+    </component>
 
-  <component>
-    <key>org.exoplatform.services.cache.CacheService</key>
-    <jmx-name>cache:type=CacheService</jmx-name>
-    <type>org.exoplatform.services.cache.impl.CacheServiceImpl</type>
-    <init-params>
-      <object-param>
-        <name>cache.config.default</name>
-        <object type="org.exoplatform.services.cache.ExoCacheConfig">
-          <field name="name"><string>default</string></field>
-          <field name="maxSize"><int>30000</int></field>
-          <field name="liveTime"><long>60000</long></field>
-          <field name="distributed"><boolean>false</boolean></field>
-          <field name="implementation"><string>org.exoplatform.services.cache.concurrent.ConcurrentFIFOExoCache</string></field>
-        </object>
-      </object-param>
-    </init-params>
-  </component>
-  
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.jcr.impl.ext.action.SessionActionCatalog</target-component>
-    <component-plugin>
-      <name>addActions</name>
-      <set-method>addPlugin</set-method>
-      <type>org.exoplatform.services.jcr.impl.ext.action.AddActionsPlugin</type>
-      <description>add actions plugin</description>
-      <init-params>
-        <object-param>
-          <name>actions</name>
-          <object type="org.exoplatform.services.jcr.impl.ext.action.AddActionsPlugin$ActionsConfig">
-            <field name="actions">
-              <collection type="java.util.ArrayList">
-                <value>
-                  <object type="org.exoplatform.services.jcr.impl.ext.action.ActionConfiguration">
-                    <field name="eventTypes">
-                      <string>addNode</string>
-                    </field>
-                    <field name="nodeTypes">
-                      <string>exo:blog</string>
-                    </field>
-                    <field name="actionClassName">
-                      <string>org.exoplatform.com.blog.service.action.AddBlogAction</string>
-                    </field>
-                  </object>
-                </value>
-                <value>
-                  <object type="org.exoplatform.services.jcr.impl.ext.action.ActionConfiguration">
-                    <field name="eventTypes">
-                      <string>removeNode</string>
-                    </field>
-                    <field name="nodeTypes">
-                      <string>exo:taxonomyLink</string>
-                    </field>
-                    <field name="isDeep">
-                      <boolean>false</boolean>
-                    </field>
-                    <field name="actionClassName">
-                      <string>org.exoplatform.com.blog.service.action.RemoveBlogAction</string>
-                    </field>
-                  </object>
-                </value>
-              </collection>
-            </field>
-          </object>
-        </object-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
+    <component>
+        <key>org.exoplatform.services.ecm.publication.PublicationService</key>
+        <type>org.exoplatform.services.ecm.publication.impl.PublicationServiceImpl</type>
+    </component>
 
-  <external-component-plugins>
-    <target-component>org.exoplatform.services.resources.ResourceBundleService</target-component>
-    <component-plugin>
-      <name>Common utils ResourceBundle Plugin</name>
-      <set-method>addResourceBundle</set-method>
-      <type>org.exoplatform.services.resources.impl.BaseResourceBundlePlugin</type>
-      <init-params>
-        <values-param>
-          <name>classpath.resources</name>
-          <description>The resources that start with the following package name should be load from file system</description>
-          <value>locale.blog.Blogs</value>
-        </values-param>
+    <component>
+        <key>org.exoplatform.services.ecm.publication.PublicationPresentationService</key>
+        <type>org.exoplatform.services.ecm.publication.impl.PublicationPresentationServiceImpl</type>
+    </component>
 
-        <values-param>
-          <name>portal.resource.names</name>
-          <description>The properties files of the portal , those file will be merged into one ResoruceBundle properties </description>
-          <value>locale.blog.Blogs</value>
-        </values-param>
-      </init-params>
-    </component-plugin>
-  </external-component-plugins>
+    <component>
+        <key>org.exoplatform.services.cms.voting.VotingService</key>
+        <type>org.exoplatform.services.cms.voting.impl.VotingServiceImpl</type>
+    </component>
+
+    <external-component-plugins>
+        <target-component>org.exoplatform.services.jcr.impl.ext.action.SessionActionCatalog</target-component>
+        <component-plugin>
+            <name>addActions</name>
+            <set-method>addPlugin</set-method>
+            <type>org.exoplatform.services.jcr.impl.ext.action.AddActionsPlugin</type>
+            <description>add actions plugin</description>
+            <init-params>
+                <object-param>
+                    <name>actions</name>
+                    <object type="org.exoplatform.services.jcr.impl.ext.action.AddActionsPlugin$ActionsConfig">
+                        <field name="actions">
+                            <collection type="java.util.ArrayList">
+                                <value>
+                                    <object type="org.exoplatform.services.jcr.impl.ext.action.ActionConfiguration">
+                                        <field name="eventTypes">
+                                            <string>addNode</string>
+                                        </field>
+                                        <field name="nodeTypes">
+                                            <string>exo:blog</string>
+                                        </field>
+                                        <field name="actionClassName">
+                                            <string>org.exoplatform.com.blog.service.action.AddBlogAction</string>
+                                        </field>
+                                    </object>
+                                </value>
+                                <value>
+                                    <object type="org.exoplatform.services.jcr.impl.ext.action.ActionConfiguration">
+                                        <field name="eventTypes">
+                                            <string>removeNode</string>
+                                        </field>
+                                        <field name="nodeTypes">
+                                            <string>exo:taxonomyLink</string>
+                                        </field>
+                                        <field name="isDeep">
+                                            <boolean>false</boolean>
+                                        </field>
+                                        <field name="actionClassName">
+                                            <string>org.exoplatform.com.blog.service.action.RemoveBlogAction</string>
+                                        </field>
+                                    </object>
+                                </value>
+                            </collection>
+                        </field>
+                    </object>
+                </object-param>
+            </init-params>
+        </component-plugin>
+    </external-component-plugins>
+
+    <external-component-plugins>
+        <target-component>org.exoplatform.services.resources.ResourceBundleService</target-component>
+        <component-plugin>
+            <name>Common utils ResourceBundle Plugin</name>
+            <set-method>addResourceBundle</set-method>
+            <type>org.exoplatform.services.resources.impl.BaseResourceBundlePlugin</type>
+            <init-params>
+                <values-param>
+                    <name>classpath.resources</name>
+                    <description>The resources that start with the following package name should be load from file system</description>
+                    <value>locale.blog.Blogs</value>
+                </values-param>
+
+                <values-param>
+                    <name>portal.resource.names</name>
+                    <description>The properties files of the portal , those file will be merged into one ResoruceBundle properties </description>
+                    <value>locale.blog.Blogs</value>
+                </values-param>
+
+                <values-param>
+                    <name>init.resources</name>
+                    <value>locale.blog.Unpublish</value>
+                </values-param>
+
+            </init-params>
+        </component-plugin>
+    </external-component-plugins>
 
 </configuration>
