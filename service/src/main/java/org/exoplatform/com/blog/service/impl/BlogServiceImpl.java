@@ -24,8 +24,6 @@ import org.exoplatform.services.cms.comments.CommentsService;
 import org.exoplatform.services.cms.drives.DriveData;
 import org.exoplatform.services.cms.drives.ManageDriveService;
 import org.exoplatform.services.cms.voting.VotingService;
-import org.exoplatform.services.ecm.publication.NotInPublicationLifecycleException;
-import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
@@ -34,7 +32,6 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
-import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 
 import javax.jcr.*;
 import javax.jcr.query.Query;
@@ -47,6 +44,7 @@ import java.util.*;
  * Author : eXoPlatform
  * exo@exoplatform.com
  * Aug 4, 2014
+ * Implement of BlogService
  */
 public class BlogServiceImpl implements BlogService {
   private Log log = ExoLogger.getExoLogger(BlogService.class);
@@ -69,7 +67,6 @@ public class BlogServiceImpl implements BlogService {
   private ManageDriveService manageDriveService;
   private CommentsService commentsService;
   private UserACL userACL;
-  private PublicationService publicationService;
   private VotingService votingService;
 
 
@@ -108,14 +105,12 @@ public class BlogServiceImpl implements BlogService {
                          ManageDriveService managerDriverService,
                          CommentsService commentsService,
                          UserACL userACL,
-                         PublicationService publicationService,
                          VotingService votingService) {
     this.manageDriveService = managerDriverService;
     this.repoService = repoService;
     this.sessionProviderService = sessionProviderService;
     this.commentsService = commentsService;
     this.userACL = userACL;
-    this.publicationService = publicationService;
     this.votingService = votingService;
 
     try {
@@ -204,7 +199,7 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public List<Node> getBlogs(int year, int month) {
+  public List<Node> getPosts(int year, int month) {
     try {
       return getAllNode(BLOG_NODE, getStrFirstDayOfMonth(year, month), getStrLastDayOfMonth(year, month));
     } catch (Exception ex) {
@@ -219,7 +214,7 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public void addBlog(Node blogNode) {
+  public void addPost(Node blogNode) {
     try {
       if (blogNode.isNodeType(BlogServiceImpl.BLOG_NODE)) {
         Calendar cal = new GregorianCalendar();
@@ -238,7 +233,7 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public void removeBlog(Node blogNode) {
+  public void removePost(Node blogNode) {
     try {
       if (blogNode.isNodeType(BlogServiceImpl.BLOG_NODE)) {
         Calendar cal = blogNode.getProperty("exo:dateCreated").getDate();
@@ -394,25 +389,6 @@ public class BlogServiceImpl implements BlogService {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
     return 0;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Node unpublish(Node node) {
-    PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
-    try {
-      String lifeCycleName = publicationService.getNodeLifecycleName(node);
-      publicationService.unsubcribeLifecycle(node);
-      publicationService.enrollNodeInLifecycle(node, lifeCycleName);
-      return node;
-    } catch (NotInPublicationLifecycleException ex) {
-      if (log.isErrorEnabled()) log.error(ex.getMessage());
-    } catch (Exception ex) {
-      if (log.isErrorEnabled()) log.error(ex.getMessage());
-    }
-    return null;
   }
 
   /**

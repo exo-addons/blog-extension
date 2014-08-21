@@ -44,6 +44,7 @@ import java.util.List;
  * Author : eXoPlatform
  * exo@exoplatform.com
  * Aug 7, 2014
+ * Blog rest service, provider functions of blog-frontend executes
  */
 @Path("/blog/service")
 public class BlogServiceRest implements ResourceContainer {
@@ -60,7 +61,7 @@ public class BlogServiceRest implements ResourceContainer {
   public Response getBlogs(@QueryParam("year") Integer year, @QueryParam("month") Integer month) {
     if (year == null || month == null) return Response.ok("false").build();
     JSONArray result = new JSONArray();
-    List<Node> blogs = blogService.getBlogs(year, month);
+    List<Node> blogs = blogService.getPosts(year, month);
     try {
       for (Node node : blogs) {
         JSONObject obj = new JSONObject();

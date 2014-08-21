@@ -22,7 +22,6 @@ import org.exoplatform.com.blog.service.util.Util;
 import org.exoplatform.container.StandaloneContainer;
 import org.exoplatform.container.component.RequestLifeCycle;
 import org.exoplatform.services.cms.comments.CommentsService;
-import org.exoplatform.services.ecm.publication.NotInPublicationLifecycleException;
 import org.exoplatform.services.ecm.publication.PublicationPlugin;
 import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.jcr.RepositoryService;
@@ -141,7 +140,7 @@ public class TestBlogService extends TestCase {
     int year = 2014;
     int month = 0;
     // Time: 2014/02 -->return 6 posts
-    List<Node> nodes = blogService.getBlogs(year, month);
+    List<Node> nodes = blogService.getPosts(year, month);
     printBlogArchive();
     System.out.println("testGetBlog() Nodes By Year/Month: 2014/02: " + nodes.size() );
     for (Node node : nodes) {
@@ -213,11 +212,11 @@ public class TestBlogService extends TestCase {
     Node node4 = addBlog("Post-003-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
     Node node5 = addBlog("Post-004-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
 
-    blogService.addBlog(node1);
-    blogService.addBlog(node2);
-    blogService.addBlog(node3);
-    blogService.addBlog(node4);
-    blogService.addBlog(node5);
+    blogService.addPost(node1);
+    blogService.addPost(node2);
+    blogService.addPost(node3);
+    blogService.addPost(node4);
+    blogService.addPost(node5);
     printBlogArchive();
     int postCountAfter = blogService.getArchivesCountInMonth(2014, 7);
 
@@ -227,7 +226,7 @@ public class TestBlogService extends TestCase {
 
   public void testRemoveBlog() throws Exception {
     System.out.println("--------------------testRemoveBlog--------------------");
-//    addBlog("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
+//    addPost("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
     printBlogArchive();
     int monthPostTotalBefore = blogService.getArchivesCountInMonth(2013, 01);
     Session session = getSession();
@@ -235,7 +234,7 @@ public class TestBlogService extends TestCase {
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     //("Post-000-2013001", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
     Node node = blog.getNode("Post-000-2013001");
-    blogService.removeBlog(node);
+    blogService.removePost(node);
     int monthPostTotalAfter = blogService.getArchivesCountInMonth(2013, 01);
     int denta = monthPostTotalBefore - monthPostTotalAfter;
 
@@ -256,44 +255,6 @@ public class TestBlogService extends TestCase {
     boolean after = blogService.changeStatus(null, node.getPath());
 
     assertTrue("Test change status failed", !(before && after));
-  }
-
-  public void testEditComment() throws Exception{
-    System.out.println("---TEST EDIT COMMENT---");
-    Session session = getSession();
-    Node rootNode = session.getRootNode();
-    Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
-    Node node = blog.getNode("Post-001");
-    if(node.canAddMixin(I18NMixin)){
-      node.addMixin(I18NMixin);
-    }
-
-    commentsService.addComment(node, "toannh", "toannh@explatform.com", null, "1st comment!", "en");
-    List<Node> nodes = commentsService.getComments(node, "en");
-    commentsService.updateComment(nodes.get(0), "updated");
-    nodes = commentsService.getComments(node, "en");
-    assertEquals("updated", nodes.get(0).getProperty(COMMENTOR_MESSAGES).getString());
-  }
-
-  public void testUnpulish() throws Exception{
-    Exception e = null;
-    System.out.println("---TEST UnPublish---");
-    Session session = getSession();
-    Node rootNode = session.getRootNode();
-    Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
-    Node node = blog.getNode("Post-001");
-    try {
-      publicationService.unsubcribeLifecycle(node);
-    } catch (NotInPublicationLifecycleException ex) {
-      e = ex;
-    }
-    assertNotNull(e);
-
-    node.addMixin("exo:sortable");
-    session.save();
-    publicationService.enrollNodeInLifecycle(node, plugin_.getLifecycleName());
-    publicationService.unsubcribeLifecycle(node);
-//    assertFalse(node.isNodeType(DumpPublicationPlugin.PUBLICATION));
   }
 
   public void printBlogArchive() {

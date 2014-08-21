@@ -43,7 +43,7 @@ public class RemoveBlogAction implements Action {
     Node node = (Node) context.get("currentItem");
     LinkManager linkManager = WCMCoreUtils.getService(LinkManager.class);
     Node blogNode = linkManager.getTarget(node);
-    blogService.removeBlog(blogNode);
+    blogService.removePost(blogNode);
     return false;
   }
 }

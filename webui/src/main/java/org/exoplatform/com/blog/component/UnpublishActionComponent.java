@@ -20,10 +20,10 @@
 package org.exoplatform.com.blog.component;
 
 import org.exoplatform.com.blog.component.filter.UnpublishActionFilter;
-import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.ecm.webui.component.explorer.UIJCRExplorer;
 import org.exoplatform.ecm.webui.component.explorer.control.filter.IsNotLockedFilter;
 import org.exoplatform.ecm.webui.component.explorer.control.listener.UIActionBarActionListener;
+import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.web.application.ApplicationMessage;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
@@ -35,7 +35,6 @@ import org.exoplatform.webui.ext.filter.UIExtensionFilter;
 import org.exoplatform.webui.ext.filter.UIExtensionFilters;
 
 import javax.jcr.Node;
-import javax.jcr.RepositoryException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,25 +62,28 @@ public class UnpublishActionComponent extends UIComponent {
     protected void processEvent(Event<UnpublishActionComponent> event) throws Exception {
       UnpublishActionComponent unpublishComponent = event.getSource();
 
-      BlogService blogService = WCMCoreUtils.getService(BlogService.class);
       UIJCRExplorer uiExplorer = unpublishComponent.getAncestorOfType(UIJCRExplorer.class);
       Node currentNode = uiExplorer.getCurrentNode();
-      Node node = blogService.unpublish(currentNode);
-      String title="";
-      if(node !=null && node.hasProperty("exo:title")){
-        try {
-          title = node.getProperty("exo:title").getString();
-        }catch(RepositoryException ex){}
+
+      PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
+
+      String lifeCycleName = publicationService.getNodeLifecycleName(currentNode);
+      publicationService.unsubcribeLifecycle(currentNode);
+      publicationService.enrollNodeInLifecycle(currentNode, lifeCycleName);
+
+      String title = "";
+      if (currentNode.hasProperty("exo:title")) {
+        title = currentNode.getProperty("exo:title").getString();
         unpublishComponent.showMsg(title + " have been unpublished!");
-      }else{
+      } else {
         unpublishComponent.showMsg(title + " couldn't unpublished!");
       }
     }
   }
 
   private static final List<UIExtensionFilter> FILTERS = Arrays.asList(
-          new UIExtensionFilter[] {
-                  new IsNotLockedFilter(), new UnpublishActionFilter() });
+          new UIExtensionFilter[]{
+                  new IsNotLockedFilter(), new UnpublishActionFilter()});
 
   @UIExtensionFilters
   public List<UIExtensionFilter> getFilters() {

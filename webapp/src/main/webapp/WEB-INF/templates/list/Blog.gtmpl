@@ -24,7 +24,7 @@ import org.exoplatform.wcm.webui.Utils;
 import org.exoplatform.wcm.webui.paginator.UICustomizeablePaginator;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.com.blog.service.BlogService;
-import java.util.Calendar;
+import java.util.Calendar;ogService
 import java.util.GregorianCalendar;
 
 import org.exoplatform.com.blog.service.entity.BlogArchive;
@@ -231,9 +231,9 @@ if (i++ < (tags.size-1)) print " "
 // get the full name from username
 String fullName(def username) {
 def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
-def user = userHandler.findUserByName(username)
-def name = user.fullName
-return name?name:username
+//def user = userHandler.findUserByName(username)
+//def name = user.fullName
+return "1";// name?name:username
 }
 
 String avatarUrl(def username) {

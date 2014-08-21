@@ -34,6 +34,11 @@
         </defaultValues>
       </propertyDefinition>
 
+      <propertyDefinition name="exo:dateCreated" requiredType="Date" autoCreated="false" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+
     </propertyDefinitions>
   </nodeType>
 

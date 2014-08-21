@@ -64,19 +64,19 @@ public interface BlogService {
    * @param month
    * @return
    */
-  public List<Node> getBlogs(int year, int month);
+  public List<Node> getPosts(int year, int month);
 
   /**
    * Increase post count from blog-archive cached table. when add new a post.
-   * @param blogNode
+   * @param postNode
    */
-  public void addBlog(Node blogNode);
+  public void addPost(Node postNode);
 
   /**
    * Decrease post count from blog-archive cached table. when remove a post.
-   * @param blogNode
+   * @param postNode
    */
-  public void removeBlog(Node blogNode);
+  public void removePost(Node postNode);
 
   /**
    * Update status to approve|disapprove a post
@@ -123,15 +123,9 @@ public interface BlogService {
 
   /**
    * Get total visited of blog-post
-   * @param nodeToUpdate
-   * @return
-   */
-  public long getPostViewCount(Node nodeToUpdate);
-
-  /**
-   * To Un publish a post
    * @param node
    * @return
    */
-  public Node unpublish(Node node);
+  public long getPostViewCount(Node node);
+
 }

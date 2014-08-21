@@ -54,10 +54,10 @@ def currentPostVisited = httpSession.getAttribute(uuid);
 
 if(currentPostVisited==null || currentPostVisited != uuid){
 	// increase post visited
-	blogService.increasePostView(postPath);
+	blogService.increasePostView(post);
 	httpSession.setAttribute(uuid, uuid);
 }
-visitedPost = blogService.getPostViewCount(postPath);
+visitedPost = blogService.getPostViewCount(post);
 %>
 <script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
@@ -69,7 +69,7 @@ visitedPost = blogService.getPostViewCount(postPath);
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
                 <header>
-                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title visited: $currentPostVisited </h3></div>
+                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title</h3></div>
                     <p class="meta">
                     <div style="float:left">
                         <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">

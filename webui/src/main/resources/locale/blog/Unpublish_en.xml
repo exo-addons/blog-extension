@@ -2,13 +2,13 @@
 <bundle>
   <UITabForm>
     <label>
-      <Unpublish>UnPublish</Unpublish>
+      <Unpublish>Un Publish</Unpublish>
     </label>
   </UITabForm>
 
   <UIActionBar>
     <tooltip>
-      <Unpublish>UnPublish</Unpublish>
+      <Unpublish>Un Publish</Unpublish>
     </tooltip>
   </UIActionBar>
 </bundle>

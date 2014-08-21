@@ -41,7 +41,7 @@ public class AddBlogAction implements Action {
   public boolean execute(Context context) throws Exception {
     BlogService blogService = WCMCoreUtils.getService(BlogService.class);
     Node node = (Node) context.get("currentItem");
-    blogService.addBlog(node);
+    blogService.addPost(node);
     return false;
   }
 

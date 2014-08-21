@@ -10,9 +10,9 @@
         <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
     </component>
 
-    <!--<component>-->
-        <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
-    <!--</component>-->
+    <component>
+        <type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>
+    </component>
 
     <component>
         <key>org.exoplatform.services.cms.comments.CommentsService</key>
@@ -148,11 +148,6 @@
                     <name>portal.resource.names</name>
                     <description>The properties files of the portal , those file will be merged into one ResoruceBundle properties </description>
                     <value>locale.blog.Blogs</value>
-                </values-param>
-
-                <values-param>
-                    <name>init.resources</name>
-                    <value>locale.blog.Unpublish</value>
                 </values-param>
 
             </init-params>
