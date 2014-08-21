@@ -63,9 +63,9 @@ visitedPost = blogService.getPostViewCount(postPath);
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
 <script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
 
-<div class="container-fluid" style="padding: 20px">
-    <div id="content" class="clearfix row-fluid">
-        <div id="main" class="span11 clearfix" role="main">
+<div class="view-post" >
+    <div id="content" class="clearfix content-blog">
+        <div id="main" class="main-content" role="main">
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
                 <header>
@@ -128,7 +128,7 @@ visitedPost = blogService.getPostViewCount(postPath);
 
 
         </div> <!-- end of m ain -->
-        <div class="span1" id="sidebar">
+        <div class="sidebar" id="sidebar">
             <%
             // show edit button
             if ((poster == viewer) && (uicomponent.class.name =="org.exoplatform.wcm.webui.scv.UIPresentation")) {
