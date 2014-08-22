@@ -109,7 +109,6 @@ public interface BlogService {
 
   /**
    * Delete a comment of post
-   *
    * @param nodePath
    * @return
    */

@@ -37,10 +37,11 @@ import java.util.Map;
  * Author : eXoPlatform
  * exo@exoplatform.com
  * Aug 19, 2014
+ * To filter unpublish button, only show when node unpublishable
  */
 
-public class UnpublishActionFilter implements UIExtensionFilter {
-  private Log log = ExoLogger.getExoLogger(UnpublishActionFilter.class);
+public class BlogUnpublishActionFilter implements UIExtensionFilter {
+  private Log log = ExoLogger.getExoLogger(BlogUnpublishActionFilter.class);
 
   @Override
   public boolean accept(Map<String, Object> context) throws Exception {
@@ -63,7 +64,7 @@ public class UnpublishActionFilter implements UIExtensionFilter {
           }
         }
       }
-
+      return false;
     }
     return currentNode.isNodeType("exo:blog");
   }

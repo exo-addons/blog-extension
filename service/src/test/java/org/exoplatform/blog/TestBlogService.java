@@ -249,8 +249,8 @@ public class TestBlogService extends TestCase {
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     Node node = blog.getNode("Post-001");
     boolean before = false;
-    if(node.hasProperty("exo:blogStatus")) {
-      before = node.getProperty("exo:blogStatus").getBoolean();
+    if(node.hasProperty("exo:commentStatus")) {
+      before = node.getProperty("exo:commentStatus").getBoolean();
     }
     boolean after = blogService.changeStatus(null, node.getPath());
 
@@ -281,11 +281,6 @@ public class TestBlogService extends TestCase {
     return node;
   }
 
-//  public void testSession(){
-//    HttpSession httpSession = org.exoplatform.portal.webui.util.Util.getPortalRequestContext().getRequest().getSession();
-////    httpSession.setAttribute("nodeName");
-//    httpSession.getAttribute("nodeName");
-//  }
   private void reset() throws Exception {
     Session session = getSession();
     Node rootNode = session.getRootNode();

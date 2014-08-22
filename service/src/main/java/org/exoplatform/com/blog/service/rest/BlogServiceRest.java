@@ -52,8 +52,8 @@ public class BlogServiceRest implements ResourceContainer {
 
   private BlogService blogService = WCMCoreUtils.getService(BlogService.class);
 
-  public BlogServiceRest(){
-    }
+  public BlogServiceRest() {
+  }
 
   @POST
   @Path("/get-blogs")

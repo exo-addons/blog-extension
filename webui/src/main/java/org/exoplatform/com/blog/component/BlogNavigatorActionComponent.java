@@ -29,7 +29,7 @@ import org.exoplatform.webui.core.UIComponent;
 
 
 @ComponentConfig(
-        template = "classpath:templates/TopNavigatorBarActionComponent.gtmpl"
+        template = "classpath:templates/BlogNavigatorActionComponent.gtmpl"
 )
 public class BlogNavigatorActionComponent extends UIComponent {
 }

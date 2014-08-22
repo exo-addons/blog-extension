@@ -51,11 +51,14 @@ public class BlogServiceImpl implements BlogService {
 
   private static final String BLOG_NODE = "exo:blog";
   private static final String DRIVER_PATH = "Blog";
+
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
-  private static final String BLOG_APPROVE_NODE = "exo:commentStatus";
   private static final String BLOG_POST_VIEWCOUNT_PROPERTY = "exo:blogViewCount";
   private static final String BLOG_DEFAULT_LANGUAGE="en";
-  private static final String BLOG_STATUS_PROPERTY = "exo:blogStatus";
+
+  private static final String BLOG_COMMENT_NODE = "exo:blogComment";
+  private static final String BLOG_COMMENT_STATUS_PROPERTY = "exo:commentStatus";
+
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
   private boolean initData = true;
@@ -280,12 +283,12 @@ public class BlogServiceImpl implements BlogService {
       }
       Session session = getSession();
       Node nodeUpdate = (Node) session.getItem(nodePath);
-      if (nodeUpdate.canAddMixin(BLOG_APPROVE_NODE)) {
-        nodeUpdate.addMixin(BLOG_APPROVE_NODE);
-        nodeUpdate.setProperty(BLOG_STATUS_PROPERTY, true);
+      if (nodeUpdate.canAddMixin(BLOG_COMMENT_NODE)) {
+        nodeUpdate.addMixin(BLOG_COMMENT_NODE);
+        nodeUpdate.setProperty(BLOG_COMMENT_STATUS_PROPERTY, true);
       } else {
-        boolean status = nodeUpdate.getProperty(BLOG_STATUS_PROPERTY).getBoolean();
-        nodeUpdate.setProperty(BLOG_STATUS_PROPERTY, !status);
+        boolean status = nodeUpdate.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean();
+        nodeUpdate.setProperty(BLOG_COMMENT_STATUS_PROPERTY, !status);
       }
       session.save();
       return true;

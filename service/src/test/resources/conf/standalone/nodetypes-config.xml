@@ -4,7 +4,7 @@
         xmlns:jcr="http://www.jcp.org/jcr/1.0"
         xmlns:exo="http://www.exoplatform.com/jcr/exo/1.0">
 
-  <nodeType name="exo:blog" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="exo:blog" isMixin="false" hasOrderableChildNodes="false" primaryItemName=""  >
 
     <supertypes>
       <supertype>nt:base</supertype>
@@ -26,25 +26,25 @@
         <valueConstraints/>
       </propertyDefinition>
 
-      <propertyDefinition name="exo:dateCreated" requiredType="Date" autoCreated="false" mandatory="false"
-                          onParentVersion="COPY" protected="false" multiple="false">
-        <valueConstraints/>
-      </propertyDefinition>
-
       <propertyDefinition name="exo:blogViewCount" autoCreated="true" mandatory="false" multiple="false"
-                          onParentVersion="COPY" protected="false" requiredType="Long">
+                          onParentVersion="COPY" protected="false" requiredType="Long" >
         <valueConstraints/>
         <defaultValues>
           <defaultValue>1</defaultValue>
         </defaultValues>
       </propertyDefinition>
 
+      <propertyDefinition name="exo:dateCreated" requiredType="Date" autoCreated="false" mandatory="false"
+                          onParentVersion="COPY" protected="false" multiple="false">
+        <valueConstraints/>
+      </propertyDefinition>
+
     </propertyDefinitions>
   </nodeType>
 
-  <nodeType name="exo:commentStatus" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="exo:blogComment" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
     <propertyDefinitions>
-      <propertyDefinition name="exo:blogStatus" autoCreated="true" mandatory="false" multiple="false"
+      <propertyDefinition name="exo:commentStatus" autoCreated="true" mandatory="false" multiple="false"
                           onParentVersion="COPY" protected="false" requiredType="Boolean">
         <valueConstraints/>
         <defaultValues>

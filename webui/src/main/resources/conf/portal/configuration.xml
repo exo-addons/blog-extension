@@ -60,7 +60,7 @@
             </field>
 
             <field name="component">
-              <string>org.exoplatform.com.blog.component.UnpublishActionComponent</string>
+              <string>org.exoplatform.com.blog.component.BlogUnpublishActionComponent</string>
             </field>
             <field name="extendedFilters">
               <collection type="java.util.ArrayList">

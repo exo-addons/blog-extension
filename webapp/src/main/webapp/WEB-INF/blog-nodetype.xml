@@ -42,9 +42,9 @@
     </propertyDefinitions>
   </nodeType>
 
-  <nodeType name="exo:commentStatus" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+  <nodeType name="exo:blogComment" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
     <propertyDefinitions>
-      <propertyDefinition name="exo:blogStatus" autoCreated="true" mandatory="false" multiple="false"
+      <propertyDefinition name="exo:commentStatus" autoCreated="true" mandatory="false" multiple="false"
                           onParentVersion="COPY" protected="false" requiredType="Boolean">
         <valueConstraints/>
         <defaultValues>
