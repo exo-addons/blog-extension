@@ -68,14 +68,4 @@ public class Util {
       return defaultValue;
     }
   }
-
-//  public static Node getNode(String postPath) {
-//    try {
-//      Session session = getSession();
-//      return (Node)session.getItem(postPath);
-//    }catch(Exception ex){if(log.isErrorEnabled()){log.error(ex.getMessage());}}
-//    return null;
-//  }
-
-
 }

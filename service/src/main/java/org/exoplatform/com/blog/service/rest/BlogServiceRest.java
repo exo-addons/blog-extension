@@ -20,9 +20,15 @@ package org.exoplatform.com.blog.service.rest;
 
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.util.Util;
+import org.exoplatform.services.cms.comments.CommentsService;
+import org.exoplatform.services.cms.voting.VotingService;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +37,7 @@ import org.json.JSONObject;
 import javax.annotation.security.RolesAllowed;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -49,7 +56,8 @@ import java.util.List;
 @Path("/blog/service")
 public class BlogServiceRest implements ResourceContainer {
   private Log log = ExoLogger.getExoLogger(BlogServiceRest.class);
-
+  private final String BLOG_DEFAULT_LANGUAGE = "en";
+  private static final String BLOG_COMMENT_STATUS_PROPERTY = "exo:commentStatus";
   private BlogService blogService = WCMCoreUtils.getService(BlogService.class);
 
   public BlogServiceRest() {
@@ -77,30 +85,48 @@ public class BlogServiceRest implements ResourceContainer {
   }
 
   @POST
-  @Path("/changeStatus")
+  @Path("/changeCommentStatus")
   @RolesAllowed("users")
   public Response getBlogs(MultivaluedMap<String, String> data) {
     String postPath = data.getFirst("postPath");
-    String nodePath = data.getFirst("nodePath");
-
-    boolean rs = blogService.changeStatus(postPath, nodePath);
+    String commentPath = data.getFirst("nodePath");
+    String ws = data.getFirst("ws");
     JSONObject obj = new JSONObject();
     try {
-      obj.put("result", rs);
+      Node commentNode = blogService.changeCommentStatus(getNode(postPath, ws), getNode(commentPath, ws));
+      if (commentNode != null && commentNode.hasProperty(BLOG_COMMENT_STATUS_PROPERTY)) {
+        boolean status = commentNode.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean();
+        obj.put("result", status);
+        return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+      }
+      return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
     } catch (JSONException e) {
       if (log.isErrorEnabled()) log.error(e.getMessage());
+    } catch (RepositoryException ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
-    return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+    return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
 
   @POST
   @Path("/updateVote")
   @RolesAllowed("users")
   public Response updateVote(MultivaluedMap<String, String> data) {
+    VotingService votingService = WCMCoreUtils.getService(VotingService.class);
     String postPath = data.getFirst("postPath");
+    String ws = data.getFirst("ws");
     double score = Util.getDouble(data.getFirst("score"), 0);
-    boolean result = blogService.vote(postPath, score);
-    return Response.ok("{\"result\": " + result + "}", MediaType.TEXT_PLAIN).build();
+    Identity identity = ConversationState.getCurrent().getIdentity();
+    JSONObject obj = new JSONObject();
+    try {
+      Node nodeToVote = getNode(postPath, ws);
+      votingService.vote(nodeToVote, score, identity.getUserId(), BLOG_DEFAULT_LANGUAGE);
+      obj.put("result", true);
+      return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
 
   @POST
@@ -109,53 +135,69 @@ public class BlogServiceRest implements ResourceContainer {
   public Response editComment(MultivaluedMap<String, String> data) {
     String commentPath = data.getFirst("commentPath");
     String newComment = data.getFirst("newComment");
+    String ws = data.getFirst("ws");
+    CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
     JSONObject obj = new JSONObject();
     try {
-      boolean result = blogService.editComment(commentPath, newComment);
-      obj.put("result", result);
+      Node nodeComment = getNode(commentPath, ws);
+      commentsService.updateComment(nodeComment, newComment);
+
+      obj.put("result", true);
       return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
-    } catch (JSONException e) {
-      if (log.isErrorEnabled()) {
-        log.error(e.getMessage());
-      }
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
-    return Response.ok("failed", MediaType.APPLICATION_JSON).build();
+    return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
 
 
   @POST
   @Path("/delComment")
   @RolesAllowed("users")
-  public Response delComment(@QueryParam("nodePath") String nodePath) {
-    boolean result = blogService.delComment(nodePath);
+  public Response delComment(MultivaluedMap<String, String> data) {
+    String commentPath = data.getFirst("commentPath");
+    String ws = data.getFirst("ws");
+    CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
     JSONObject obj = new JSONObject();
     try {
-      obj.put("result", result);
+      Node nodeComment = getNode(commentPath, ws);
+      commentsService.deleteComment(nodeComment);
+      obj.put("result", true);
       return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
-    } catch (JSONException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
-    return Response.ok("failed", MediaType.APPLICATION_JSON).build();
+    return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
 
   @POST
   @Path("/getComment")
   @RolesAllowed("users")
-  public Response getComment(@QueryParam("nodePath") String nodePath) {
-    Node node = blogService.getCommentNode(nodePath);
+  public Response getComment(MultivaluedMap<String, String> data) {
+      String commentPath = data.getFirst("commentPath");
+    String ws = data.getFirst("ws");
+
     JSONObject obj = new JSONObject();
     try {
-      if (node != null && node.hasProperty("exo:commentContent")) {
+      Node nodeComment = getNode(commentPath, ws);
+
+      if (nodeComment.hasProperty("exo:commentContent")) {
         obj.put("result", true);
-        obj.put("commentContent", node.getProperty("exo:commentContent").getString());
-        obj.put("commentPath", node.getPath());
+        obj.put("commentContent", nodeComment.getProperty("exo:commentContent").getString());
+        obj.put("commentPath", nodeComment.getPath());
         return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
       }
-    } catch (JSONException e) {
-      e.printStackTrace();
-    } catch (RepositoryException ex) {
-      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    } catch (Exception e) {
+      if (log.isErrorEnabled()) log.error(e.getMessage());
     }
-    return Response.ok("failed", MediaType.APPLICATION_JSON).build();
+    return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
+
+  private Node getNode(String nodePath, String ws) throws RepositoryException {
+    SessionProvider sessionProvider = WCMCoreUtils.getUserSessionProvider();
+    ManageableRepository manageableRepository = WCMCoreUtils.getRepository();
+    Session session = sessionProvider.getSession(ws, manageableRepository);
+    return (Node) session.getItem(nodePath);
+  }
+
 }

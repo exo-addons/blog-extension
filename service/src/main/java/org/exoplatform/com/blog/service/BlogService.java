@@ -23,21 +23,23 @@ import java.util.List;
 /**
  * Created by The eXo Platform SAS
  * Author : eXoPlatform
- *          exo@exoplatform.com
+ * exo@exoplatform.com
  * Aug 4, 2014
- *
+ * <p/>
  * Blog-extension service, provider methods for blog extension
  */
 public interface BlogService {
 
   /**
    * Get all blog archive years
+   *
    * @return
    */
   public List<Integer> getArchiveYears();
 
   /**
    * Get all archive month by year
+   *
    * @param year
    * @return
    */
@@ -45,6 +47,7 @@ public interface BlogService {
 
   /**
    * Get total post of year
+   *
    * @param year
    * @return
    */
@@ -52,6 +55,7 @@ public interface BlogService {
 
   /**
    * Get total post of  month
+   *
    * @param year
    * @param month
    * @return
@@ -60,6 +64,7 @@ public interface BlogService {
 
   /**
    * Get all blogs by year/month
+   *
    * @param year
    * @param month
    * @return
@@ -68,63 +73,39 @@ public interface BlogService {
 
   /**
    * Increase post count from blog-archive cached table. when add new a post.
+   *
    * @param postNode
    */
   public void addPost(Node postNode);
 
   /**
    * Decrease post count from blog-archive cached table. when remove a post.
+   *
    * @param postNode
    */
   public void removePost(Node postNode);
 
   /**
-   * Update status to approve|disapprove a post
-   * @param nodePath
+   * Update status to approve|disapprove a post's comment
+   *
+   * @param postNode
+   * @param commentNode
    */
-  public boolean changeStatus(String postPath, String nodePath);
-
-  /**
-   * Vote a post of blog by user/language
-   * @param postPath
-   * @param score
-   * @return
-   */
-  public boolean vote(String postPath, double score);
-
-  /**
-   * get a comment of post by comment path
-   * @param nodePath
-   * @return
-   */
-  public Node getCommentNode(String nodePath);
-
-  /**
-   * Edit a comment of post
-   * @param nodeToEdit
-   * @param newComment
-   * @return
-   */
-  public boolean editComment(String nodeToEdit, String newComment);
-
-  /**
-   * Delete a comment of post
-   * @param nodePath
-   * @return
-   */
-  public boolean delComment(String nodePath);
+  public Node changeCommentStatus(Node postNode, Node commentNode);
 
   /**
    * To increase a blog-post view count when user visited article
+   *
    * @param nodeToUpdate
    */
   public void increasePostView(Node nodeToUpdate);
 
   /**
-   * Get total visited of blog-post
-   * @param node
+   * Get total visited of post
+   *
+   * @param postNode
    * @return
    */
-  public long getPostViewCount(Node node);
+  public long getPostViewCount(Node postNode);
 
 }

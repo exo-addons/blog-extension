@@ -162,22 +162,23 @@
     sharethis.stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});
   };
   // approve a post
-  blog.prototype.changeStatus = function (elId, nodePath, postPath) {
+  blog.prototype.changeStatus = function (elId, nodePath, postPath, ws) {
     if (confirm("Are u sure?")) {
       var obj = new Object();
       obj.nodePath = nodePath;
       obj.postPath = postPath;
+      obj.ws = ws;
       gj.ajax({
-        url: "/portal/rest/blog/service/changeStatus",
+        url: "/portal/rest/blog/service/changeCommentStatus",
         dataType: "text",
         data: obj,
         type: "POST"
       })
           .success(function (data) {
             var rs = gj.parseJSON(data);
-            console.log(data);
+            console.log(rs);
 
-            var btn = '<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\');"';
+            var btn = '<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');"';
             if (!rs.result) {
               btn += ' value="Approve"';
               gj('#' + elId).removeClass('approved');
@@ -324,6 +325,19 @@
         console.log('ui: '+ui);
         console.log('score: '+score);
         //send out our ajax call
+        var obj = new Object();
+        obj.score = score;
+        obj.postPath = ui.find("input[name=postPath]").val();
+        obj.ws = ui.find("input[name=ws]").val()
+        gj.ajax({
+          url: "/portal/rest/blog/service/updateVote",
+          dataType: "text",
+          data: obj,
+          type: "POST"
+        })
+            .success(function (data) {
+              console.log(data);
+            })
         var p = ui.find('input');
         //alert('sending out product_id: ' + p.val() + ' with score ' + score);
       },
@@ -670,10 +684,14 @@
   }
 
   //edit comment
-  blog.prototype.loadToEdit = function(commentPath, postUUID, timeId){
+  blog.prototype.loadToEdit = function(commentPath, postUUID, timeId, ws){
+    var obj = new Object();
+    obj.commentPath = commentPath;
+    obj.ws = ws;
     gj.ajax({
-      url: "/portal/rest/blog/service/getComment?nodePath=" + commentPath,
+      url: "/portal/rest/blog/service/getComment",
       dataType: "text",
+      data:obj,
       type: "POST"
     })
         .success(function (data) {
@@ -684,7 +702,7 @@
             gj('#commentform-'+postUUID+' input[name=timeId]').val(timeId);
 
             gj('#commentform-'+postUUID+' input[type=button]').attr("value","Update Comment");
-            gj('#commentform-'+postUUID+' input[type=button]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"', '"+timeId+"')");
+            gj('#commentform-'+postUUID+' input[type=button]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"', '"+timeId+"', '"+ws+"')");
           }else{
             alert('Comment in '+commentPath+ ' doesnt exist!');
           }
@@ -692,11 +710,15 @@
 
   }
 
-  blog.prototype.deleteComment = function(commentPath, commendId){
+  blog.prototype.deleteComment = function(commentPath, commendId, ws){
     if (confirm("Are u sure?")) {
+      var obj = new Object();
+      obj.commentPath = commentPath;
+      obj.ws = ws;
       gj.ajax({
         type: "POST",
-        url: "/portal/rest/blog/service/delComment?nodePath="+commentPath,
+        data:obj,
+        url: "/portal/rest/blog/service/delComment",
         success: function (data) {
           if(data.result){
             gj('#comment-'+commendId).remove();
@@ -708,13 +730,14 @@
     }
   }
 
-  blog.prototype.editComment = function(uuid, timeId){
+  blog.prototype.editComment = function(uuid, timeId, ws){
     var aform = gj("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     var path = aform.find('input[name="commentPath"]').val();
     var obj = new Object();
     obj.commentPath = path;
     obj.newComment = comment;
+    obj.ws=ws;
     gj.ajax({
       type: "POST",
       url: "/portal/rest/blog/service/editComment",

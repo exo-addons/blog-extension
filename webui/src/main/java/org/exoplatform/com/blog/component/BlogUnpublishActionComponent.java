@@ -24,6 +24,8 @@ import org.exoplatform.ecm.webui.component.explorer.UIJCRExplorer;
 import org.exoplatform.ecm.webui.component.explorer.control.filter.IsNotLockedFilter;
 import org.exoplatform.ecm.webui.component.explorer.control.listener.UIActionBarActionListener;
 import org.exoplatform.services.ecm.publication.PublicationService;
+import org.exoplatform.services.security.ConversationState;
+import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.web.application.ApplicationMessage;
@@ -68,10 +70,10 @@ public class BlogUnpublishActionComponent extends UIComponent {
 
       PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
       WCMPublicationService wcmPublicationService = WCMCoreUtils.getService(WCMPublicationService.class);
-
+      Identity identity = ConversationState.getCurrent().getIdentity();
       String lifeCycleName = publicationService.getNodeLifecycleName(currentNode);
       wcmPublicationService.unsubcribeLifecycle(currentNode);
-      wcmPublicationService.enrollNodeInLifecycle(currentNode, lifeCycleName);
+      wcmPublicationService.enrollNodeInLifecycle(currentNode, lifeCycleName, identity.getUserId());
 
       String title = "";
       if (currentNode.hasProperty("exo:title")) {

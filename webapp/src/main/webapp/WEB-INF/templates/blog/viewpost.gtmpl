@@ -58,10 +58,11 @@ if(currentPostVisited==null || currentPostVisited != uuid){
 	httpSession.setAttribute(uuid, uuid);
 }
 visitedPost = blogService.getPostViewCount(post);
+def ws = post.getSession().getWorkspace().getName();
 %>
-<script type="text/javascript">var switchTo5x=true;</script>
+<!--script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script-->
 
 <div class="view-post" >
     <div id="content" class="clearfix content-blog">
@@ -90,9 +91,8 @@ visitedPost = blogService.getPostViewCount(post);
                 </section> <!-- end article section -->
 
                 <footer>
-                    <p class="tags"><% tags(post)
-                        %></p>
-										<!--share this-->
+                    <p class="tags"><% tags(post) %></p>
+                  <!--share this-->
                   <span class='st_googleplus_hcount' displayText='Google +'></span>
                   <span class='st_sharethis_hcount' displayText='ShareThis'></span>
                   <span class='st_facebook_hcount' displayText='Facebook'></span>
@@ -107,6 +107,7 @@ visitedPost = blogService.getPostViewCount(post);
                     <div class="rate-wrapper">
 
                       <input type="hidden" name="postPath" value="$postPath">
+                      <input type="hidden" name="ws" value="$ws">
                       <a class="score-1" href="#">1</a>
                       <a class="score-2" href="#">2</a>
                       <a class="score-3" href="#">3</a>
@@ -175,9 +176,9 @@ if (comments.size > 1) plural = "s"
 				def timeId = comment.getProperty("exo:commentDate").date.time.time;
 				def approve = false;
 				def postUuid = post.getUUID();
-
+     		def _ws = comment.getSession().getWorkspace().getName();
 				try{
-					approve = comment.getProperty("exo:blogStatus").getBoolean();
+					approve = comment.getProperty("exo:commentStatus").getBoolean();
 				}catch(Exception ex){
 					approve=true;
 				}
@@ -195,9 +196,9 @@ if (comments.size > 1) plural = "s"
 										<span class="dateTime">$commentDate </span>
 											<span id="approve-$timeId" style="margin-right:10px; float:right;">
 												<%if(!approve){%>
-													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Approve" />
+													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" value="Approve" />
 												<%}else{%>
-													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath');" value="Disapprove" />
+													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" value="Disapprove" />
 												<%}%>
 											</span>
 									</div>
@@ -208,8 +209,8 @@ if (comments.size > 1) plural = "s"
 									<%}%>
 									" > $commentContent
 									<span>
-										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId')"><i class="icon-pencil"></i></a>
-										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}')"><i class="uiIconEcmsDelete" style="this:hover:none;"></i></a>
+										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="icon-pencil"></i></a>
+										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')"><i class="uiIconEcmsDelete" style="this:hover:none;"></i></a>
 									</span>
 									</p>
 							</div><!--end commentRight-->

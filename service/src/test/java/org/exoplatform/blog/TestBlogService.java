@@ -242,21 +242,6 @@ public class TestBlogService extends TestCase {
     printBlogArchive();
   }
 
-  public void testChangeStatus() throws Exception{
-    System.out.println("-----TEST CHANGE STATUS-----");
-    Session session = getSession();
-    Node rootNode = session.getRootNode();
-    Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
-    Node node = blog.getNode("Post-001");
-    boolean before = false;
-    if(node.hasProperty("exo:commentStatus")) {
-      before = node.getProperty("exo:commentStatus").getBoolean();
-    }
-    boolean after = blogService.changeStatus(null, node.getPath());
-
-    assertTrue("Test change status failed", !(before && after));
-  }
-
   public void printBlogArchive() {
     List<Integer> years = blogService.getArchiveYears();
     // print blog-archive cached table;
