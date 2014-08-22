@@ -40,8 +40,8 @@ import java.util.Map;
  * To filter unpublish button, only show when node unpublishable
  */
 
-public class BlogUnpublishActionFilter implements UIExtensionFilter {
-  private Log log = ExoLogger.getExoLogger(BlogUnpublishActionFilter.class);
+public class CanUnpublishFilter implements UIExtensionFilter {
+  private Log log = ExoLogger.getExoLogger(CanUnpublishFilter.class);
 
   @Override
   public boolean accept(Map<String, Object> context) throws Exception {

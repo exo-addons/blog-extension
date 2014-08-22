@@ -19,11 +19,11 @@
 
 package org.exoplatform.com.blog.component;
 
-import org.exoplatform.com.blog.component.filter.BlogUnpublishActionFilter;
+import org.exoplatform.com.blog.component.filter.CanUnpublishFilter;
 import org.exoplatform.ecm.webui.component.explorer.UIJCRExplorer;
 import org.exoplatform.ecm.webui.component.explorer.control.filter.IsNotLockedFilter;
 import org.exoplatform.ecm.webui.component.explorer.control.listener.UIActionBarActionListener;
-import org.exoplatform.services.ecm.publication.PublicationService;
+import org.exoplatform.portal.webui.util.Util;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.wcm.publication.WCMPublicationService;
@@ -68,12 +68,11 @@ public class BlogUnpublishActionComponent extends UIComponent {
       UIJCRExplorer uiExplorer = unpublishComponent.getAncestorOfType(UIJCRExplorer.class);
       Node currentNode = uiExplorer.getCurrentNode();
 
-      PublicationService publicationService = WCMCoreUtils.getService(PublicationService.class);
       WCMPublicationService wcmPublicationService = WCMCoreUtils.getService(WCMPublicationService.class);
       Identity identity = ConversationState.getCurrent().getIdentity();
-      String lifeCycleName = publicationService.getNodeLifecycleName(currentNode);
+      String siteName = Util.getPortalRequestContext().getPortalOwner();
       wcmPublicationService.unsubcribeLifecycle(currentNode);
-      wcmPublicationService.enrollNodeInLifecycle(currentNode, lifeCycleName, identity.getUserId());
+      wcmPublicationService.enrollNodeInLifecycle(currentNode, siteName, identity.getUserId());
 
       String title = "";
       if (currentNode.hasProperty("exo:title")) {
@@ -87,7 +86,7 @@ public class BlogUnpublishActionComponent extends UIComponent {
 
   private static final List<UIExtensionFilter> FILTERS = Arrays.asList(
           new UIExtensionFilter[]{
-                  new IsNotLockedFilter(), new BlogUnpublishActionFilter()});
+                  new IsNotLockedFilter(), new CanUnpublishFilter()});
 
   @UIExtensionFilters
   public List<UIExtensionFilter> getFilters() {

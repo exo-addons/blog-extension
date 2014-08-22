@@ -20,10 +20,8 @@ package org.exoplatform.com.blog.service.impl;
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.entity.BlogArchive;
 import org.exoplatform.portal.config.UserACL;
-import org.exoplatform.services.cms.comments.CommentsService;
 import org.exoplatform.services.cms.drives.DriveData;
 import org.exoplatform.services.cms.drives.ManageDriveService;
-import org.exoplatform.services.cms.voting.VotingService;
 import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
@@ -50,7 +48,7 @@ public class BlogServiceImpl implements BlogService {
   private Log log = ExoLogger.getExoLogger(BlogService.class);
 
   private static final String BLOG_NODE = "exo:blog";
-  private static final String DRIVER_PATH = "Blog";
+  private static final String DRIVER_NAME = "Blog";
 
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_POST_VIEWCOUNT_PROPERTY = "exo:blogViewCount";
@@ -68,7 +66,6 @@ public class BlogServiceImpl implements BlogService {
   private RepositoryService repoService;
   private SessionProviderService sessionProviderService;
   private ManageDriveService manageDriveService;
-  private CommentsService commentsService;
   private UserACL userACL;
 
 
@@ -105,20 +102,15 @@ public class BlogServiceImpl implements BlogService {
   public BlogServiceImpl(RepositoryService repoService,
                          SessionProviderService sessionProviderService,
                          ManageDriveService managerDriverService,
-                         CommentsService commentsService,
-                         UserACL userACL,
-                         VotingService votingService) {
+                         UserACL userACL) {
     this.manageDriveService = managerDriverService;
     this.repoService = repoService;
     this.sessionProviderService = sessionProviderService;
-    this.commentsService = commentsService;
     this.userACL = userACL;
-
-//    managerDriverService.getDriveByName("Blog").getWorkspace();
 
     try {
       this.repo = repoService.getCurrentRepository().getConfiguration().getName();
-      this.ws = repoService.getCurrentRepository().getConfiguration().getDefaultWorkspaceName();
+      this.ws = managerDriverService.getDriveByName(DRIVER_NAME).getWorkspace();
     } catch (Exception ex) {
       if (log.isErrorEnabled()) {
         log.error("Using default repository & workspace", ex.getMessage());
@@ -425,7 +417,7 @@ public class BlogServiceImpl implements BlogService {
   }
 
   private String getDriverPath() throws Exception {
-    DriveData driveData = manageDriveService.getDriveByName(DRIVER_PATH);
+    DriveData driveData = manageDriveService.getDriveByName(DRIVER_NAME);
     String driverPath = driveData.getHomePath();
     if (driverPath != null) driverPath = driverPath.substring(0, driverPath.lastIndexOf("/") + 1);
     driverPath += "%";
