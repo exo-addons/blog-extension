@@ -10,9 +10,9 @@
         <type>org.exoplatform.com.blog.service.impl.BlogServiceImpl</type>
     </component>
 
-    <component>
-        <type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>
-    </component>
+    <!--<component>-->
+        <!--<type>org.exoplatform.com.blog.service.rest.BlogServiceRest</type>-->
+    <!--</component>-->
 
     <component>
         <key>org.exoplatform.services.cms.comments.CommentsService</key>

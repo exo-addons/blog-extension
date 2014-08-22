@@ -22,8 +22,12 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 
 /**
- * Created by toannh on 8/4/14.
- */
+ * Created by The eXo Platform SAS
+ * Author : eXoPlatform
+ *          exo@exoplatform.com
+ * Aug 4, 2014
+ *
+ **/
 
 public class Util {
   private static Log log = ExoLogger.getExoLogger("BlogService");
