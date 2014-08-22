@@ -70,7 +70,7 @@ def ws = post.getSession().getWorkspace().getName();
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
                 <header>
-                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title</h3></div>
+                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title <%=post.getPath()%></h3></div>
                     <p class="meta">
                     <div style="float:left">
                         <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">

@@ -20,8 +20,6 @@
 package org.exoplatform.com.blog.component.filter;
 
 import org.exoplatform.portal.webui.util.Util;
-import org.exoplatform.services.log.ExoLogger;
-import org.exoplatform.services.log.Log;
 import org.exoplatform.services.wcm.extensions.publication.PublicationManager;
 import org.exoplatform.services.wcm.extensions.publication.lifecycle.impl.LifecyclesConfig;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
@@ -41,8 +39,6 @@ import java.util.Map;
  */
 
 public class CanUnpublishFilter implements UIExtensionFilter {
-  private Log log = ExoLogger.getExoLogger(CanUnpublishFilter.class);
-
   @Override
   public boolean accept(Map<String, Object> context) throws Exception {
     Node currentNode = (Node) context.get(Node.class.getName());

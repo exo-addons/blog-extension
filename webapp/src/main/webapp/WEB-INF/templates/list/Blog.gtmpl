@@ -225,13 +225,12 @@ else {
 }
 for(tag in tags) {
 def name = tag.name
-def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
+def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name";
+url = uicomponent.getRssLink();
 %>
-<a href="$url" title="View all posts in $name" rel="category tag" class="label">$name</a>
+<a href="$url" title="View all posts in $name" rel="category tag" class="label">$url</a>
 <%
-
 if (i++ < (tags.size-1)) print " "
-
 } //end loop on  tags
 } //end renderTags
 // get the full name from username

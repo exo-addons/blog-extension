@@ -23,6 +23,7 @@
               <field name="permissions"><string>*:/platform/users</string></field>
               <field name="homePath"><string>/Groups/platform/users/Documents/Blog</string></field>
               <field name="icon"><string></string></field>
+
               <field name="views">
                 <string>blog-view</string>
               </field>
