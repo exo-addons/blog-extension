@@ -254,9 +254,28 @@ def manageVersionAction = uicomponent.event("ManageVersions", Utils.formatNodeNa
 <div class="columnCheckbox">
   <span class="uiCheckbox"><input type="checkbox" name="checkbox" class="checkbox"><span></span></span>
 </div>
+<%
+def uiExplorer = uicomponent.getAncestorOfType(UIJCRExplorer.class);
+def currentDrive = uiExplorer.getDriveData();
+def driverName = currentDrive.getName();
+
+def statusLabel = _ctx.appRes("UIPublicationPanel.status." + status)
+def iconLabel = statusLabel
+if (isLocked) iconLabel += " - " + lockedLabel
+
+def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "PublicationDraftIcon"
+%>
 <div class="columnText" data-placement="bottom" rel="tooltip" title="$lockedLabel">
   <a href="javascript:void(0);" onmousedown="$actionLink" onmouseup="eXo.ecm.UIFileView.cancelEvent(event);">
     <span class="nodeName"><%=fileName%></span>
+    <%if ("draft".equals(status)) {%> -
+    <span class="label label-important" style="background: blue;" ><%=statusLabel%></span>
+    <span class="label label-important" >Published</span>
+    <%}else if("published".equals(status)) {%>
+    <span class="label label-important" >Darf</span>
+    <span class="label label-important" style="background: blue;" ><%=statusLabel%></span>
+    <%}%>
+
   </a>
   <span class="nodeLabel fileExtension"><%=fileExtension%></span>
 
@@ -275,17 +294,6 @@ postCategory
 commentCount
 -->
     <%
-    def uiExplorer = uicomponent.getAncestorOfType(UIJCRExplorer.class);
-    def currentDrive = uiExplorer.getDriveData();
-    def driverName = currentDrive.getName();
-
-
-    def statusLabel = _ctx.appRes("UIPublicationPanel.status." + status)
-    def iconLabel = statusLabel
-    if (isLocked) iconLabel += " - " + lockedLabel
-
-    def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "PublicationDraftIcon"
-
     if(driverName=="Blog"){
     %>
     <style>
@@ -299,15 +307,7 @@ commentCount
         text-align:center;a
       }
     </style>
-    <%if ("draft".equals(status)) {%> -
-    <span class="label label-important" style="background: blue;" ><%=statusLabel%></span>
-    <span class="label label-important" >Published</span>
-    <%}else if("published".equals(status)) {%>
-    <span class="label label-important" >Darf</span>
-    <span class="label label-important" style="background: blue;" ><%=statusLabel%></span>
-    <%}%>
 
-    <!--span class="blog-fileview blog-postCategory">$status</span-->
     <span class="blog-fileview blog-postCategory">Categories ($postCategory)</span>
     <span class="blog-fileview blog-postCommentCount">Comment ($commentCount)</span>
     <span class="blog-fileview blog-postView">Views ($viewCount)</span>
