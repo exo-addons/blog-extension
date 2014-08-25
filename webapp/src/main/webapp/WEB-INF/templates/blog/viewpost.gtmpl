@@ -161,6 +161,7 @@ if (comments.size > 1) plural = "s"
 <h5 class="title">${comments.size} comment ${plural}</h5>
 <div class="uiContentBox">
     <div>
+<div class="commentList" id="commentList">
         <%
         int i=0;
         for (comment in comments) {
@@ -241,7 +242,6 @@ if (comments.size > 1) plural = "s"
         }
         } // end loop on comments
         %>
-    </div>
 </div> <!--end commentlist-->
 <%
 } // end if comments
