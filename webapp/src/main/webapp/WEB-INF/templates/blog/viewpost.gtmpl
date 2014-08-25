@@ -70,7 +70,7 @@ def ws = post.getSession().getWorkspace().getName();
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
                 <header class="header">
-                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title <%=post.getPath()%></h3></div>
+                    <div class="page-header"><h3 class="single-title" itemprop="headline">$title</h3></div>
                     <div class="meta media">
                     <div class="pull-left">
                         <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
@@ -158,6 +158,9 @@ if (comments) {
 def plural=""
 if (comments.size > 1) plural = "s"
 %>
+
+
+
 <h5 class="title">${comments.size} comment ${plural}</h5>
 <div class="uiContentBox">
     <div>
@@ -210,7 +213,7 @@ if (comments.size > 1) plural = "s"
 											disapproved
 										<%}%>
 										" > $commentContent
-									
+
 										</span>	 &nbsp; &nbsp;
 										<span>
 											<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="uiIconLightGray uiIconEdit"></i></a>
@@ -277,13 +280,15 @@ def avt = avatarUrl(viewer)
         <div class="commentRight">
             <div class="commentInputBox " id="commentInputBox">
                 <form class="form-inline media" id="commentform-$uuid" name="commentform-$uuid">
-                		<input type="button" value="Post Comment" class="btn btn-primary  pull-right" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment" onclick="eXo.ecm.blog.postComment('$uuid')" />
+                		<input type="button" value="Post Comment" class="btn btn-primary  pull-right" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment"
+													 onclick="eXo.ecm.blog.postComment('$uuid')" />
                 		<div class="media-body">
-                		
+                			<input name="viewer" type="hidden" value="$viewer" />
+											<input name="fme" type="hidden" value="$fme" />
 	                    <input name="jcrPath" type="hidden" value="/repository/collaboration${post.path}"/>
 	                    <input name="commentPath" type="hidden" value="${post.path}"/>
 	                    <input name="timeId" type="hidden" value=""/>
-	                    <input type="text" name="comment" id="comment-$uuid" placeholder="Your Comment Here"   tabindex="0" style="width:100%" />
+	                    <input type="text" name="comment" id="comment-$uuid" placeholder="Your Comment Here"   tabindex="0" style="width:100%" onkeydown="return eXo.ecm.blog.prePostComment(event, '$uuid')" />
                     </div>
                 </form>
             </div>

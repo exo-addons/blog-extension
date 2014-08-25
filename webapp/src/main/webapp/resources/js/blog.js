@@ -2,10 +2,6 @@
   function blog() {
   };
 
-  blog.prototype.test = function () {
-    alert('Blog\'s js worked! ');
-  };
-
   blog.prototype.getPost = function (el, year, month) {
     gj.ajax({
       url: "/portal/rest/blog/service/get-blogs?year=" + year + "&month=" + month,
@@ -132,11 +128,33 @@
   }); // end change title
   gj("#name").change(blog.prototype.syncuri);
 
+  function getBlogTime(date){
+    var month = new Array(); month[0] = "Jan"; month[1] = "Feb"; month[2] = "Mar";
+    month[3] = "Apr"; month[4] = "May"; month[5] = "Jun"; month[6] = "Jul";
+    month[7] = "Aug"; month[8] = "Sep"; month[9] = "Oct";
+    month[10] = "Nov"; month[11] = "Dec";
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+    var result =	"on "+month[date.getMonth()] +" "+ date.getDate() + ", " + date.getFullYear()+" at "+strTime;
+    return result;
+  }
+  blog.prototype.prePostComment = function (e, uuid) {
+    if(e.keyCode === 13){
+      blog.prototype.postComment(uuid);
+      return false;
+    }else{console.log('init....')}
+  };
+
   blog.prototype.postComment = function (uuid) {
     var aform = gj("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     if(comment===''){
-      alert('Comment message count empty!');
+      //alert('Comment message count empty!');
       aform.find('input[name="comment"]').focus();
       return false;
     }
@@ -146,10 +164,47 @@
       url: "/rest/contents/comment/add",
       data: { comment: comment, jcrPath: path},
       success: function () {
-        gj('#respond-$uuid').html("<div id='message'></div>");
-        gj('#message').html('<div class="alert alert-success"><p>Your comment has been posted.</p></div>')
-            .hide()
-            .fadeIn(1500);
+        var viewer = aform.find('input[name="viewer"]').val();
+        var fme = aform.find('input[name="fme"]').val();
+        var avatar = aform.find('input[name="avatar"]').val();
+        var date = new Date();
+        var timeId = date.getTime();
+
+
+        var dateStr = getBlogTime(date);
+
+        //var result = new StringBuffer();
+        var result="";
+        result += "<div class=\"commentItem\" id=\"comment-"+timeId+"\">";
+        result += "	<div class=\"commmentLeft\">";
+        result += "		<a class=\"avatarXSmall\" href=\""+avatar+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
+        result += "			<img alt=\""+fme+"\" src=\""+avatar+"\">";
+        result += "		</a>";
+        result += "	</div>"; // end comment left
+
+        result += "<div class=\"commentRight\">";
+        result += "<div class=\"author\">";
+        result += "	<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
+        result += "	<span class=\"dateTime\">"+dateStr+"</span> &nbsp; &nbsp;";
+        result += "	<span class=\"reply actionIcon\"><i class=\"uiIconReply uiIconLightGray\"></i> Reply</span>";
+        result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
+        result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '/Grou04063', '/Grrs/D', 'collaboration');\" value=\"Disapprove\">";
+        result += " </span>"
+
+        result +=	"	<p class=\"contentComment\">";
+        result += "	<p id=\""+timeId+"\" class=\"ContentBlock\"> "+comment;
+        result += "		<span>";
+        result += " 		<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('/Groups/platform/users/Documents/2014/08/22/check1/comments/1408941804063', 'fbde1d897f00010171992eb25f346549', '1408941804063', 'collaboration')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>";
+        result += "			<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('/Groups/platform/users/Documents/08/22/check1/comments/1408941804063', '1408941804063' ,'collaboration')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>";
+        result += "		</span>";
+        result += "	</p>"
+        result += "	</p>"
+        result += "</div>";
+        result += "</div>";
+        result += "</div>";
+
+        gj("#commentList").append(result);
+        gj("#commentInputBox input[name=comment]").val('');
       }
     }); // end ajax
 
@@ -747,6 +802,8 @@
           gj('#'+timeId).html(comment);
         }else{
           alert('Edit comment failed. Please retry again!.');
+          aform.find('input[name="comment"]').focus();
+          return false;
         }
       }
     }); // end ajax
