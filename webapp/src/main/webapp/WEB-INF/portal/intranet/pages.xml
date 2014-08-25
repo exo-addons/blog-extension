@@ -59,8 +59,14 @@
                 <name>showRssLink</name>
                 <value>false</value>
                 <read-only>false</read-only>
-              </preference>     
+              </preference>
+              <preference>
+                <name>contextualFolder</name>
+                <value>contextualDisable</value>
+                <read-only>true</read-only>
+              </preference>
             </preferences>
+
          </portlet>
           <title>Blog Posts</title>
           <access-permissions>*:/platform/users</access-permissions>

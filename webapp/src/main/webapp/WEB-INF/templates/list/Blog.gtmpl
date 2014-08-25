@@ -49,10 +49,7 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
     if (uicomponent.getUIPageIterator().getAvailable() == 0) {
     %>
 
-    <div class="alert alert-info">
-      <%=_ctx.appRes(uicomponent.getParent().getMessageKey()) %>
-    </div>
-
+    <div class="alert alert-info"> <%=_ctx.appRes(uicomponent.getParent().getMessageKey()) %></div>
     <%
     } // end if (no entries)
     // else (has entries)
@@ -214,7 +211,8 @@ void tags(def entry) {
 def folkService = uicomponent.getApplicationComponent(NewFolksonomyService.class)
 def tags = folkService.getLinkedTagsOfDocument(entry, "collaboration")
 def i = 0;
-
+%>
+<%
 if (!tags) {
 tags = [];
 }
@@ -223,35 +221,42 @@ else {
 <span class="tags-title">Tags:</span>
 <%
 }
-for(tag in tags) {
-def name = tag.name
-def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name";
-url = uicomponent.getRssLink();
-%>
-<a href="$url" title="View all posts in $name" rel="category tag" class="label">$url</a>
-<%
-if (i++ < (tags.size-1)) print " "
-} //end loop on  tags
+	for(tag in tags) {
+		def name = tag.name;
+		def path = tag.getPath();
+		def url="/portal/intranet/blog?folder-id=repository:collaboration:$path";
+	%>
+			<a href="$url" title="View all posts in $name" rel="category tag" class="label">$name</a>
+	<%
+		if (i++ < (tags.size-1)) print " "
+	} //end loop on  tags
 } //end renderTags
+
 // get the full name from username
 String fullName(def username) {
 def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
 def user = userHandler.findUserByName(username)
-def name = user.fullName
+def name = "";
+if(user!=null) user.fullName
 return name?name:username
 }
 
 String avatarUrl(def username) {
 String avatar = "/social-resources/skin/ShareImages/Avatar.gif";
+
 try {
-def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
-def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username)
-def userProfile = userIdentity.getProfile()
-if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
+	def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
+	def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username)
+
+	if(userIdentity!=null){
+		def userProfile = userIdentity.getProfile()
+		if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
+	}
 } catch (Exception e) {
 print e.message // ugly old school debug
 }
 return avatar
+
 }
 
 // (only display  viewable webcontents here)
@@ -271,37 +276,32 @@ return true;
 
 // render a blog entry
 void renderPost(def entry) {
-try {
+	try {
+	def cssOption = "CSSData=";
+	def excerpt = uicomponent.getSummary(entry);
+	def html = "";
+	if(entry.hasProperty("exo:blogSummary")){html=entry.getProperty("exo:blogSummary").getString();}
+	// if there is no summary, we use an inline marker
+	if (!excerpt) {
+		def marker = "<!-- more -->";
+		if (html.contains(marker)) {
+			def idx = html.indexOf(marker)
+			excerpt = html.substring(0,idx)
+			html = html.substring(idx + marker.length(), html.length())
+		}
+	}
 
-def cssOption = "CSSData=";
-def excerpt = uicomponent.getSummary(entry);
-def html = entry.getProperty("exo:blogSummary").getString();
-// if there is no summary, we use an inline marker
-if (!excerpt) {
-def marker = "<!-- more -->";
-
-if (html.contains(marker)) {
-def idx = html.indexOf(marker)
-excerpt = html.substring(0,idx)
-html = html.substring(idx + marker.length(), html.length())
-}
-}
-if (excerpt) {
+	if(entry.hasProperty("exo:blogSummary")){
+		def blogSummary = entry.getProperty("exo:blogSummary").getString();
+		print uicomponent.getInlineEditingField(entry, blogSummary, html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
+	}
 %>
-
-	$excerpt &nbsp;<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
+	<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
   <i class="icon-hand-right"></i>
   Read full article</a>
 <%
-} else {
-def blogSummary = entry.getProperty("exo:blogSummary").getString();
-print uicomponent.getInlineEditingField(entry, blogSummary, html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
 
-}
-
-} catch (Exception e) {
-print e;
-}
+} catch (Exception e) { print e; }
 } // end render post
 
 void bloggers() {
@@ -379,8 +379,9 @@ List<Node> publicTags() {
 
     for(tag in publicTags()) {
     def name = tag.name
+		def path = tag.getPath();
     def selected = ((name == currentTag)?"label-info":"")
-    def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
+    def url="/portal/intranet/blog?folder-id=repository:collaboration:$path"
     %>
     <a href="$url" class="label $selected" title="View all posts in $name" style="font-size: 9.75px;">$name</a>
     <%
