@@ -424,7 +424,8 @@ return name?name:poster
 
 /* get the url of the avatar */
 String avatarUrl(def poster) {
-String avatar = "/social-resources/skin/ShareImages/Avatar.gif";
+String avatar = "/social-resources/skin/images/ShareImages/UserAvtDefault.png";
+/*
 try {
 def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
 def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, poster)
@@ -433,6 +434,7 @@ if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSourc
 } catch (Exception e) {
 print e.message // ugly old school debug
 }
+*/
 return avatar
 }
 

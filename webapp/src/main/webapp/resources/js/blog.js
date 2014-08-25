@@ -85,6 +85,7 @@
             plugin.find('.accordion_in').removeClass('acc_active');
           }
         }
+
         if (s_parent.hasClass('acc_active')) {
           if (false !== settings.closeAble) {
             s_parent.children('.acc_content').slideUp(settings.slideSpeed);

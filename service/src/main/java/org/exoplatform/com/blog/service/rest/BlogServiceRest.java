@@ -193,7 +193,7 @@ public class BlogServiceRest implements ResourceContainer {
     return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
 
-  private Node getNode(String nodePath, String ws) throws RepositoryException {
+    private Node getNode(String nodePath, String ws) throws RepositoryException {
     SessionProvider sessionProvider = WCMCoreUtils.getUserSessionProvider();
     ManageableRepository manageableRepository = WCMCoreUtils.getRepository();
     Session session = sessionProvider.getSession(ws, manageableRepository);
