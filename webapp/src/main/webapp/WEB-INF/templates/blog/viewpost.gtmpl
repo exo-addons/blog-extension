@@ -69,43 +69,42 @@ def ws = post.getSession().getWorkspace().getName();
         <div id="main" class="main-content" role="main">
 
             <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
-                <header>
+                <header class="header">
                     <div class="page-header"><h3 class="single-title" itemprop="headline">$title <%=post.getPath()%></h3></div>
-                    <p class="meta">
-                    <div style="float:left">
+                    <div class="meta media">
+                    <div class="pull-left">
                         <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
                             <img alt="$author" src="$avatar">
                         </a>
                     </div>
-                    <div class="commentRight">
+                    <div class="media-body">
                         <div class="author">
                             <a href="/portal/intranet/profile/$poster">$author</a>
                             <span class="dateTime" datetime="$date">$date</span>
                         </div>
                     </div>
-                    </p>
+                    </div>
                 </header> <!-- end article header -->
 
-                <section class="post_content clearfix">
+                <section class="post-content">
                     <% renderPost(post) %>
                 </section> <!-- end article section -->
 
                 <footer>
-                    <p class="tags"><% tags(post) %></p>
-                  <!--share this-->
-                  <span class='st_googleplus_hcount' displayText='Google +'></span>
-                  <span class='st_sharethis_hcount' displayText='ShareThis'></span>
-                  <span class='st_facebook_hcount' displayText='Facebook'></span>
-                  <span class='st_twitter_hcount' displayText='Tweet'></span>
-                  <span class='st_linkedin_hcount' displayText='LinkedIn'></span>
-                  <span class='st_pinterest_hcount' displayText='Pinterest'></span>
-                  <span class='st_email_hcount' displayText='Email'></span>
+                    <div class="tags"><% tags(post) %></div>
+                    <div class="share-this">
+                 		 <span class='st_googleplus_hcount' displayText='Google +'></span>
+		                  <span class='st_sharethis_hcount' displayText='ShareThis'></span>
+		                  <span class='st_facebook_hcount' displayText='Facebook'></span>
+		                  <span class='st_twitter_hcount' displayText='Tweet'></span>
+		                  <span class='st_linkedin_hcount' displayText='LinkedIn'></span>
+		                  <span class='st_pinterest_hcount' displayText='Pinterest'></span>
+		                  <span class='st_email_hcount' displayText='Email'></span>
+                    </div>
+                  
 
-                  <div class="blog-vote">
-
-                    <div style="float: right;position: absolute;padding-left: 600px;">Avg. Rating: $voteAvg Votes: $voteTotal </div>
-                    <div class="rate-wrapper">
-
+                  <div class="blog-vote clearfix">
+                    <div class="rate-wrapper">											
                       <input type="hidden" name="postPath" value="$postPath">
                       <input type="hidden" name="ws" value="$ws">
                       <a class="score-1" href="#">1</a>
@@ -115,6 +114,7 @@ def ws = post.getSession().getWorkspace().getName();
                       <a class="score-5" href="#">5</a>
                       <span class="rate-current-score"><%=voteValueOfUser*20%></span>
                     </div>
+                    <span class="vote-label pull-right">Avg. Rating: $voteAvg Votes: $voteTotal </span>
                   </div>
 
                 </footer> <!-- end article footer -->
@@ -134,11 +134,11 @@ def ws = post.getSession().getWorkspace().getName();
             // show edit button
             if ((poster == viewer) && (uicomponent.class.name =="org.exoplatform.wcm.webui.scv.UIPresentation")) {
             %>
-            <a class="btn btn-mini" href="/portal/intranet/blog/admin?edit=true&path=/collaboration/Groups/platform/users/Documents/Blog/${post.name}&backto=/portal/intranet/blog"><i class="icon-pencil"></i> Edit</a>
+            <a class="btn " href="/portal/intranet/blog/admin?edit=true&path=/collaboration/Groups/platform/users/Documents/Blog/${post.name}&backto=/portal/intranet/blog"><i class="uiIconLightGray uiIconEdit"></i> Edit</a>
             <%
             } // end edit button
             %>
-          <a class="btn btn-mini" href="/portal/intranet/blog" title="Back to top" ><i class="uiIconEcmsGoBack uiIconEcmsLightGray" ></i> Back</a>
+          <a class="btn" href="/portal/intranet/blog" title="Back to top" ><i class="uiIconEcmsGoBack uiIconEcmsLightGray" ></i> Back</a>
         </div> <!-- end sidebar -->
 
     </div> <!-- end #content -->
@@ -159,7 +159,7 @@ def plural=""
 if (comments.size > 1) plural = "s"
 %>
 <h5 class="title">${comments.size} comment ${plural}</h5>
-<div class="commentList">
+<div class="uiContentBox">
     <div>
         <%
         int i=0;
@@ -193,25 +193,28 @@ if (comments.size > 1) plural = "s"
 							<div class="commentRight">
 									<div class="author">
 										<a href="/portal/intranet/profile/$commentor">$commentorName</a>
-										<span class="dateTime">$commentDate </span>
-											<span id="approve-$timeId" style="margin-right:10px; float:right;">
+										<span class="dateTime">$commentDate </span> &nbsp; &nbsp;
+										<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
+											<span id="approve-$timeId" class="pull-right approve">
 												<%if(!approve){%>
-													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" value="Approve" />
+													<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" >Approve</button>
 												<%}else{%>
-													<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" value="Disapprove" />
+													<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >Disapprove</button>
 												<%}%>
 											</span>
 									</div>
-									<p class="contentComment"></p>
-									<p id="$timeId" class="ContentBlock
-									<%if(!approve){%>
-										disapproved
-									<%}%>
-									" > $commentContent
-									<span>
-										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="icon-pencil"></i></a>
-										<a class="btn-mini" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')"><i class="uiIconEcmsDelete" style="this:hover:none;"></i></a>
-									</span>
+									<p class="contentComment">
+										<span id="$timeId" class="ContentBlock
+										<%if(!approve){%>
+											disapproved
+										<%}%>
+										" > $commentContent
+									
+										</span>	 &nbsp; &nbsp;
+										<span>
+											<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="uiIconLightGray uiIconEdit"></i></a>
+											<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')"><i class="uiIconLightGray uiIconDelete" ></i></a>
+										</span>
 									</p>
 							</div><!--end commentRight-->
 					<%}else{%>
@@ -262,23 +265,26 @@ def viewer = _ctx.getRequestContext().getRemoteUser()
 def fme = fullName(viewer)
 def avt = avatarUrl(viewer)
 %>
-<div class="commentList inputContainer inputContainerShow" style="display: block;">
+<div class="commentList uiContentBox inputContainer inputContainerShow" style="display: block;">
     <div class="commentItem commentFormBox" id="respond-$uuid">
 
         <div class="commmentLeft">
-            <a class="avatarXShttp://localhost:8080/portal/intranet/mall" rel="tooltip" data-placement="bottom" href="/portal/intranet/profile/$viewer" data-original-title="$fme">
+            <a class="avatarXSmall" rel="tooltip" data-placement="bottom" href="/portal/intranet/profile/$viewer" data-original-title="$fme">
                 <img src="$avt" alt="$fme">
             </a>
         </div><!--end commentLeft-->
 
         <div class="commentRight">
             <div class="commentInputBox " id="commentInputBox">
-                <form class="form-inline" id="commentform-$uuid" name="commentform-$uuid">
-                    <input name="jcrPath" type="hidden" value="/repository/collaboration${post.path}"/>
-                    <input name="commentPath" type="hidden" value="${post.path}"/>
-                    <input name="timeId" type="hidden" value=""/>
-                    <input type="text" name="comment" id="comment-$uuid" placeholder="Your Comment Here…"  style="margin-bottom: 7px; height: 28px; resize: none; max-height: 28px;"  tabindex="0" />
-                    <input type="button" value="Post Comment" class="btn btn-primary" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment" onclick="eXo.ecm.blog.postComment('$uuid')" />
+                <form class="form-inline media" id="commentform-$uuid" name="commentform-$uuid">
+                		<input type="button" value="Post Comment" class="btn btn-primary  pull-right" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment" onclick="eXo.ecm.blog.postComment('$uuid')" />
+                		<div class="media-body">
+                		
+	                    <input name="jcrPath" type="hidden" value="/repository/collaboration${post.path}"/>
+	                    <input name="commentPath" type="hidden" value="${post.path}"/>
+	                    <input name="timeId" type="hidden" value=""/>
+	                    <input type="text" name="comment" id="comment-$uuid" placeholder="Your Comment Here"   tabindex="0" style="width:100%" />
+                    </div>
                 </form>
             </div>
         </div><!--end commentRight-->

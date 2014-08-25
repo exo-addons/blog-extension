@@ -402,7 +402,7 @@ List<Node> publicTags() {
     %>
     <div class="uiBox">
       <h5 class="title"><a href="${link}#commentlist">${comments.size} comment${plural}</a></h5>
-      <div class="commentList">
+      <div class="commentList uiContentBox ">
         <div>
           <%
           int i=0;
