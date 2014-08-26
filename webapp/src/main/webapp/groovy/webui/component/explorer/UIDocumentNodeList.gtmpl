@@ -269,17 +269,18 @@ def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "Publ
   <a href="javascript:void(0);" onmousedown="$actionLink" onmouseup="eXo.ecm.UIFileView.cancelEvent(event);">
     <span class="nodeName"><%=fileName%></span>
     <%if ("draft".equals(status)) {%> -
-    <span class="label label-important" style="background: blue;" ><%=statusLabel%></span>
-    <span class="label label-important" >Published</span>
+    <span class="label label-important"  ><%=statusLabel%></span>
+    <span class="label label-important label-success" >Published</span>
     <%}else if("published".equals(status)) {%>
     <span class="label label-important" >Darf</span>
-    <span class="label label-important" style="background: blue;" ><%=statusLabel%></span>
+    <span class="label label-important label-success"><%=statusLabel%></span>
     <%}%>
 
   </a>
   <span class="nodeLabel fileExtension"><%=fileExtension%></span>
 
-  <p class="fileInfoBottom">
+  <div class="fileInfoBottom">
+  <span>
     <% if(!"".equals(versionNum)) {%>
     <a href="<%=manageVersionAction%>" class="fileInfoVersion"><%=versionNum%></a>
     <% }%>
@@ -292,7 +293,7 @@ def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "Publ
     <!--
 postCategory
 commentCount
--->
+--></span>
     <%
     if(driverName=="Blog"){
     %>
@@ -303,18 +304,26 @@ commentCount
         font-size: 12px;
         display: inline-block;
         word-wrap: break-word;
-        width: 65px;
-        text-align:center;a
+        width: 75px;
+        text-align:center;
       }
+      .label-info {background: #3a87ad;}
+      .label-success {background: #468847;}
     </style>
 
-    <span class="blog-fileview blog-postCategory">Categories ($postCategory)</span>
-    <span class="blog-fileview blog-postCommentCount">Comment ($commentCount)</span>
-    <span class="blog-fileview blog-postView">Views ($viewCount)</span>
+	    <span class="blog-fileview blog-postCategory">Categories<br/>
+					<span class="label-info label">($postCategory)</span>
+			</span>
+	    <span class="blog-fileview blog-postCommentCount">Comment<br/>
+	     	<span class="label-info label">($commentCount)</span>
+	     </span>
+	    <span class="blog-fileview blog-postView">Views <br/>
+	    	<span class="label-info label">($viewCount)</span>
+	    </span>
 
     <%}%>
 
-  </p>
+  </div>
 </div>
 </div>
 <%
