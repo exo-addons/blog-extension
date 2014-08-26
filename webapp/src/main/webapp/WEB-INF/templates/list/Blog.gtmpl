@@ -298,7 +298,7 @@ void renderPost(def entry) {
 	}
 %>
 	<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
-  <i class="uiIconView uiIconLightGray"></i>
+  <i class=" uiIconLightGray"></i>
   Read full article</a>
 <%
 
