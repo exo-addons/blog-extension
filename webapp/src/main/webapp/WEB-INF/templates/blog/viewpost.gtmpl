@@ -180,10 +180,8 @@ if (comments.size > 1) plural = "s"
 				def approve = false;
 				def postUuid = post.getUUID();
      		def _ws = comment.getSession().getWorkspace().getName();
-				try{
+				if(comment.hasProperty("exo:commentStatus")){
 					approve = comment.getProperty("exo:commentStatus").getBoolean();
-				}catch(Exception ex){
-					approve=true;
 				}
         %>
         <div class="commentItem" id="comment-${comment.name}">
@@ -207,8 +205,9 @@ if (comments.size > 1) plural = "s"
 										<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
 											
 									</div>
-									<div class="contentComment">
-										<span id="$timeId" class="ContentBlock
+
+									<p class="contentComment">
+										<span id="$timeId" class="ContentBlock comment-context
 										<%if(!approve){%>
 											disapproved
 										<%}%>

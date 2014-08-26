@@ -38,12 +38,15 @@ import javax.annotation.security.RolesAllowed;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -59,7 +62,7 @@ public class BlogServiceRest implements ResourceContainer {
   private final String BLOG_DEFAULT_LANGUAGE = "en";
   private static final String BLOG_COMMENT_STATUS_PROPERTY = "exo:commentStatus";
   private BlogService blogService = WCMCoreUtils.getService(BlogService.class);
-
+  private CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
   public BlogServiceRest() {
   }
 
@@ -136,7 +139,6 @@ public class BlogServiceRest implements ResourceContainer {
     String commentPath = data.getFirst("commentPath");
     String newComment = data.getFirst("newComment");
     String ws = data.getFirst("ws");
-    CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
     JSONObject obj = new JSONObject();
     try {
       Node nodeComment = getNode(commentPath, ws);
@@ -157,7 +159,6 @@ public class BlogServiceRest implements ResourceContainer {
   public Response delComment(MultivaluedMap<String, String> data) {
     String commentPath = data.getFirst("commentPath");
     String ws = data.getFirst("ws");
-    CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
     JSONObject obj = new JSONObject();
     try {
       Node nodeComment = getNode(commentPath, ws);
@@ -165,7 +166,7 @@ public class BlogServiceRest implements ResourceContainer {
       obj.put("result", true);
       return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
     } catch (Exception e) {
-      e.printStackTrace();
+      if (log.isErrorEnabled()) log.error(e.getMessage());
     }
     return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
@@ -174,7 +175,7 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/getComment")
   @RolesAllowed("users")
   public Response getComment(MultivaluedMap<String, String> data) {
-      String commentPath = data.getFirst("commentPath");
+    String commentPath = data.getFirst("commentPath");
     String ws = data.getFirst("ws");
 
     JSONObject obj = new JSONObject();
@@ -193,11 +194,47 @@ public class BlogServiceRest implements ResourceContainer {
     return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
 
-    private Node getNode(String nodePath, String ws) throws RepositoryException {
+  @POST
+  @Path("/getLastComment")
+  @RolesAllowed("users")
+  public Response getLastComment(@FormParam("jcrPath") String jcrPath) {
+    if (jcrPath.contains("%20")) try {
+      jcrPath = URLDecoder.decode(jcrPath, "UTF-8");
+    } catch (UnsupportedEncodingException ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    String[] path = jcrPath.split("/");
+    String repositoryName = path[1];
+    String workspaceName = path[2];
+    jcrPath = jcrPath.substring(repositoryName.length()+workspaceName.length()+2);
+    if (jcrPath.charAt(1)=='/') jcrPath.substring(1);
+    JSONObject obj = new JSONObject();
+    try {
+      Node nodeComment = getNode(jcrPath, workspaceName);
+      List<Node> comments = commentsService.getComments(nodeComment, BLOG_DEFAULT_LANGUAGE);
+      Node lastComment = comments.get(0);
+      if (lastComment.hasProperty("exo:commentContent")) {
+        obj.put("result", true);
+        obj.put("commentContent", lastComment.getProperty("exo:commentContent").getString());
+        obj.put("commentPath", lastComment.getPath());
+        obj.put("ws", workspaceName);
+        return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+      }
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
+  }
+
+  private Node getNode(String nodePath, String ws) throws RepositoryException {
+    Session session = getSession(ws);
+    return (Node) session.getItem(nodePath);
+  }
+
+  private Session getSession(String ws) throws RepositoryException {
     SessionProvider sessionProvider = WCMCoreUtils.getUserSessionProvider();
     ManageableRepository manageableRepository = WCMCoreUtils.getRepository();
-    Session session = sessionProvider.getSession(ws, manageableRepository);
-    return (Node) session.getItem(nodePath);
+    return sessionProvider.getSession(ws, manageableRepository);
   }
 
 }
