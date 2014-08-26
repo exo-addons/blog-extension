@@ -68,7 +68,7 @@ def ws = post.getSession().getWorkspace().getName();
     <div id="content" class="clearfix content-blog">
         <div id="main" class="main-content" role="main">
 
-            <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" style="padding:7px" role="article">
+            <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article">
                 <header class="header">
                     <div class="page-header"><h3 class="single-title" itemprop="headline">$title</h3></div>
                     <div class="meta media">
@@ -122,7 +122,7 @@ def ws = post.getSession().getWorkspace().getName();
             </article> <!-- end article -->
 
 
-            <div class="uiBox">
+            <div class="uiBox comment-area">
                 <% commentList(post)%>
                 <% commentForm(post) %>
             </div>
@@ -163,7 +163,6 @@ if (comments.size > 1) plural = "s"
 
 <h5 class="title">${comments.size} comment ${plural}</h5>
 <div class="uiContentBox">
-    <div>
 <div class="commentList" id="commentList">
         <%
         int i=0;
@@ -189,7 +188,7 @@ if (comments.size > 1) plural = "s"
         %>
         <div class="commentItem" id="comment-${comment.name}">
 					<%if(isAdmin || viewer==poster){%>
-							<div class="commmentLeft">
+							<div class="commentLeft">
 								<a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
 									<img alt="$commentorName" src="$commentorAvatar">
 								</a>
@@ -208,7 +207,7 @@ if (comments.size > 1) plural = "s"
 										<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
 											
 									</div>
-									<p class="contentComment">
+									<div class="contentComment">
 										<span id="$timeId" class="ContentBlock
 										<%if(!approve){%>
 											disapproved
@@ -220,11 +219,11 @@ if (comments.size > 1) plural = "s"
 											<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="uiIconLightGray uiIconEdit"></i></a>
 											<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')"><i class="uiIconLightGray uiIconDelete" ></i></a>
 										</span>
-									</p>
+									</div>
 							</div><!--end commentRight-->
 					<%}else{%>
           <%if(approve){%>
-          <div class="commmentLeft">
+          <div class="commentLeft">
             <a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom" data-original-title="$commentorName">
               <img alt="$commentorName" src="$commentorAvatar">
             </a>
@@ -234,8 +233,8 @@ if (comments.size > 1) plural = "s"
               <a href="/portal/intranet/profile/$commentor">$commentorName</a>
               <span class="dateTime">$commentDate </span>
             </div>
-            <p class="contentComment"></p>
-            <p id="$timeId" class="ContentBlock" >$commentContent</p>
+            <div class="contentComment"></div>
+            <div id="$timeId" class="ContentBlock" >$commentContent</div>
           </div><!--end commentRight-->
           <%}}%>
         </div><!--end commentItem-->
@@ -247,6 +246,164 @@ if (comments.size > 1) plural = "s"
         } // end loop on comments
         %>
 </div> <!--end commentlist-->
+<!--static html-->
+	<ul class="commentList">
+		<li class="commentItem">
+			<div class="clearfix comment-container">
+				<div class="commentLeft">
+					<a data-original-title="Root Root" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/root" class="avatarXSmall">
+						<img src="/social-resources/skin/images/ShareImages/UserAvtDefault.png" alt="Root Root">
+					</a>
+				</div>
+				<!--end commentLeft-->
+				<div class="commentRight">
+					<div class="author">
+						<span class="pull-right approve" id="">						
+							<button onclick="" class="btn" type="button">Disapprove</button>
+						</span>
+						<a href="/portal/intranet/profile/root">Root Root</a>
+						<span class="dateTime">on Aug 26, 2014 at 10:06 AM </span>&nbsp; &nbsp;
+						<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>					
+					</div><!--end author-->
+					<div class="contentComment">
+						<span class="ContentBlock" > how abaout al fasdf 
+						</span>&nbsp; &nbsp;
+						<span>
+							<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
+							<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
+						</span>
+					</div>
+				</div><!--end commentRight-->
+			</div>		
+			<!--end comment-container-->
+			
+		
+			<ul class="commentList children">
+				<li class="commentItem">
+					<div class="clearfix comment-container">
+						<div class="commentLeft">
+							<a data-original-title="Root Root" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/root" class="avatarXSmall">
+								<img src="/social-resources/skin/images/ShareImages/UserAvtDefault.png" alt="Root Root">
+							</a>
+						</div>
+						<!--end commentLeft-->
+						<div class="commentRight">
+							<div class="author">
+								<span class="pull-right approve" id="">						
+									<button onclick="" class="btn" type="button">Disapprove</button>
+								</span>
+								<a href="/portal/intranet/profile/root">Root Root</a>
+								<span class="dateTime">on Aug 26, 2014 at 10:06 AM </span>&nbsp; &nbsp;
+								<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>					
+							</div><!--end author-->
+							<div class="contentComment">
+								<span class="ContentBlock" > how abaout al fasdf 
+								</span>&nbsp; &nbsp;
+								<span>
+									<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
+									<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
+								</span>
+							</div>
+						</div><!--end commentRight-->
+					</div>		
+					<!--end comment-container-->					
+					
+					<ul class="commentList children">
+						<li class="commentItem">
+							<div class="clearfix comment-container">
+								<div class="commentLeft">
+									<a data-original-title="Root Root" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/root" class="avatarXSmall">
+										<img src="/social-resources/skin/images/ShareImages/UserAvtDefault.png" alt="Root Root">
+									</a>
+								</div>
+								<!--end commentLeft-->
+								<div class="commentRight">
+									<div class="author">
+										<span class="pull-right approve" id="">						
+											<button onclick="" class="btn" type="button">Disapprove</button>
+										</span>
+										<a href="/portal/intranet/profile/root">Root Root</a>
+										<span class="dateTime">on Aug 26, 2014 at 10:06 AM </span>&nbsp; &nbsp;
+										<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>					
+									</div><!--end author-->
+									<div class="contentComment">
+										<span class="ContentBlock" > how abaout al fasdf 
+										</span>&nbsp; &nbsp;
+										<span>
+											<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
+											<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
+										</span>
+									</div>
+								</div><!--end commentRight-->
+							</div>		
+							<!--end comment-container-->
+							
+							<div id="" class="commentItem commentFormBox clearfix">
+								<div class="commentLeft">
+									<a data-original-title="Root Root" href="/portal/intranet/profile/root" data-placement="bottom" rel="tooltip" class="avatarXSmall">
+										<img alt="Root Root" src="/social-resources/skin/images/ShareImages/UserAvtDefault.png">
+									</a>
+								</div><!--end commentLeft-->
+								<div class="commentRight">
+									<div id="commentInputBox" class="commentInputBox ">
+										<form name="" id="" class="form-inline media">
+												<input type="button" onclick="eXo.ecm.blog.editComment('1045259bc0a80147161e1935f0f4222d', '1409022402168', 'collaboration')" data-original-title="Comment" id="btn-1045259bc0a80147161e1935f0f4222d" data-placement="bottom" rel="tooltip" class="btn btn-primary  pull-right" value="Update Comment">
+												<div class="media-body">
+													<input type="hidden" value="root" name="viewer">
+																	<input type="hidden" value="Root Root" name="fme">
+												<input type="hidden" value="/repository/collaboration/Groups/platform/users/Documents/2014/08/26/test2" name="jcrPath">
+												<input type="hidden" value="/Groups/platform/users/Documents/2014/08/26/test2/comments/1409022402168" name="commentPath">
+												<input type="hidden" value="1409022402168" name="timeId">
+												<input type="text" onkeydown="return eXo.ecm.blog.prePostComment(event, '1045259bc0a80147161e1935f0f4222d')" style="width:100%" tabindex="0" placeholder="Your Comment Here" id="comment-1045259bc0a80147161e1935f0f4222d" name="comment">
+											</div>
+										</form>
+									</div>
+								</div><!--end commentRight-->
+							</div>
+							<!--end commentFormBox-->
+						</li>
+						
+					</ul>
+				</li>
+				
+			</ul>
+		<!--end commentItem-->
+		</li>
+		<li class="commentItem">
+			<div class="clearfix comment-container">
+				<div class="commentLeft">
+					<a data-original-title="Root Root" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/root" class="avatarXSmall">
+						<img src="/social-resources/skin/images/ShareImages/UserAvtDefault.png" alt="Root Root">
+					</a>
+				</div>
+				<!--end commentLeft-->
+				<div class="commentRight">
+					<div class="author">
+						<span class="pull-right approve" id="">						
+							<button onclick="" class="btn" type="button">Disapprove</button>
+						</span>
+						<a href="/portal/intranet/profile/root">Root Root</a>
+						<span class="dateTime">on Aug 26, 2014 at 10:06 AM </span>&nbsp; &nbsp;
+						<span class="reply actionIcon"><i class="uiIconReply uiIconLightGray"></i> Reply</span>					
+					</div><!--end author-->
+					<div class="contentComment">
+						<span class="ContentBlock" > how abaout al fasdf 
+						</span>&nbsp; &nbsp;
+						<span>
+							<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
+							<a onclick="" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
+						</span>
+					</div>
+				</div><!--end commentRight-->
+			</div>		
+			<!--end comment-container-->
+		</li>
+	</ul>
+<!--end commentItem-->
+
+<!--end static html-->
+
+</div> <!--end uiContentBox-->
 <%
 } // end if comments
 else {
@@ -272,7 +429,7 @@ def avt = avatarUrl(viewer)
 <div class="commentList uiContentBox inputContainer inputContainerShow" style="display: block;">
     <div class="commentItem commentFormBox" id="respond-$uuid">
 
-        <div class="commmentLeft">
+        <div class="commentLeft">
             <a class="avatarXSmall" rel="tooltip" data-placement="bottom" href="/portal/intranet/profile/$viewer" data-original-title="$fme">
                 <img src="$avt" alt="$fme">
             </a>

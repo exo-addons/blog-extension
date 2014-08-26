@@ -40,7 +40,7 @@ def jsManager = rcontext.getJavascriptManager();
 jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccordionInit();");
 %>
 
-<div class="container-fluid" style="padding: 20px">
+<div class="container-fluid list-blog">
 <div id="content" class="clearfix row-fluid">
 <div id="main" class="span9 clearfix" role="main">
   <div class="" id="$uicomponent.id">
@@ -75,7 +75,7 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
     def date = uicomponent.getCreatedDate(entry)
     %>
 
-    <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" style="padding: 7px;">
+    <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" >
       <header>
         <div class="page-header">
           <h3><a href="$link" rel="bookmark" title="$title">$title</a></h3>
@@ -298,7 +298,7 @@ void renderPost(def entry) {
 	}
 %>
 	<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
-  <i class="uiIconWatch uiIconLightGray"></i>
+  <i class="uiIconView uiIconLightGray"></i>
   Read full article</a>
 <%
 
@@ -384,7 +384,7 @@ List<Node> publicTags() {
     def selected = ((name == currentTag)?"label-info":"")
     def url="/portal/intranet/blog?folder-id=repository:collaboration:$path"
     %>
-    <a href="$url" class="label $selected" title="View all posts in $name" style="font-size: 9.75px;">$name</a>
+    <a href="$url" class="label $selected" title="View all posts in $name" >$name</a>
     <%
     }
     } // end render all tags

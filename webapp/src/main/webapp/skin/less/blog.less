@@ -47,7 +47,7 @@
   border-bottom: none;
 }
 
-.commmentLeft {
+.commentLeft {
   float: left;
 }
 .commentRight {
@@ -67,18 +67,31 @@
 
 /* TODO : we should reuse activity stream comments style instead of redeclaring*/
 
-.commentList {
-  padding: 15px 15px 0 15px;
-}
+
 .commentList .commentItem {
   position: relative;
 }
-.commentList .commentItem .commmentLeft {
+.commentItem + .commentItem {
+	margin: 15px 0 0 0;	
+	
+}
+
+.commentList .commentItem .commentLeft {
   float: left;
 }
-.commentList .commentItem .commmentLeft+.commentRight {
+
+.commentList .commentItem .commentLeft + .commentRight {
   margin-left: 45px;
 }
+.comment-container {
+    margin: 15px 0;
+}
+.commentList.children {
+    border-left: 4px solid #f0f0f0;
+    margin-left: 45px;
+    padding-left: 15px;
+}
+
 .author a {
   font-family: "Helvetica Neue Bold",Helvetica,Lucida,Arial,sans-serif;
   font-weight: bold;
@@ -232,7 +245,7 @@ a.tag {
 .commentList .commentItem {
   position: relative;
 }
-.commentList .commentItem .commmentLeft {
+.commentList .commentItem .commentLeft {
   float: left;
 }
 .commentRight {
@@ -267,7 +280,7 @@ a.tag {
   padding-top: 0;
 }
 
-.commentList .commentItem .commmentLeft {
+.commentList .commentItem .commentLeft {
   float: left;
 }
 .commentRight {
@@ -308,7 +321,8 @@ a.tag {
 		
 }
 
-.content-blog {
+.post {padding:15px;}
+.content-blog,.list-blog  {
 	padding: 15px;	
 }
 
@@ -338,12 +352,26 @@ a.tag {
 				    color: #333;
 				}
 		}
+		.month {
+	    cursor: pointer;
+	}
 }
 .blog-archive-post-link {
-    a {color: #333;}
+    a {
+    		color: #333;
+    	  display: block;
+    		margin: 5px 0;
+    }
     padding-left: 15px;
 }
 
 .uiContentBox + .uiContentBox {
     border-top: 1px solid #ddd;
+}
+.page-header h3 {
+	color:#333;
+	a {
+		color:#333;
+	}
+	
 }
