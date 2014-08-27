@@ -79,25 +79,38 @@
     this.clickHead = function () {
       plugin.on('click', '.acc_head', function () {
         var s_parent = gj(this).parent();
-        if (s_parent.hasClass('acc_active') == false) {
+
+        if (s_parent.hasClass('acc_active') == false) {  //not active, remove actice class
           if (settings.closeOther) {
             plugin.find('.acc_content').slideUp(settings.slideSpeed);
             plugin.find('.accordion_in').removeClass('acc_active');
+            plugin.find('.uiIconLightGray').removeClass('uiIconArrowDown');
+            plugin.find('.uiIconLightGray').addClass('uiIconArrowRight');
           }
         }
 
-        if (s_parent.hasClass('acc_active')) {
+        if (s_parent.hasClass('acc_active')) { //actived
           if (false !== settings.closeAble) {
             s_parent.children('.acc_content').slideUp(settings.slideSpeed);
             s_parent.removeClass('acc_active');
+            s_parent.children('.uiIconLightGray').removeClass('uiIconArrowRight');
+            gj(this).children('.uiIconLightGray').addClass('uiIconArrowDown');
+          }else{
+            s_parent.children('.acc_content').slideUp(settings.slideSpeed);
+            s_parent.removeClass('acc_active');
+            s_parent.children('.uiIconLightGray').removeClass('uiIconArrowDown');
+            gj(this).children('.uiIconLightGray').addClass('uiIconArrowRight');
           }
         }
         else {
           gj(this).next('.acc_content').slideDown(settings.slideSpeed);
           s_parent.addClass('acc_active');
+          gj(this).children('.uiIconLightGray').removeClass('uiIconArrowRight');
+          gj(this).children('.uiIconLightGray').addClass('uiIconArrowDown');
         }
       });
     }
+
     init();
     return this;
   };
@@ -148,15 +161,23 @@
     if(e.keyCode === 13){
       blog.prototype.postComment(uuid);
       return false;
-    }else{console.log('init....')}
+    }//else{console.log('init....')}
   };
 
   blog.prototype.postComment = function (uuid) {
     var aform = gj("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
+    var type = aform.find('input[name="type"]').val();
     if(comment===''){
       //alert('Comment message count empty!');
       aform.find('input[name="comment"]').focus();
+      return false;
+    }
+
+    var action = aform.find('input[name="action"]').val();
+
+    if(action === "Edit"){
+      eXo.ecm.blog.editComment(uuid, '');
       return false;
     }
     var path = aform.find('input[name="jcrPath"]').val();
@@ -165,48 +186,87 @@
       url: "/rest/contents/comment/add",
       data: { comment: comment, jcrPath: path},
       success: function () {
-        var viewer = aform.find('input[name="viewer"]').val();
-        var fme = aform.find('input[name="fme"]').val();
-        var avatar = aform.find('input[name="avatar"]').val();
-        var date = new Date();
-        var timeId = date.getTime();
+        gj.ajax({
+          type: "POST",
+          url: "/portal/rest/blog/service/getLastComment",
+          data: {jcrPath: path},
+          async:false,
+          success: function (data) {
+            if(data.result){
+              var commentContent = data.commentContent;
+              var commentPath = data.commentPath;
+              var ws = data.ws;
+              var totalComment = data.totalComment;
+              var postPath = "";
+              var _path = path.split("/");
+              var repo = _path[1];
+              var _ws = _path[2];
+              postPath = path.substr(repo.length+_ws.length+2, path.length);
+              if (postPath.charAt(1)==='/') postPath.substr(1, postPath.length);
 
+              var viewer = aform.find('input[name="viewer"]').val();
+              var fme = aform.find('input[name="fme"]').val();
+              var avatar = aform.find('input[name="avatar"]').val();
+              var date = new Date();
+              var timeId = date.getTime();
 
-        var dateStr = getBlogTime(date);
+              var dateStr = getBlogTime(date);
 
-        //var result = new StringBuffer();
-        var result="";
-        result += "<div class=\"commentItem\" id=\"comment-"+timeId+"\">";
-        result += "	<div class=\"commmentLeft\">";
-        result += "		<a class=\"avatarXSmall\" href=\""+avatar+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
-        result += "			<img alt=\""+fme+"\" src=\""+avatar+"\">";
-        result += "		</a>";
-        result += "	</div>"; // end comment left
+              //var result = new StringBuffer();
+              var result="<ul class=\"commentList children\">";
+              result += "<li class=\"commentItem\" id=\"comment-"+timeId+"\">";
+              result += "	<div class=\"commentLeft\">";
+              result += "		<a class=\"avatarXSmall\" href=\""+avatar+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
+              result += "			<img alt=\""+fme+"\" src=\""+avatar+"\">";
+              result += "		</a>";
+              result += "	</div>"; // end comment left
 
-        result += "<div class=\"commentRight\">";
-        result += "<div class=\"author\">";
-        result += "	<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
-        result += "	<span class=\"dateTime\">"+dateStr+"</span> &nbsp; &nbsp;";
-        result += "	<span class=\"reply actionIcon\"><i class=\"uiIconReply uiIconLightGray\"></i> Reply</span>";
-        result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
-        result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '/Grou04063', '/Grrs/D', 'collaboration');\" value=\"Disapprove\">";
-        result += " </span>"
+              result += "<div class=\"commentRight\">";
+              result += "<div class=\"author\">";
+              result += "	<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
+              result += "	<span class=\"dateTime\">"+dateStr+"</span> &nbsp; &nbsp;";
+              result += "<input name=\"cmtPath\" type=\"hidden\" value=\""+commentPath+"\" />";
+              result += "<input name=\"ws\" type=\"hidden\" value=\""+ws+"\" />";
+              result += "<input name=\"avatar\" type=\"hidden\" value=\""+avatar+"\" />";
+              result += "<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\" />";
+              result += "<input name=\"fme\" type=\"hidden\" value=\""+fme+"\" />";
+              result += "<input name=\"postPath\" type=\"hidden\" value=\""+postPath+"\" />";
 
-        result +=	"	<p class=\"contentComment\">";
-        result += "	<p id=\""+timeId+"\" class=\"ContentBlock\"> "+comment;
-        result += "		<span>";
-        result += " 		<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('/Groups/platform/users/Documents/2014/08/22/check1/comments/1408941804063', 'fbde1d897f00010171992eb25f346549', '1408941804063', 'collaboration')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>";
-        result += "			<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('/Groups/platform/users/Documents/08/22/check1/comments/1408941804063', '1408941804063' ,'collaboration')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>";
-        result += "		</span>";
-        result += "	</p>"
-        result += "	</p>"
-        result += "</div>";
-        result += "</div>";
-        result += "</div>";
+              result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> Reply</span>";
+              result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
+              result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '/Grrs/D', '"+ws+"');\" value=\"Disapprove\">";
+              result += " </span>"
 
-        gj("#commentList").append(result);
-        gj("#commentInputBox input[name=comment]").val('');
-      }
+              result +=	"	<div class=\"contentComment\">";
+              result += "	  <span class=\"ContentBlock\"  id=\""+timeId+"\">"+commentContent;
+              result += "	  </span>";
+              result += "	  <span>";
+              result += " 		<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+uuid+"', '"+timeId+"', '"+ws+"')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>";
+              result += "			<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+timeId+"' ,'"+ws+"')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>";
+              result += "		</span>";
+              result += "	</div>"
+
+              result += "</div>";
+              //  result += "</div>";
+              result += "</li></ul>";
+
+              if(type !== 'rootPostComment'){
+                gj("#comment-form-"+uuid+" .commentItem").has("form").remove();
+                gj("#comment-"+uuid).append(result);
+              }else{
+                gj("#commentList").append(result);
+              }
+              gj("#commentInputBox input[name=comment]").val('');
+              var plural="";
+              if(totalComment>1){plural="s";}
+              gj("#total-comment").html(totalComment + " comment" + plural);
+            }else{//end if (_data.result=false)
+              alert("Error, u can trial again!.");
+            }
+          }
+
+        }); //end ajax get last comment
+      } // end sucess 
     }); // end ajax
 
     return false;
@@ -232,8 +292,6 @@
       })
           .success(function (data) {
             var rs = gj.parseJSON(data);
-            console.log(rs);
-
             var btn = '<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');"';
             if (!rs.result) {
               btn += ' value="Approve"';
@@ -378,8 +436,7 @@
     gj(item).rate({
       uid: gj(item).find('input').val(),
       on_select: function(ui, score) {
-        console.log('ui: '+ui);
-        console.log('score: '+score);
+
         //send out our ajax call
         var obj = new Object();
         obj.score = score;
@@ -392,7 +449,7 @@
           type: "POST"
         })
             .success(function (data) {
-              console.log(data);
+
             })
         var p = ui.find('input');
         //alert('sending out product_id: ' + p.val() + ' with score ' + score);
@@ -753,12 +810,20 @@
         .success(function (data) {
           var _result = gj.parseJSON(data);
           if(_result.result){
+            var type = gj('#commentform-'+postUUID+' input[name=type]').val();
+            if(type !== 'rootPostComment'){
+              blog.prototype.replyComment(postUUID);
+            }else{
+              gj('#commentform-'+postUUID+' input[name=commentCancel]').removeAttr("style");
+            }
             gj('#commentform-'+postUUID+' input[name=comment]').val(_result.commentContent);
+            gj('#commentform-'+postUUID+' input[name=comment]').focus();
             gj('#commentform-'+postUUID+' input[name=commentPath]').val(_result.commentPath);
             gj('#commentform-'+postUUID+' input[name=timeId]').val(timeId);
-
-            gj('#commentform-'+postUUID+' input[type=button]').attr("value","Update Comment");
-            gj('#commentform-'+postUUID+' input[type=button]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"', '"+timeId+"', '"+ws+"')");
+            gj('#commentform-'+postUUID+' input[name=ws]').val(ws);
+            gj('#commentform-'+postUUID+' input[name=action]').val("Edit");
+            gj('#commentform-'+postUUID+' input[name=submit]').attr("value","Update Comment");
+            gj('#commentform-'+postUUID+' input[name=submit]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"')");
           }else{
             alert('Comment in '+commentPath+ ' doesnt exist!');
           }
@@ -769,6 +834,8 @@
   blog.prototype.deleteComment = function(commentPath, commendId, ws){
     if (confirm("Are u sure?")) {
       var obj = new Object();
+      if (commentPath.charAt(1)==='/') commentPath.substr(1, commentPath.length);
+
       obj.commentPath = commentPath;
       obj.ws = ws;
       gj.ajax({
@@ -777,7 +844,11 @@
         url: "/portal/rest/blog/service/delComment",
         success: function (data) {
           if(data.result){
+            var totalComment = data.totalComment;
+            var plural="";
+            if(totalComment>1){plural="s";}
             gj('#comment-'+commendId).remove();
+            gj('#total-comment').html(totalComment + " comment" +plural);
           }else{
             alert('Delete comment failed. Please retry again!.');
           }
@@ -785,11 +856,16 @@
       }); // end ajax
     }
   }
-
-  blog.prototype.editComment = function(uuid, timeId, ws){
+  /**
+   Edit a comment
+   */
+  blog.prototype.editComment = function(uuid){
     var aform = gj("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     var path = aform.find('input[name="commentPath"]').val();
+    var timeId = aform.find('input[name="timeId"]').val();
+    var ws = aform.find('input[name="ws"]').val();
+    var type = aform.find('input[name="type"]').val();
     var obj = new Object();
     obj.commentPath = path;
     obj.newComment = comment;
@@ -801,14 +877,92 @@
       success: function (data) {
         if(data.result){
           gj('#'+timeId).html(comment);
+          var destination = gj('#comment-'+uuid+" span .ContentBlock");
+
+          destination.html(comment);
+
+          if(type !== 'rootPostComment'){
+            gj('#commentform-'+uuid).closest("ul").remove();
+          }
+          gj('#commentform-'+uuid+' input[name=submit]').attr("value","Post Comment");
+          gj('#commentform-'+uuid+' input[name=submit]').attr("id","btn-"+uuid);
+          gj('#commentform-'+uuid+' input[name=submit]').attr("onclick","eXo.ecm.blog.postComment('"+uuid+"')");
+          gj('#commentform-'+uuid+' input[name=commentCancel]').attr("style","display:none;");
+          gj('#commentform-'+uuid+' input[name=action').val('');
+          gj('#commentform-'+uuid+' input[name=comment').val('');
+          /*
+           gj('html, body').animate({
+           scrollTop: destination.offset().top
+           }, 2000);
+           */
         }else{
           alert('Edit comment failed. Please retry again!.');
           aform.find('input[name="comment"]').focus();
+
           return false;
         }
       }
     }); // end ajax
   }
+
+  blog.prototype.commentCancel = function(commentId, type){
+    if(type==='rootPostComment'){
+      gj('#commentform-'+commentId+' input[name=commentCancel]').attr("style", "display:none;");
+      gj('#commentform-'+commentId+' input[name=submit]').attr("value", "Post Comment");
+      gj('#commentform-'+commentId+' input[name=comment]').val('');
+    }
+    gj("#comment-"+commentId+" ul:last-child ").has("form").remove();
+  }
+  /**
+   reply a comment
+   */
+  blog.prototype.replyComment = function(commentId){
+    var commentItem = gj("#comment-"+commentId);
+    var commentPath = commentItem.find('input[name="cmtPath"]').val();
+//		var postPath = commentItem.find('input[name="postPath"]').val();
+    var ws = commentItem.find('input[name="ws"]').val();
+    var avatar = commentItem.find('input[name="avatar"]').val();
+    var viewer = commentItem.find('input[name="viewer"]').val();
+
+    gj("#comment-"+commentId+" ul:last-child ").has("form").remove();
+
+    var commentForm="";
+    commentForm += "<ul class=\"commentList children\" id=\"comment-form-"+commentId+"\" >";
+    commentForm += "<li class=\"commentItem\">";
+
+    commentForm += "<div class=\"commentItem commentFormBox clearfix\">";
+    commentForm += "	<div class=\"commentLeft\">";
+    commentForm += "		<a data-original-title=\""+viewer+"\" href=\"/portal/intranet/profile/"+viewer+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"avatarXSmall\">";
+    commentForm += "			<img alt=\""+viewer+"\" src=\""+avatar+"\">";
+    commentForm += "		</a>";
+    commentForm += "	</div><!--end commentLeft-->";
+    commentForm += "	<div class=\"commentRight\">";
+    commentForm += "		<div id=\"commentInputBox\" class=\"commentInputBox\">";
+    commentForm += "			<form name=\"commentform-"+commentId+"\" id=\"commentform-"+commentId+"\" class=\"form-inline media\">";
+    commentForm += "				<input type=\"button\" onclick=\"eXo.ecm.blog.commentCancel('"+commentId+"')\" data-original-title=\"Cancel\" id=\"btn-cancel"+commentId+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"btn pull-right\" value=\"Cancel\" />";
+
+    commentForm += "				<input type=\"button\" name=\"submit\" onclick=\"eXo.ecm.blog.postComment('"+commentId+"')\" data-original-title=\"Reply Comment\" id=\"btn-"+commentId+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"btn btn-primary  pull-right\" value=\"Reply\" />";
+    commentForm += "					<div class=\"media-body\">";
+    commentForm += "					<input name=\"avatar\" type=\"hidden\" value=\""+avatar+"\" />";
+    commentForm += "					<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\" />";
+    commentForm += "					<input name=\"fme\" type=\"hidden\" value=\""+viewer+"\" />";
+    commentForm += "					<input name=\"timeId\" type=\"hidden\" value=\""+commentId+"\" />";
+    commentForm += "					<input name=\"ws\" type=\"hidden\" value=\""+ws+"\" />";
+    commentForm += "					<input name=\"action\" type=\"hidden\" value=\"\" />";
+    commentForm += "					<input name=\"commentPath\" type=\"hidden\" value=\"/repository/collaboration"+commentPath+"\"/>";
+    commentForm += "					<input name=\"jcrPath\" type=\"hidden\" value=\"/repository/collaboration"+commentPath+"\"/>";
+    commentForm += "					<input type=\"text\" onkeydown=\"return eXo.ecm.blog.prePostComment(event, '"+commentId+"')\" style=\"width:100%\" tabindex=\"0\" placeholder=\"Your Reply Comment Here\" id=\"comment-"+commentId+"\" name=\"comment\">";
+    commentForm += "					</div>";
+    commentForm += "			</form>";
+    commentForm += "		</div> <!--end comment input box-->";
+    commentForm += "	</div> <!--end comment right-->";
+    commentForm += "</div>";
+    commentForm += "</li></ul>";
+
+    commentItem.append(commentForm);
+    gj("#commentform-"+commentId).find('input[name="comment"]').focus();
+  }
+  //context-menu in comment
 
   eXo.ecm.blog = new blog();
   return eXo.ecm.blog;
