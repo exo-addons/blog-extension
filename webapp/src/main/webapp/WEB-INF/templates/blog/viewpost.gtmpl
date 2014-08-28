@@ -198,9 +198,12 @@ void commentList(Node post) {
 					<%if(isAdmin || viewer == poster){%>
 					<span id="approve-$timeId" class="pull-right approve">
 						<%if(!approve){%>
-							<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" >Approve</button>
+							<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" >
+                <i class="uiIconAnsApprove uiIconAnsWhite"></i>
+								Approve</button>
 						<%}else{%>
-							<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >Disapprove</button>
+							<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >
+                <i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>
 						<%}%>
 					</span>
 					<%}%>
@@ -475,6 +478,7 @@ void printCommentChild(NodeIterator comments, String poster){
 
 		if(_commentContent != null){
 %>
+<%if(_isAdmin){%>
 			<ul class="commentList children">
 				<li class="commentItem" id="comment-${node.name}">
 					<div class="clearfix comment-container">
@@ -485,15 +489,16 @@ void printCommentChild(NodeIterator comments, String poster){
 						</div> <!--end comment left-->
 						<div class="commentRight">
 							<div class="author">
-								<%if(_isAdmin){%>
+
 									<span id="approve-$_timeId" class="pull-right approve">
 										<%if(!_approve){%>
-											<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');" >Approve</button>
+											<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');" >
+                        <i class="uiIconAnsApprove uiIconAnsWhite"></i>Approve</button>
 										<%}else{%>
-											<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');"  >Disapprove</button>
+											<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');"  ><i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>
 										<%}%>
 									</span>
-								<%}%>
+
 								<a href="/portal/intranet/profile/$_commentor">$_commentor</a>
 
 								<span class="dateTime">$_commentDate</span>&nbsp; &nbsp;
@@ -507,7 +512,11 @@ void printCommentChild(NodeIterator comments, String poster){
 								<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${node.name})"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
 							</div><!--end author-->
 							<div class="contentComment">
-								<span class="ContentBlock" id="$_timeId"> $_commentContent
+								<span class="ContentBlock
+								<%if(!_approve){%>
+									disapproved
+								<%}%>
+								" id="$_timeId"> $_commentContent
 								</span>&nbsp; &nbsp;
                 <%if(_isOwner || _isAdmin){%>
 								<span>
@@ -521,6 +530,47 @@ void printCommentChild(NodeIterator comments, String poster){
 					</div>
 				</li>
 			</ul>
+<%}else{%>
+	<%if(_approve){%>
+		<ul class="commentList children">
+			<li class="commentItem" id="comment-${node.name}">
+				<div class="clearfix comment-container">
+					<div class="commentLeft">
+						<a data-original-title="$_commentor" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/$_commentor" class="avatarXSmall">
+							<img src="$_commentorAvatar" alt="$_commentor">
+						</a>
+					</div> <!--end comment left-->
+					<div class="commentRight">
+						<div class="author">
+							<span id="approve-$_timeId" class="pull-right approve"> </span>
+							<a href="/portal/intranet/profile/$_commentor">$_commentor</a>
+							<span class="dateTime">$_commentDate</span>&nbsp; &nbsp;
+							<input name="cmtPath" type="hidden" value="$_commentPath" />
+							<input name="isAdmin" type="hidden" value="$_isAdmin" />
+							<input name="isOwner" type="hidden" value="$_isOwner" />
+							<input name="ws" type="hidden" value="$_ws" />
+							<input name="avatar" type="hidden" value="$_commentorAvatar" />
+							<input name="viewer" type="hidden" value="$_viewer" />
+							<input name="commentor" type="hidden" value="$_commentor" />
+							<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${node.name})"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
+						</div><!--end author-->
+						<div class="contentComment">
+										<span class="ContentBlock" id="$_timeId"> $_commentContent
+										</span>&nbsp; &nbsp;
+							<%if(_isOwner || _isAdmin){%>
+										<span>
+											<a onclick="eXo.ecm.blog.loadToEdit('$_commentPath', '${node.name}', '$_timeId', '$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
+											<a onclick="eXo.ecm.blog.deleteComment('$_commentPath', '${node.name}' ,'$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
+										</span>
+							<%}%>
+						</div>
+					</div><!--end commentRight-->
+					<% printCommentChild(node.getNodes(), poster); %>
+				</div>
+			</li>
+		</ul>
+	<%}%>
+<%}%>
 <%
 		}else{
 			printCommentChild(node.getNodes(), poster);

@@ -54,25 +54,25 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
     } // end if (no entries)
     // else (has entries)
     else {
-
     def i = 0;
     def entries = uicomponent.getCurrentPageData()
-
     // loop on entries
     for (entry in entries) {
+			// if blog entry
+			if (isValidBlogEntry(entry)) {
+				count ++ ;
+				String uuid = entry.getUUID();// entry.getProperty("jcr:frozenUuid").getString()
+				def originalNode = entry.getSession().getNodeByUUID(uuid)
+				def link = uicomponent.getURL(entry)
 
-    // if blog entry
-    if (isValidBlogEntry(entry)) {
-    count ++ ;
-    String uuid = entry.getUUID();// entry.getProperty("jcr:frozenUuid").getString()
-    def originalNode = entry.getSession().getNodeByUUID(uuid)
-    def link = uicomponent.getURL(entry)
-    def title = originalNode.getProperty("exo:title").string;
-    def username = uicomponent.getAuthor(entry)
-    def author = fullName(username)
-    def poster = username
-    def avatar = avatarUrl(username)
-    def date = uicomponent.getCreatedDate(entry)
+				//def title = entry.getProperty("exo:title").string
+				def title = originalNode.getProperty("exo:title").string;
+
+				def username = uicomponent.getAuthor(entry)
+				def author = fullName(username)
+				def poster = username
+				def avatar = avatarUrl(username)
+				def date = uicomponent.getCreatedDate(entry)
     %>
 
     <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" >
@@ -108,21 +108,15 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 
     <%      //commentPreview(originalNode, link) %>
     <%
-    } // if blog entry
+    		} // if blog entry
 
-    } // end loop on entries
+    	} // end loop on entries
     } // end else has entries
     %>
     <!-- Paginator-->
     <div class="CaptionFunc ClearFix">
-      <%
-      if (uicomponent.showPaginator()) {
-
-      uicomponent.renderChild(UICustomizeablePaginator.class)
-
-      }
-      %>
-    </div>
+      <% if (uicomponent.showPaginator()) { uicomponent.renderChild(UICustomizeablePaginator.class) } %>
+		</div>
 
   </div>
 
@@ -208,14 +202,14 @@ jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccor
 
 <%
 void tags(def entry) {
-def folkService = uicomponent.getApplicationComponent(NewFolksonomyService.class)
-def tags = folkService.getLinkedTagsOfDocument(entry, "collaboration")
-def i = 0;
+	def folkService = uicomponent.getApplicationComponent(NewFolksonomyService.class)
+	def tags = folkService.getLinkedTagsOfDocument(entry, "collaboration")
+	def i = 0;
 %>
 <%
-if (!tags) {
-tags = [];
-}
+	if (!tags) {
+		tags = [];
+	}
 else {
 %>
 <span class="tags-title">Tags:</span>
@@ -263,14 +257,14 @@ return avatar
 // (only display  viewable webcontents here)
 boolean isValidBlogEntry(def entry) {
 /*
-def frozen = entry.primaryNodeType.name == "nt:frozenNode"
-if (frozen) {
-def viewable = Utils.isViewable(entry)
-def type = entry.getProperty("jcr:frozenPrimaryType").string
-if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
-return true;
-}
-}
+	def frozen = entry.primaryNodeType.name == "nt:frozenNode"
+	if (frozen) {
+		def viewable = Utils.isViewable(entry)
+		def type = entry.getProperty("jcr:frozenPrimaryType").string
+		if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
+			return true;
+		}
+	}
 */
 return true;
 }
@@ -306,19 +300,18 @@ void renderPost(def entry) {
 } // end render post
 
 void bloggers() {
-def bloggers = new HashSet();
-def entries = uicomponent.getCurrentPageData()
-entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
-int maxbloggers = 5
-for (blogger in bloggers) {
-if (maxbloggers-- == 0) break;
-def author = fullName(blogger)
-def avatar = avatarUrl(blogger)
+	def bloggers = new HashSet();
+	def entries = uicomponent.getCurrentPageData()
+	entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
+	int maxbloggers = 5
+	for (blogger in bloggers) {
+		if (maxbloggers-- == 0) break;
+		def author = fullName(blogger)
+		def avatar = avatarUrl(blogger)
 %>
 <a class="avatarXSmall" href="/portal/intranet/profile/$blogger" style="display: inline-block;"> <img src="$avatar" alt="$author"> </a>
 <%
-}
-
+	}
 }
 
 void categories() {

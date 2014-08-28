@@ -238,7 +238,9 @@
               result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> Reply</span>";
               if(isAdmin == "true"){
                 result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
-                result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"');\" value=\"Disapprove\">";
+                result += "	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"');\" value=\"Disapprove\">";
+                result += "<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>Disapprove"
+                result += "</button>"
                 result += " </span>"
               }
 
@@ -272,7 +274,12 @@
           }
 
         }); //end ajax get last comment
-      } // end sucess 
+      }, // end sucess 
+      error: function() {
+        if(comfirm('Your session have been expired!. Would you want re-login?')){
+          location.reload();
+        }
+      }
     }); // end ajax
 
     return false;
@@ -298,17 +305,16 @@
       })
           .success(function (data) {
             var rs = gj.parseJSON(data);
-            var btn = '<input type="button" class="btn" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');"';
+            var btn = '<button type="button" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');" ';
             if (!rs.result) {
-              btn += ' value="Approve"';
+              btn += 'class="btn btn-primary" > <i class="uiIconAnsApprove uiIconAnsWhite"></i>Approve</button>'
               gj('#' + elId).removeClass('approved');
               gj('#' + elId).addClass('disapproved');
             } else {
-              btn += ' value="Disapprove"';
+              btn += 'class="btn" ><i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>'
               gj('#' + elId).removeClass('disapproved');
               gj('#' + elId).addClass('approved');
             }
-            btn += ' />';
 
             gj('#approve-' + elId).html(btn);
           })
@@ -1068,10 +1074,19 @@
 
   gj('.comment-context').contextPopup({
     items: [
-      {label:'Edit', styleclass:'uiIconLightGray uiIconEdit',action:function() {
+      {
+        label:'Edit',
+        styleclass:'uiIconLightGray uiIconEdit',
+        action:function(e) {
 
-      } },
-      {label:'Remove', styleclass:'uiIconLightGray uiIconDelete',action:function() { alert('clicked 8') } }
+        }
+      },{
+        label:'Remove',
+        styleclass:'uiIconLightGray uiIconDelete',
+        action:function() {
+          alert('clicked 8')
+        }
+      }
     ]
   });
   eXo.ecm.blog = new blog();
