@@ -168,6 +168,7 @@
     var aform = gj("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     var type = aform.find('input[name="type"]').val();
+    var isAdmin = aform.find('input[name="isAdmin"]').val();
     if(comment===''){
       //alert('Comment message count empty!');
       aform.find('input[name="comment"]').focus();
@@ -196,7 +197,7 @@
               var commentContent = data.commentContent;
               var commentPath = data.commentPath;
               var ws = data.ws;
-              var totalComment = data.totalComment;
+              var totalComment = gj("#totalCurrentComment").val();//data.totalComment;
               var postPath = "";
               var _path = path.split("/");
               var repo = _path[1];
@@ -213,7 +214,7 @@
               var dateStr = getBlogTime(date);
 
               //var result = new StringBuffer();
-              var result="<ul class=\"commentList children\">";
+              var result="";
               result += "<li class=\"commentItem\" id=\"comment-"+timeId+"\">";
               result += "	<div class=\"commentLeft\">";
               result += "		<a class=\"avatarXSmall\" href=\""+avatar+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
@@ -230,12 +231,16 @@
               result += "<input name=\"avatar\" type=\"hidden\" value=\""+avatar+"\" />";
               result += "<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\" />";
               result += "<input name=\"fme\" type=\"hidden\" value=\""+fme+"\" />";
+              result += "<input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\" />";
+
               result += "<input name=\"postPath\" type=\"hidden\" value=\""+postPath+"\" />";
 
               result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> Reply</span>";
-              result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
-              result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '/Grrs/D', '"+ws+"');\" value=\"Disapprove\">";
-              result += " </span>"
+              if(isAdmin == "true"){
+                result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
+                result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '/Grrs/D', '"+ws+"');\" value=\"Disapprove\">";
+                result += " </span>"
+              }
 
               result +=	"	<div class=\"contentComment\">";
               result += "	  <span class=\"ContentBlock\"  id=\""+timeId+"\">"+commentContent;
@@ -248,11 +253,11 @@
 
               result += "</div>";
               //  result += "</div>";
-              result += "</li></ul>";
+              result += "</li>";
 
               if(type !== 'rootPostComment'){
                 gj("#comment-form-"+uuid+" .commentItem").has("form").remove();
-                gj("#comment-"+uuid).append(result);
+                gj("#comment-"+uuid).append("<ul class=\"commentList children\">"+result + "</ul>");
               }else{
                 gj("#commentList").append(result);
               }
@@ -923,6 +928,7 @@
     var ws = commentItem.find('input[name="ws"]').val();
     var avatar = commentItem.find('input[name="avatar"]').val();
     var viewer = commentItem.find('input[name="viewer"]').val();
+    var isAdmin = commentItem.find('input[name="isAdmin"]').val();
 
     gj("#comment-"+commentId+" ul:last-child ").has("form").remove();
 
@@ -945,6 +951,8 @@
     commentForm += "					<div class=\"media-body\">";
     commentForm += "					<input name=\"avatar\" type=\"hidden\" value=\""+avatar+"\" />";
     commentForm += "					<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\" />";
+    commentForm += "					<input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\" />";
+
     commentForm += "					<input name=\"fme\" type=\"hidden\" value=\""+viewer+"\" />";
     commentForm += "					<input name=\"timeId\" type=\"hidden\" value=\""+commentId+"\" />";
     commentForm += "					<input name=\"ws\" type=\"hidden\" value=\""+ws+"\" />";
