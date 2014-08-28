@@ -80,6 +80,8 @@
     border-left: 4px solid #f0f0f0;
     margin-left: 45px;
     padding-left: 15px;
+    min-width: 400px;
+    overflow-x: auto;
 }
 
 .author a {
@@ -100,7 +102,7 @@
   word-wrap: break-word;
 }
 .rate-current-score {
-  background:url(../img/ratings.gif) 0 -16px no-repeat;
+  background:url(../img/ratings.png) 0 -16px no-repeat;
   display:block;
   text-indent: -9999px;
   position:absolute;
@@ -109,7 +111,7 @@
 }
 .rate-wrapper {
   height: 16px;
-  background:url(../img/ratings.gif) 0 0 no-repeat;
+  background:url(../img/ratings.png) 0 0 no-repeat;
   width:85px;
   float:right;
   position: relative;
@@ -129,13 +131,13 @@
   line-height:1em;
 }
 
-.rate-wrapper a:hover{ background:url(../img/ratings.gif) bottom right no-repeat;}
+.rate-wrapper a:hover{ background:url(../img/ratings.png) bottom right no-repeat;}
 .score-1 {width:20%; z-index:55;}
 .score-2 {width:40%; z-index:54;}
 .score-3 {width:60%; z-index:53;}
 .score-4 {width:80%; z-index:52;}
 .score-5 {width:100%; z-index:51;}
-.score a:hover{ background:url(../img/ratings.gif) bottom right no-repeat;}
+.score a:hover{ background:url(../img/ratings.png) bottom right no-repeat;}
 
 /*scroll*/
 html {
@@ -293,8 +295,35 @@ a.tag {
 	background-position: -120px 0;
 }
 
+.uiIconAnsDisapprove{
+ background-image: url("/faq/skin/images/answers/Icons/uiIconsAnsDarkGray.png")!important;
+}
+.uiIconAnsApprove{
+ background-image: url("/faq/skin/images/answers/Icons/uiIconsAnsWhite.png")!important;
+}
+
+.uiIconAnsApprove {
+	background-position: -100px 0px;
+}
+.uiIconAnsDisapprove {
+	background-position: -120px 0px;
+}
+.uiIconAnsApprove:hover,.btn-primary:hover .uiIconAnsApprove {
+ background-image: url("/faq/skin/images/answers/Icons/uiIconsAnsWhite.png")!important;
+ }
+.uiIconAnsDisapprove:hover,.btn:hover .uiIconAnsDisapprove {
+	background-image: url("/faq/skin/images/answers/Icons/uiIconsAnsBlue.png")!important;
+	
+}
 .uiIconExt-blog:hover,a:hover .uiIconExt-blog  {
 	 background-image: url("/eXoPlatformResources/skin/images/icons/uiIconsPLFBlue.png");
+}
+
+.btn {
+	.uiIconAnsApprove,.uiIconAnsDisapprove {
+		margin-right:5px;
+	}
+	
 }
 
 .view-post {
@@ -328,6 +357,10 @@ a.tag {
 
 .post-content {
 	margin-top: 15px;
+		ul, ol {
+	    margin: 0 0 10px 25px;
+	    padding: 0;
+	}
 	
 }
 .commentItem {
@@ -335,7 +368,7 @@ a.tag {
 	    margin-left: 10px;
 	}
 	.approve .btn {
-	    min-width: 100px;
+	    min-width: 115px;
 	}
 }
 

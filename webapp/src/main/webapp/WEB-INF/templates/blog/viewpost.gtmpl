@@ -203,7 +203,7 @@ void commentList(Node post) {
 								Approve</button>
 						<%}else{%>
 							<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >
-                <i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>
+                <i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>						
 						<%}%>
 					</span>
 					<%}%>
@@ -493,12 +493,12 @@ void printCommentChild(NodeIterator comments, String poster){
 									<span id="approve-$_timeId" class="pull-right approve">
 										<%if(!_approve){%>
 											<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');" >
-                        <i class="uiIconAnsApprove uiIconAnsWhite"></i>Approve</button>
+                        <i class="uiIconAnsApprove uiIconAnsWhite"></i>Approve</button>									
 										<%}else{%>
 											<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');"  ><i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>
 										<%}%>
 									</span>
-
+								<%}%>
 								<a href="/portal/intranet/profile/$_commentor">$_commentor</a>
 
 								<span class="dateTime">$_commentDate</span>&nbsp; &nbsp;
