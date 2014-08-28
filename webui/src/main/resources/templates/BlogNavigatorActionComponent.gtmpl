@@ -1,7 +1,6 @@
 <li>
     <a href="/portal/intranet/blog" class="ToolBarBlogIcon">
-        <i id="blog-icon" class="uiIconPLFBlogExtension"></i>
-      <%=_ctx.appRes("Blog.navigator.BlogPost")%>
+        <i id="blog-icon" class="uiIconPLFBlogExtension"></i><%=_ctx.appRes("Blog.navigator.BlogPost")%>
     </a>
 </li>
 
