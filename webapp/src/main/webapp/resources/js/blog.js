@@ -238,7 +238,7 @@
               result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> Reply</span>";
               if(isAdmin == "true"){
                 result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
-                result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '/Grrs/D', '"+ws+"');\" value=\"Disapprove\">";
+                result += "	<input type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"');\" value=\"Disapprove\">";
                 result += " </span>"
               }
 
@@ -263,8 +263,9 @@
               }
               gj("#commentInputBox input[name=comment]").val('');
               var plural="";
+              totalComment ++ ;
               if(totalComment>1){plural="s";}
-              gj("#total-comment").html(totalComment + " comment" + plural);
+              gj("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
             }else{//end if (_data.result=false)
               alert("Error, u can trial again!.");
             }
@@ -849,11 +850,17 @@
         url: "/portal/rest/blog/service/delComment",
         success: function (data) {
           if(data.result){
-            var totalComment = data.totalComment;
+            //var totalComment = data.totalComment;
+            var totalComment = gj("#totalCurrentComment").val();//data.totalComment;
+            totalComment--;
             var plural="";
             if(totalComment>1){plural="s";}
             gj('#comment-'+commendId).remove();
-            gj('#total-comment').html(totalComment + " comment" +plural);
+            if(totalComment > 0){
+              gj("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
+            }else{
+              gj("#total-comment").html("Comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
+            }
           }else{
             alert('Delete comment failed. Please retry again!.');
           }
@@ -924,7 +931,7 @@
   blog.prototype.replyComment = function(commentId){
     var commentItem = gj("#comment-"+commentId);
     var commentPath = commentItem.find('input[name="cmtPath"]').val();
-//		var postPath = commentItem.find('input[name="postPath"]').val();
+//		var CPath = commentItem.find('input[name="postPath"]').val();
     var ws = commentItem.find('input[name="ws"]').val();
     var avatar = commentItem.find('input[name="avatar"]').val();
     var viewer = commentItem.find('input[name="viewer"]').val();
@@ -970,8 +977,103 @@
     commentItem.append(commentForm);
     gj("#commentform-"+commentId).find('input[name="comment"]').focus();
   }
-  //context-menu in comment
 
+  //context-menu in comment
+  gj.fn.contextPopup = function(menuData) {
+    // Define default settings
+    var settings = {
+      contextMenuClass: 'ClickPopupContent dropdown-menu dropdownArrowTop',
+      headerClass: 'header',
+      seperatorClass: 'divider',
+      title: '',
+      items: []
+    };
+
+    // merge them
+    gj.extend(settings, menuData);
+
+    // Build popup menu HTML
+    function createMenu(e) {
+      var xxx = gj(this.parentNode); //e.toElement.parents('.commentRight').children('input[name="cmtPath"]').val();
+      console.log('xxx: ' + xxx);
+
+      gj('.contextMenuPlugin').remove();
+      var menu = gj('<ul class="' + settings.contextMenuClass + '"><div class="' + settings.gutterLineClass + '"></div></ul>')
+          .appendTo(document.body);
+      if (settings.title) {
+        gj('<li class="' + settings.headerClass + '"></li>').text(settings.title).appendTo(menu);
+      }
+      settings.items.forEach(function(item) {
+        if (item) {
+          var rowCode = '<li><a href="#" class="actionIcon"><span></span></a></li>';
+          // if(item.icon)
+          //   rowCode += '<img>';
+          // rowCode +=  '<span></span></a></li>';
+          var row = gj(rowCode).appendTo(menu);
+          if(item.styleclass){
+            var icon = gj('<i>');
+            icon.attr('class', item.styleclass);
+            icon.insertBefore(row.find('span'));
+          }
+          row.find('span').text(item.label);
+
+          if (item.isEnabled != undefined && !item.isEnabled()) {
+            row.addClass('disabled');
+          } else if (item.action) {
+            row.find('a').click(function () { item.action(e); });
+          }
+
+        } else {
+          gj('<li class="' + settings.seperatorClass + '"></li>').appendTo(menu);
+        }
+      });
+      menu.find('.' + settings.headerClass ).text(settings.title);
+      return menu;
+    }
+    // On contextmenu event (right click)
+    this.bind('contextmenu', function(e) {
+      var menu = createMenu(e)
+          .show();
+      var left = e.pageX + 5, /* nudge to the right, so the pointer is covering the title */
+          top = e.pageY;
+      if (top + menu.height() >= gj(window).height()) {
+        top -= menu.height();
+      }
+      if (left + menu.width() >= gj(window).width()) {
+        left -= menu.width();
+      }
+      // Create and show menu
+      menu.css({zIndex:1000001, left:left, top:top + 50})
+          .bind('contextmenu', function() { return false; });
+      // Cover rest of page with invisible div that when clicked will cancel the popup.
+      var bg = gj('<div></div>')
+          .css({left:0, top:0, width:'100%', height:'100%', position:'absolute', zIndex:1000000})
+          .appendTo(document.body)
+          .bind('contextmenu click', function() {
+            // If click or right click anywhere else on page: remove clean up.
+            bg.remove();
+            menu.remove();
+            return false;
+          });
+      // When clicking on a link in menu: clean up (in addition to handlers on link already)
+      menu.find('a').click(function() {
+        bg.remove();
+        menu.remove();
+      });
+      // Cancel event, so real browser popup doesn't appear.
+      return false;
+    });
+    return this;
+  };
+
+  gj('.comment-context').contextPopup({
+    items: [
+      {label:'Edit', styleclass:'uiIconLightGray uiIconEdit',action:function() {
+
+      } },
+      {label:'Remove', styleclass:'uiIconLightGray uiIconDelete',action:function() { alert('clicked 8') } }
+    ]
+  });
   eXo.ecm.blog = new blog();
   return eXo.ecm.blog;
   //-------------------------------------------------------------------------//

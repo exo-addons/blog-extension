@@ -160,7 +160,7 @@ void commentList(Node post) {
 %>
 			<h5 class="title" id="total-comment">
 				${comments.size} comment${plural}
-				<input type="hidden" name="totalCurrentComment" value="${comments.size}" />
+				<input type="hidden" id="totalCurrentComment" value="${comments.size}" />
 			</h5>
 			<div class="uiContentBox">
 				<ul class="commentList" id="commentList">
@@ -202,8 +202,9 @@ void commentList(Node post) {
 						<%}else{%>
 							<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >Disapprove</button>
 						<%}%>
-					<%}%>
 					</span>
+					<%}%>
+
           <a href="/portal/intranet/profile/$commentor">$commentorName</a>
           <span class="dateTime">$commentDate </span> &nbsp; &nbsp;
           <input name="cmtPath" type="hidden" value="$cmtPath" />
@@ -271,7 +272,8 @@ void commentList(Node post) {
 } // end if comments
 		else {
 		%>
-		<h5 class="title">Comments</h5>
+		<h5 class="title" id="total-comment">Comments <input type="hidden" id="totalCurrentComment" value="0"></h5>
+
 		<div class="uiContentBox">
 			<ul class="commentList" id="commentList"></ul>
 		</div>
@@ -484,9 +486,13 @@ void printCommentChild(NodeIterator comments, String poster){
 						<div class="commentRight">
 							<div class="author">
 								<%if(_isAdmin){%>
-										<span class="pull-right approve" id="">
-											<button onclick="" class="btn" type="button">Disapprove</button>
-										</span>
+									<span id="approve-$_timeId" class="pull-right approve">
+										<%if(!_approve){%>
+											<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');" >Approve</button>
+										<%}else{%>
+											<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');"  >Disapprove</button>
+										<%}%>
+									</span>
 								<%}%>
 								<a href="/portal/intranet/profile/$_commentor">$_commentor</a>
 
