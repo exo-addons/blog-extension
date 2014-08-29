@@ -4,7 +4,7 @@
 
   <groupId>org.exoplatform.addons.blog</groupId>
   <artifactId>blog-extension</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>1.x-blog-improvement-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>eXo Blog</name>
   <description>A Simple blog system for eXo.</description>
