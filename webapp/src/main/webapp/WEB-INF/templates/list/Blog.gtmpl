@@ -35,10 +35,18 @@ def count = 0;
 def blogService = WCMCoreUtils.getService(BlogService.class)
 
 //regis javascript
-def rcontext = _ctx.getRequestContext() ;
-def jsManager = rcontext.getJavascriptManager();
-jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccordionInit();");
+//def rcontext = _ctx.getRequestContext() ;
+//def jsManager = rcontext.getJavascriptManager();
+//jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.blogArchiveAccordionInit();");
 %>
+<script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/blog.js" ></script>
+
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+    jQuery('.blog_archive_accordion').blogArchiveAccordion();
+  })
+</script>
 
 <div class="container-fluid list-blog">
 <div id="content" class="clearfix row-fluid">

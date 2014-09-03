@@ -23,25 +23,24 @@ import org.exoplatform.com.blog.service.BlogService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-def node = uicomponent.node
-def post = uicomponent.originalNode
-def uuid = post.getUUID()
-def viewer = _ctx.getRequestContext().getRemoteUser()
-def title = post.getProperty("exo:title").string
-def poster = post.getProperty("exo:owner").string
-def author = fullName(poster)
-def avatar = avatarUrl(poster)
+def node = uicomponent.node;
+def post = uicomponent.originalNode;
+def uuid = post.getUUID();
+def viewer = _ctx.getRequestContext().getRemoteUser();
+def title = post.getProperty("exo:title").string;
+def poster = post.getProperty("exo:owner").string;
+def author = fullName(poster);
+def avatar = avatarUrl(poster);
 def postPath = post.getPath();
 
 def formatter =  new SimpleDateFormat("MMM d, yyyy")
 def date = formatter.format(post.getProperty("exo:dateCreated").date.time)
 
 def rcontext = _ctx.getRequestContext() ;
-def jsManager = rcontext.getJavascriptManager();
-jsManager.require("SHARED/blogjs", "blogjs")
-.addScripts("blogjs.initScroll();");
+//def jsManager = rcontext.getJavascriptManager();
+//jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.initScroll();");
 
-jsManager.require("SHARED/bootstrap.js", "bootstrap");
+// jsManager.require("SHARED/bootstrap.js", "bootstrap");
 
 def isAdmin = Utils.isAdministratorUser();
 
@@ -64,6 +63,13 @@ if(currentPostVisited==null || currentPostVisited != uuid){
 visitedPost = blogService.getPostViewCount(post);
 def ws = post.getSession().getWorkspace().getName();
 %>
+<script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/popup.min.js" ></script>
+
+<script type="text/javascript" src="/blog/resources/js/blog-rate.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/blog.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/blog-scroll.js" ></script>
+
 <!--script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
 <script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script-->
@@ -106,21 +112,32 @@ def ws = post.getSession().getWorkspace().getName();
             <span class='st_email_hcount' displayText='Email'></span>
           </div>
 
-
+					<!--rate article-->
           <div class="blog-vote clearfix">
-            <div class="rate-wrapper">
-              <input type="hidden" name="postPath" value="$postPath">
-              <input type="hidden" name="ws" value="$ws">
-              <a class="score-1" href="#">1</a>
-              <a class="score-2" href="#">2</a>
-              <a class="score-3" href="#">3</a>
-              <a class="score-4" href="#">4</a>
-              <a class="score-5" href="#">5</a>
+
+						<div class="rate-wrapper-display">
               <span class="rate-current-score"><%=voteValueOfUser*20%></span>
             </div>
-            <span class="vote-label pull-right">Avg. Rating: $voteAvg Votes: $voteTotal </span>
-            <!-- Small modal -->
-            <button class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Small modal</button>
+						<!--end display vote-->
+						<div class="rate-wrapper-form" style="display: none;" >
+              <div class="rate-text" >My rating:<%=voteValueOfUser*20%></div>
+							<div class="rate-content">
+                <div class="rate-wrapper">
+                  <input type="hidden" name="postPath" value="$postPath">
+                  <input type="hidden" name="ws" value="$ws">
+                  <input type="hidden" name="voteAvg" value="$voteAvg"/>
+                  <input type="hidden" name="voteTotal" value="$voteTotal"/>
+                  <input type="hidden" name="userVote" value="<%=voteValueOfUser%>"/>
+                  <a class="score-1" href="#">1</a>
+                  <a class="score-2" href="#">2</a>
+                  <a class="score-3" href="#">3</a>
+                  <a class="score-4" href="#">4</a>
+                  <a class="score-5" href="#">5</a>
+                  <span class="rate-current-score"><%=voteValueOfUser*20%></span>
+                </div>
+							</div>
+						</div>
+            <!--span class="vote-label pull-right">Avg. Rating: $voteAvg Votes: $voteTotal </span-->
 					</div>
 
         </footer> <!-- end article footer -->

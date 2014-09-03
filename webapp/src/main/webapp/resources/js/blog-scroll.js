@@ -1,6 +1,6 @@
   var ScrollToTop = function (options) {
-    this.gjdoc = gj('body');
-    this.options = gj.extend(ScrollToTop.defaults, options);
+    this.$doc = $('body');
+    this.options = $.extend(ScrollToTop.defaults, options);
 
     var namespace = this.options.namespace;
 
@@ -20,7 +20,7 @@
     this.isShow = false;
 
     var self = this;
-    gj.extend(self, {
+    $.extend(self, {
       init: function () {
         self.transition = self.transition();
         self.build();
@@ -30,19 +30,19 @@
           if (typeof self.options.target === 'number') {
             self.target = self.options.target;
           } else if (typeof self.options.target === 'string') {
-            self.target = Math.floor(gj(self.options.target).offset().top);
+            self.target = Math.floor($(self.options.target).offset().top);
           }
         } else {
           self.target = 0;
         }
 
-        self.gjtrigger.on('click.scrollToTop', function () {
-          self.gjdoc.trigger('ScrollToTop::jump');
+        self.$trigger.on('click.scrollToTop', function () {
+          self.$doc.trigger('ScrollToTop::jump');
           return false;
         });
 
         // bind events
-        self.gjdoc.on('ScrollToTop::jump', function () {
+        self.$doc.on('ScrollToTop::jump', function () {
           if (self.disabled) {
             return;
           }
@@ -59,29 +59,29 @@
             easing = self.options.easing;
           }
 
-          self.gjdoc.addClass(self.classes.animating);
+          self.$doc.addClass(self.classes.animating);
 
 
           if (self.transition.supported) {
-            var pos = gj(window).scrollTop();
+            var pos = $(window).scrollTop();
 
-            self.gjdoc.css({
+            self.$doc.css({
               'margin-top': -pos + self.target + 'px'
             });
-            gj(window).scrollTop(self.target);
+            $(window).scrollTop(self.target);
 
             self.insertRule('.duration_' + speed + '{' + self.transition.prefix + 'transition-duration: ' + speed + 'ms;}');
 
-            self.gjdoc.addClass('easing_' + easing + ' duration_' + speed).css({
+            self.$doc.addClass('easing_' + easing + ' duration_' + speed).css({
               'margin-top': ''
             }).one(self.transition.end, function () {
-              self.gjdoc.removeClass(self.classes.animating + ' easing_' + easing + ' duration_' + speed);
+              self.$doc.removeClass(self.classes.animating + ' easing_' + easing + ' duration_' + speed);
             });
           } else {
-            gj('html, body').stop(true, false).animate({
+            $('html, body').stop(true, false).animate({
               scrollTop: self.target
             }, speed, function () {
-              self.gjdoc.removeClass(self.classes.animating);
+              self.$doc.removeClass(self.classes.animating);
             });
             return;
           }
@@ -92,25 +92,25 @@
               }
               self.isShow = true;
 
-              self.gjtrigger.addClass(self.classes.show);
+              self.$trigger.addClass(self.classes.show);
             })
             .on('ScrollToTop::hide', function () {
               if (!self.isShow) {
                 return;
               }
               self.isShow = false;
-              self.gjtrigger.removeClass(self.classes.show);
+              self.$trigger.removeClass(self.classes.show);
             })
             .on('ScrollToTop::disable', function () {
               self.disabled = true;
-              self.gjdoc.trigger('ScrollToTop::hide');
+              self.$doc.trigger('ScrollToTop::hide');
             })
             .on('ScrollToTop::enable', function () {
               self.disabled = false;
               self.toggle();
             });
 
-        gj(window).on('scroll', self._throttle(function () {
+        $(window).on('scroll', self._throttle(function () {
           if (self.disabled) {
             return;
           }
@@ -119,7 +119,7 @@
         }, self.options.throttle));
 
         if (self.options.mobile) {
-          gj(window).on('resize', self._throttle(function () {
+          $(window).on('resize', self._throttle(function () {
             if (self.disabled) {
               return;
             }
@@ -131,7 +131,7 @@
         self.toggle();
       },
       checkMobile: function () {
-        var width = gj(window).width();
+        var width = $(window).width();
 
         if (width < self.options.mobile.width) {
           self.useMobile = true;
@@ -141,9 +141,9 @@
       },
       build: function () {
         if (self.options.trigger) {
-          self.gjtrigger = gj(self.options.trigger);
+          self.$trigger = $(self.options.trigger);
         } else {
-          self.gjtrigger = gj('<a href="#" class="' + self.classes.trigger + ' ' + self.classes.skin + '">' + self.options.text + '</a>').appendTo(gj('body'));
+          self.$trigger = $('<a href="#" class="' + self.classes.trigger + ' ' + self.classes.skin + '">' + self.options.text + '</a>').appendTo($('body'));
         }
 
         self.insertRule('.' + self.classes.show + '{' + self.transition.prefix + 'animation-duration: ' + self.options.animationSpeed + 'ms;' + self.transition.prefix + 'animation-name: ' + self.options.namespace + '_' + self.options.animation + ';}');
@@ -159,7 +159,7 @@
         } else {
           distance = self.options.distance;
         }
-        if (gj(window).scrollTop() > distance) {
+        if ($(window).scrollTop() > distance) {
           return true;
         } else {
           return false;
@@ -167,9 +167,9 @@
       },
       toggle: function () {
         if (self.can()) {
-          self.gjdoc.trigger('ScrollToTop::show');
+          self.$doc.trigger('ScrollToTop::show');
         } else {
-          self.gjdoc.trigger('ScrollToTop::hide');
+          self.$doc.trigger('ScrollToTop::hide');
         }
       },
 
@@ -287,18 +287,18 @@
   ScrollToTop.prototype = {
     constructor: ScrollToTop,
     jump: function () {
-      this.gjdoc.trigger('ScrollToTop::jump');
+      this.$doc.trigger('ScrollToTop::jump');
     },
     disable: function () {
-      this.gjdoc.trigger('ScrollToTop::disable');
+      this.$doc.trigger('ScrollToTop::disable');
     },
     enable: function () {
-      this.gjdoc.trigger('ScrollToTop::enable');
+      this.$doc.trigger('ScrollToTop::enable');
     },
     destroy: function () {
-      this.gjtrigger.remove();
-      this.gjdoc.data('ScrollToTop', null);
-      this.gjdoc.off('ScrollToTop::enable')
+      this.$trigger.remove();
+      this.$doc.data('ScrollToTop', null);
+      this.$doc.off('ScrollToTop::enable')
           .off('ScrollToTop::disable')
           .off('ScrollToTop::jump')
           .off('ScrollToTop::show')
@@ -306,13 +306,13 @@
     }
   };
 
-  gj.fn.scrollToTop = function (options) {
+  $.fn.scrollToTop = function (options) {
     if (typeof options === 'string') {
       var method = options;
       var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
 
       return this.each(function () {
-        var api = gj.data(this, 'scrollToTop');
+        var api = $.data(this, 'scrollToTop');
 
         if (api && typeof api[method] === 'function') {
           api[method].apply(api, method_arguments);
@@ -320,10 +320,10 @@
       });
     } else {
       return this.each(function () {
-        var api = gj.data(this, 'scrollToTop');
+        var api = $.data(this, 'scrollToTop');
         if (!api) {
           api = new ScrollToTop(options);
-          gj.data(this, 'scrollToTop', api);
+          $.data(this, 'scrollToTop', api);
         }
       });
     }

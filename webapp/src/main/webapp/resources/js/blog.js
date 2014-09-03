@@ -1,37 +1,33 @@
-(function (gj, sharethis) {
+(function () {
   function blog() {
   };
 
   blog.prototype.getPost = function (el, year, month) {
-    gj.ajax({
+    $.ajax({
       url: "/portal/rest/blog/service/get-blogs?year=" + year + "&month=" + month,
       dataType: "text",
       type: "POST"
     })
-        .success(function (data) {
-          var _blogs = gj.parseJSON(data);
-          var html = "";
-          gj.each(_blogs, function (key, val) {
-            var link = "/portal/intranet/blog/article?content-id=/repository/collaboration" + val.postPath;
-            html += "<div> <a href='" + link + "' >" + val.postTitle + "</a></div>";
-          });
-          gj(".blog-archive-post-link").html('');
-          gj("#month-" + year + "-" + month).html(html);
-        })
+    .success(function (data) {
+      var _blogs = $.parseJSON(data);
+      var html = "";
+      $.each(_blogs, function (key, val) {
+        var link = "/portal/intranet/blog/article?content-id=/repository/collaboration" + val.postPath;
+        html += "<div> <a href='" + link + "' >" + val.postTitle + "</a></div>";
+      });
+      $(".blog-archive-post-link").html('');
+      $("#month-" + year + "-" + month).html(html);
+    })
   }
 
-  blog.prototype.blogArchiveAccordionInit = function () {
-    gj(".blog_archive_accordion").blogArchiveAccordion();
-  }
-
-  gj.fn.blogArchiveAccordion = function (options) {
+  $.fn.blogArchiveAccordion = function (options) {
     if (this.length > 1) {
       this.each(function () {
-        gj(this).blogArchiveAccordion(options);
+        $(this).blogArchiveAccordion(options);
       });
       return this;
     }
-    var settings = gj.extend({
+    var settings = $.extend({
       animation: true,
       showIcon: false,
       closeAble: false,
@@ -53,9 +49,9 @@
         plugin.children().addClass('accordion_in');
       }
       plugin.find('.accordion_in').each(function (index, elem) {
-        var childs = gj(elem).children();
-        gj(childs[0]).addClass('acc_head');
-        gj(childs[1]).addClass('acc_content');
+        var childs = $(elem).children();
+        $(childs[0]).addClass('acc_head');
+        $(childs[1]).addClass('acc_content');
       });
       //Append icon
       if (settings.showIcon) {
@@ -78,7 +74,7 @@
     // Action when the user click accordion head
     this.clickHead = function () {
       plugin.on('click', '.acc_head', function () {
-        var s_parent = gj(this).parent();
+        var s_parent = $(this).parent();
 
         if (s_parent.hasClass('acc_active') == false) {  //not active, remove actice class
           if (settings.closeOther) {
@@ -94,19 +90,19 @@
             s_parent.children('.acc_content').slideUp(settings.slideSpeed);
             s_parent.removeClass('acc_active');
             s_parent.children('.uiIconLightGray').removeClass('uiIconArrowRight');
-            gj(this).children('.uiIconLightGray').addClass('uiIconArrowDown');
+            $(this).children('.uiIconLightGray').addClass('uiIconArrowDown');
           }else{
             s_parent.children('.acc_content').slideUp(settings.slideSpeed);
             s_parent.removeClass('acc_active');
             s_parent.children('.uiIconLightGray').removeClass('uiIconArrowDown');
-            gj(this).children('.uiIconLightGray').addClass('uiIconArrowRight');
+            $(this).children('.uiIconLightGray').addClass('uiIconArrowRight');
           }
         }
         else {
-          gj(this).next('.acc_content').slideDown(settings.slideSpeed);
+          $(this).next('.acc_content').slideDown(settings.slideSpeed);
           s_parent.addClass('acc_active');
-          gj(this).children('.uiIconLightGray').removeClass('uiIconArrowRight');
-          gj(this).children('.uiIconLightGray').addClass('uiIconArrowDown');
+          $(this).children('.uiIconLightGray').removeClass('uiIconArrowRight');
+          $(this).children('.uiIconLightGray').addClass('uiIconArrowDown');
         }
       });
     }
@@ -117,30 +113,30 @@
 
   //postform
   blog.prototype.syncuri = function (dateTime) {
-    var name = gj("#name");
+    var name = $("#name");
     var data = name.val();
     data = dateTime + "/" + data;
-    gj('#uri').replaceWith('<span id="uri">' + data + '</span>');
+    $('#uri').replaceWith('<span id="uri">' + data + '</span>');
   }
 
-  gj("#title").change(function () {
-    var name = gj("#name");
+  $("#title").change(function () {
+    var name = $("#name");
     if (!name.readOnly) {
       var title = this.value;
       var portalContext = eXo.env.portal.context;
       var portalRest = eXo.env.portal.rest;
       var url = portalContext + "/" + portalRest + "/l11n/cleanName";
-      gj.ajax({
+      $.ajax({
         type: "GET",
         url: url,
         data: { name: title},
         success: function (data) {
-          gj('#name').val(data).trigger('change');
+          $('#name').val(data).trigger('change');
         }
       }); // end ajax
     } // end if not readonly
   }); // end change title
-  gj("#name").change(blog.prototype.syncuri);
+  $("#name").change(blog.prototype.syncuri);
 
   function getBlogTime(date){
     var month = new Array(); month[0] = "Jan"; month[1] = "Feb"; month[2] = "Mar";
@@ -165,7 +161,7 @@
   };
 
   blog.prototype.postComment = function (uuid) {
-    var aform = gj("#commentform-" + uuid);
+    var aform = $("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     var type = aform.find('input[name="type"]').val();
     var isAdmin = aform.find('input[name="isAdmin"]').val();
@@ -182,12 +178,12 @@
       return false;
     }
     var path = aform.find('input[name="jcrPath"]').val();
-    gj.ajax({
+    $.ajax({
       type: "POST",
       url: "/rest/contents/comment/add",
       data: { comment: comment, jcrPath: path},
       success: function () {
-        gj.ajax({
+        $.ajax({
           type: "POST",
           url: "/portal/rest/blog/service/getLastComment",
           data: {jcrPath: path},
@@ -197,7 +193,7 @@
               var commentContent = data.commentContent;
               var commentPath = data.commentPath;
               var ws = data.ws;
-              var totalComment = gj("#totalCurrentComment").val();//data.totalComment;
+              var totalComment = $("#totalCurrentComment").val();//data.totalComment;
               var postPath = "";
               var _path = path.split("/");
               var repo = _path[1];
@@ -258,16 +254,16 @@
               result += "</li>";
 
               if(type !== 'rootPostComment'){
-                gj("#comment-form-"+uuid+" .commentItem").has("form").remove();
-                gj("#comment-"+uuid).append("<ul class=\"commentList children\">"+result + "</ul>");
+                $("#comment-form-"+uuid+" .commentItem").has("form").remove();
+                $("#comment-"+uuid).append("<ul class=\"commentList children\">"+result + "</ul>");
               }else{
-                gj("#commentList").append(result);
+                $("#commentList").append(result);
               }
-              gj("#commentInputBox input[name=comment]").val('');
+              $("#commentInputBox input[name=comment]").val('');
               var plural="";
               totalComment ++ ;
               if(totalComment>1){plural="s";}
-              gj("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
+              $("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
             }else{//end if (_data.result=false)
               alert("Error, u can trial again!.");
             }
@@ -297,184 +293,67 @@
       obj.nodePath = nodePath;
       obj.postPath = postPath;
       obj.ws = ws;
-      gj.ajax({
+      $.ajax({
         url: "/portal/rest/blog/service/changeCommentStatus",
         dataType: "text",
         data: obj,
         type: "POST"
       })
           .success(function (data) {
-            var rs = gj.parseJSON(data);
+            var rs = $.parseJSON(data);
             var btn = '<button type="button" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');" ';
             if (!rs.result) {
               btn += 'class="btn btn-primary" > <i class="uiIconAnsApprove uiIconAnsWhite"></i>Approve</button>'
-              gj('#' + elId).removeClass('approved');
-              gj('#' + elId).addClass('disapproved');
+              $('#' + elId).removeClass('approved');
+              $('#' + elId).addClass('disapproved');
             } else {
               btn += 'class="btn" ><i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>'
-              gj('#' + elId).removeClass('disapproved');
-              gj('#' + elId).addClass('approved');
+              $('#' + elId).removeClass('disapproved');
+              $('#' + elId).addClass('approved');
             }
 
-            gj('#approve-' + elId).html(btn);
+            $('#approve-' + elId).html(btn);
           })
     }
   }
+  $(document).ready(function(){
+    $('.rate-wrapper').each(function(i, item) {
+      $(item).rate({
+        uid: $(item).find('input').val(),
+        on_select: function(ui, score) {
 
-  //rate
-  gj.rate_wrapper = {
-    el: null,
-    init: function (options, el) {
-      this.settings = gj.extend({}, {
-            on_select: function (ui, score) {
-            },
-            uid: 0,
-            star_count: 5,
-            start_z: 100,
-            cookie_name: 'mysite_product_score',
-            cookie_domain: '',
-            cookie_path: '/',
-            cookie_duration: 365
-          }, options
-      );
-      //set the current element
-      this.el = el;
-      var uid = this.settings.uid;
+          //send out our ajax call
+          var obj = new Object();
+          obj.score = score;
+          obj.postPath = ui.find("input[name=postPath]").val();
+          obj.ws = ui.find("input[name=ws]").val()
+          $.ajax({
+            url: "/portal/rest/blog/service/updateVote",
+            dataType: "text",
+            data: obj,
+            type: "POST"
+          })
+              .success(function (data) {
 
-      //use the score in the cookies when we have them;
-      this.set_score(el, uid);
-
-      stars = el.find('a');
-      stars.each(function (i, star) {
-        gj(star).bind('click', function (ev) {
-          score = +gj(star).html();
-          ev.preventDefault();
-          gj.rate_wrapper.settings.on_select(el, score);
-          gj.rate_wrapper.set_cookie_score(uid, score);
-          gj.rate_wrapper.set_score(el, uid, score);
-        });
+              })
+          var p = ui.find('input');
+          //alert('sending out product_id: ' + p.val() + ' with score ' + score);
+        },
+        cookie_domain: '.mydomain.com',
+        cookie_name: 'my-rating-cookie-name'
       });
-
-      // Hide the current score when we have a mousever
-      // and show em again on leave.
-      stars.each(function (i, star) {
-        gj(star).hover(function () {
-              el.find('.rate-current-score').hide();
-            },
-            function () {
-              el.find('.rate-current-score').show();
-            }
-        );
-      });
-    },
-    set_score: function (el, uid, score) {
-
-      cur_score = el.find('.rate-current-score');
-      cur_score_val = cur_score.html();
-      cookie_score_val = this.get_rating(uid);
-
-      if (cookie_score_val !== 0) {
-        cur_score_val = cookie_score_val;
-      }
-
-      if (score > 0) {
-        cur_score_val = score / gj.rate_wrapper.settings.star_count * 100;
-      }
-      cur_score.css('display', 'block').css('width', String(cur_score_val) + '%');
-    },
-    /** retrieve the cookie value **/
-    get_cookie: function (c_name) {
-      if (document.cookie.length > 0) {
-        c_start = document.cookie.indexOf(c_name + "=");
-        if (c_start != -1) {
-          c_start = c_start + c_name.length + 1;
-          c_end = document.cookie.indexOf(";", c_start);
-          if (c_end == -1) c_end = document.cookie.length;
-          return unescape(document.cookie.substring(c_start, c_end));
-        }
-      }
-      return "";
-    },
-    /** Retrives the current rating inside the cookie **/
-    get_rating: function (uid) {
-      uid = String(uid);
-
-      cookie = this.get_cookie(gj.rate_wrapper.settings.cookie_name);
-
-      if ('' === cookie) {
-        return 0;
-      }
-
-      cookie = eval("(" + cookie + ")")
-      if (uid in cookie) {
-
-        return cookie[uid] / gj.rate_wrapper.settings.star_count * 100;
-      }
-      return 0;
-    },
-    set_cookie_score: function (uid, score) {
-      var duration = new Date();
-      duration.setDate(duration.getDate() + gj.rate_wrapper.settings.cookie_duration);
-
-      cookie_name = gj.rate_wrapper.settings.cookie_name;
-      cookie_domain = gj.rate_wrapper.settings.cookie_domain;
-      cookie_path = gj.rate_wrapper.settings.cookie_path;
-      cookie_duration = duration.toUTCString()
-
-      cookie_val = this.get_cookie(cookie_name);
-      o = new Object;
-      o[String(uid)] = score;
-
-      if ('' === cookie_val) {
-        cookie_val = o;
-      } else {
-        cookie_val = eval("(" + cookie_val + ")");
-        cookie_val = gj.extend({}, cookie_val, o);
-      }
-
-      cookie_val = escape(JSON.stringify(cookie_val));
-      cookie = cookie_name + '=' + cookie_val + ';expires=' + cookie_duration + ';path=' + cookie_path;
-      if ('' !== cookie_domain) {
-        cookie += ';domain=' + cookie_domain
-      }
-      document.cookie = cookie;
-    }
-  }
-  gj.fn.rate = function (options) {
-    return gj.rate_wrapper.init(options, gj(this));
-  }
-
-  gj('.rate-wrapper').each(function(i, item) {
-    gj(item).rate({
-      uid: gj(item).find('input').val(),
-      on_select: function(ui, score) {
-
-        //send out our ajax call
-        var obj = new Object();
-        obj.score = score;
-        obj.postPath = ui.find("input[name=postPath]").val();
-        obj.ws = ui.find("input[name=ws]").val()
-        gj.ajax({
-          url: "/portal/rest/blog/service/updateVote",
-          dataType: "text",
-          data: obj,
-          type: "POST"
-        })
-            .success(function (data) {
-
-            })
-        var p = ui.find('input');
-        //alert('sending out product_id: ' + p.val() + ' with score ' + score);
-      },
-      cookie_domain: '.mydomain.com',
-      cookie_name: 'my-rating-cookie-name'
     });
-  });
+
+    $('.rate-wrapper').on('click', function(){
+      console.log('hehhe');
+    })
+  })
+
 
   //scroll
   var ScrollToTop = function (options) {
-    this.gjdoc = gj('body');
-    this.options = gj.extend(ScrollToTop.defaults, options);
+    this.$doc = $('body');
+    this.options = $.extend(ScrollToTop.defaults, options);
 
     var namespace = this.options.namespace;
 
@@ -494,7 +373,7 @@
     this.isShow = false;
 
     var self = this;
-    gj.extend(self, {
+    $.extend(self, {
       init: function () {
         self.transition = self.transition();
         self.build();
@@ -504,19 +383,19 @@
           if (typeof self.options.target === 'number') {
             self.target = self.options.target;
           } else if (typeof self.options.target === 'string') {
-            self.target = Math.floor(gj(self.options.target).offset().top);
+            self.target = Math.floor($(self.options.target).offset().top);
           }
         } else {
           self.target = 0;
         }
 
-        self.gjtrigger.on('click.scrollToTop', function () {
-          self.gjdoc.trigger('ScrollToTop::jump');
+        self.$trigger.on('click.scrollToTop', function () {
+          self.$doc.trigger('ScrollToTop::jump');
           return false;
         });
 
         // bind events
-        self.gjdoc.on('ScrollToTop::jump', function () {
+        self.$doc.on('ScrollToTop::jump', function () {
           if (self.disabled) {
             return;
           }
@@ -533,29 +412,29 @@
             easing = self.options.easing;
           }
 
-          self.gjdoc.addClass(self.classes.animating);
+          self.$doc.addClass(self.classes.animating);
 
 
           if (self.transition.supported) {
-            var pos = gj(window).scrollTop();
+            var pos = $(window).scrollTop();
 
-            self.gjdoc.css({
+            self.$doc.css({
               'margin-top': -pos + self.target + 'px'
             });
-            gj(window).scrollTop(self.target);
+            $(window).scrollTop(self.target);
 
             self.insertRule('.duration_' + speed + '{' + self.transition.prefix + 'transition-duration: ' + speed + 'ms;}');
 
-            self.gjdoc.addClass('easing_' + easing + ' duration_' + speed).css({
+            self.$doc.addClass('easing_' + easing + ' duration_' + speed).css({
               'margin-top': ''
             }).one(self.transition.end, function () {
-              self.gjdoc.removeClass(self.classes.animating + ' easing_' + easing + ' duration_' + speed);
+              self.$doc.removeClass(self.classes.animating + ' easing_' + easing + ' duration_' + speed);
             });
           } else {
-            gj('html, body').stop(true, false).animate({
+            $('html, body').stop(true, false).animate({
               scrollTop: self.target
             }, speed, function () {
-              self.gjdoc.removeClass(self.classes.animating);
+              self.$doc.removeClass(self.classes.animating);
             });
             return;
           }
@@ -566,25 +445,25 @@
               }
               self.isShow = true;
 
-              self.gjtrigger.addClass(self.classes.show);
+              self.$trigger.addClass(self.classes.show);
             })
             .on('ScrollToTop::hide', function () {
               if (!self.isShow) {
                 return;
               }
               self.isShow = false;
-              self.gjtrigger.removeClass(self.classes.show);
+              self.$trigger.removeClass(self.classes.show);
             })
             .on('ScrollToTop::disable', function () {
               self.disabled = true;
-              self.gjdoc.trigger('ScrollToTop::hide');
+              self.$doc.trigger('ScrollToTop::hide');
             })
             .on('ScrollToTop::enable', function () {
               self.disabled = false;
               self.toggle();
             });
 
-        gj(window).on('scroll', self._throttle(function () {
+        $(window).on('scroll', self._throttle(function () {
           if (self.disabled) {
             return;
           }
@@ -593,7 +472,7 @@
         }, self.options.throttle));
 
         if (self.options.mobile) {
-          gj(window).on('resize', self._throttle(function () {
+          $(window).on('resize', self._throttle(function () {
             if (self.disabled) {
               return;
             }
@@ -605,7 +484,7 @@
         self.toggle();
       },
       checkMobile: function () {
-        var width = gj(window).width();
+        var width = $(window).width();
 
         if (width < self.options.mobile.width) {
           self.useMobile = true;
@@ -615,9 +494,9 @@
       },
       build: function () {
         if (self.options.trigger) {
-          self.gjtrigger = gj(self.options.trigger);
+          self.$trigger = $(self.options.trigger);
         } else {
-          self.gjtrigger = gj('<a href="#" class="' + self.classes.trigger + ' ' + self.classes.skin + '">' + self.options.text + '</a>').appendTo(gj('body'));
+          self.$trigger = $('<a href="#" class="' + self.classes.trigger + ' ' + self.classes.skin + '">' + self.options.text + '</a>').appendTo($('body'));
         }
 
         self.insertRule('.' + self.classes.show + '{' + self.transition.prefix + 'animation-duration: ' + self.options.animationSpeed + 'ms;' + self.transition.prefix + 'animation-name: ' + self.options.namespace + '_' + self.options.animation + ';}');
@@ -633,7 +512,7 @@
         } else {
           distance = self.options.distance;
         }
-        if (gj(window).scrollTop() > distance) {
+        if ($(window).scrollTop() > distance) {
           return true;
         } else {
           return false;
@@ -641,9 +520,9 @@
       },
       toggle: function () {
         if (self.can()) {
-          self.gjdoc.trigger('ScrollToTop::show');
+          self.$doc.trigger('ScrollToTop::show');
         } else {
-          self.gjdoc.trigger('ScrollToTop::hide');
+          self.$doc.trigger('ScrollToTop::hide');
         }
       },
 
@@ -761,18 +640,18 @@
   ScrollToTop.prototype = {
     constructor: ScrollToTop,
     jump: function () {
-      this.gjdoc.trigger('ScrollToTop::jump');
+      this.$doc.trigger('ScrollToTop::jump');
     },
     disable: function () {
-      this.gjdoc.trigger('ScrollToTop::disable');
+      this.$doc.trigger('ScrollToTop::disable');
     },
     enable: function () {
-      this.gjdoc.trigger('ScrollToTop::enable');
+      this.$doc.trigger('ScrollToTop::enable');
     },
     destroy: function () {
-      this.gjtrigger.remove();
-      this.gjdoc.data('ScrollToTop', null);
-      this.gjdoc.off('ScrollToTop::enable')
+      this.$trigger.remove();
+      this.$doc.data('ScrollToTop', null);
+      this.$doc.off('ScrollToTop::enable')
           .off('ScrollToTop::disable')
           .off('ScrollToTop::jump')
           .off('ScrollToTop::show')
@@ -780,13 +659,13 @@
     }
   };
 
-  gj.fn.scrollToTop = function (options) {
+  $.fn.scrollToTop = function (options) {
     if (typeof options === 'string') {
       var method = options;
       var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
 
       return this.each(function () {
-        var api = gj.data(this, 'scrollToTop');
+        var api = $.data(this, 'scrollToTop');
 
         if (api && typeof api[method] === 'function') {
           api[method].apply(api, method_arguments);
@@ -794,18 +673,18 @@
       });
     } else {
       return this.each(function () {
-        var api = gj.data(this, 'scrollToTop');
+        var api = $.data(this, 'scrollToTop');
         if (!api) {
           api = new ScrollToTop(options);
-          gj.data(this, 'scrollToTop', api);
+          $.data(this, 'scrollToTop', api);
         }
       });
     }
   };
 
   blog.prototype.initScroll = function(){
-    gj('body').scrollToTop();
-    gj( ".scrollToTop" ).attr("title", "Back to top");
+    $('body').scrollToTop();
+    $( ".scrollToTop" ).attr("title", "Back to top");
   }
 
   //edit comment
@@ -813,29 +692,29 @@
     var obj = new Object();
     obj.commentPath = commentPath;
     obj.ws = ws;
-    gj.ajax({
+    $.ajax({
       url: "/portal/rest/blog/service/getComment",
       dataType: "text",
       data:obj,
       type: "POST"
     })
         .success(function (data) {
-          var _result = gj.parseJSON(data);
+          var _result = $.parseJSON(data);
           if(_result.result){
-            var type = gj('#commentform-'+postUUID+' input[name=type]').val();
+            var type = $('#commentform-'+postUUID+' input[name=type]').val();
             if(type !== 'rootPostComment'){
               blog.prototype.replyComment(postUUID);
             }else{
-              gj('#commentform-'+postUUID+' input[name=commentCancel]').removeAttr("style");
+              $('#commentform-'+postUUID+' input[name=commentCancel]').removeAttr("style");
             }
-            gj('#commentform-'+postUUID+' input[name=comment]').val(_result.commentContent);
-            gj('#commentform-'+postUUID+' input[name=comment]').focus();
-            gj('#commentform-'+postUUID+' input[name=commentPath]').val(_result.commentPath);
-            gj('#commentform-'+postUUID+' input[name=timeId]').val(timeId);
-            gj('#commentform-'+postUUID+' input[name=ws]').val(ws);
-            gj('#commentform-'+postUUID+' input[name=action]').val("Edit");
-            gj('#commentform-'+postUUID+' input[name=submit]').attr("value","Update Comment");
-            gj('#commentform-'+postUUID+' input[name=submit]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"')");
+            $('#commentform-'+postUUID+' input[name=comment]').val(_result.commentContent);
+            $('#commentform-'+postUUID+' input[name=comment]').focus();
+            $('#commentform-'+postUUID+' input[name=commentPath]').val(_result.commentPath);
+            $('#commentform-'+postUUID+' input[name=timeId]').val(timeId);
+            $('#commentform-'+postUUID+' input[name=ws]').val(ws);
+            $('#commentform-'+postUUID+' input[name=action]').val("Edit");
+            $('#commentform-'+postUUID+' input[name=submit]').attr("value","Update Comment");
+            $('#commentform-'+postUUID+' input[name=submit]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"')");
           }else{
             alert('Comment in '+commentPath+ ' doesnt exist!');
           }
@@ -850,22 +729,22 @@
 
       obj.commentPath = commentPath;
       obj.ws = ws;
-      gj.ajax({
+      $.ajax({
         type: "POST",
         data:obj,
         url: "/portal/rest/blog/service/delComment",
         success: function (data) {
           if(data.result){
             //var totalComment = data.totalComment;
-            var totalComment = gj("#totalCurrentComment").val();//data.totalComment;
+            var totalComment = $("#totalCurrentComment").val();//data.totalComment;
             totalComment--;
             var plural="";
             if(totalComment>1){plural="s";}
-            gj('#comment-'+commendId).remove();
+            $('#comment-'+commendId).remove();
             if(totalComment > 0){
-              gj("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
+              $("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
             }else{
-              gj("#total-comment").html("Comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
+              $("#total-comment").html("Comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
             }
           }else{
             alert('Delete comment failed. Please retry again!.');
@@ -878,7 +757,7 @@
    Edit a comment
    */
   blog.prototype.editComment = function(uuid){
-    var aform = gj("#commentform-" + uuid);
+    var aform = $("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     var path = aform.find('input[name="commentPath"]').val();
     var timeId = aform.find('input[name="timeId"]').val();
@@ -888,28 +767,28 @@
     obj.commentPath = path;
     obj.newComment = comment;
     obj.ws=ws;
-    gj.ajax({
+    $.ajax({
       type: "POST",
       url: "/portal/rest/blog/service/editComment",
       data: obj,
       success: function (data) {
         if(data.result){
-          gj('#'+timeId).html(comment);
-          var destination = gj('#comment-'+uuid+" span .ContentBlock");
+          $('#'+timeId).html(comment);
+          var destination = $('#comment-'+uuid+" span .ContentBlock");
 
           destination.html(comment);
 
           if(type !== 'rootPostComment'){
-            gj('#commentform-'+uuid).closest("ul").remove();
+            $('#commentform-'+uuid).closest("ul").remove();
           }
-          gj('#commentform-'+uuid+' input[name=submit]').attr("value","Post Comment");
-          gj('#commentform-'+uuid+' input[name=submit]').attr("id","btn-"+uuid);
-          gj('#commentform-'+uuid+' input[name=submit]').attr("onclick","eXo.ecm.blog.postComment('"+uuid+"')");
-          gj('#commentform-'+uuid+' input[name=commentCancel]').attr("style","display:none;");
-          gj('#commentform-'+uuid+' input[name=action').val('');
-          gj('#commentform-'+uuid+' input[name=comment').val('');
+          $('#commentform-'+uuid+' input[name=submit]').attr("value","Post Comment");
+          $('#commentform-'+uuid+' input[name=submit]').attr("id","btn-"+uuid);
+          $('#commentform-'+uuid+' input[name=submit]').attr("onclick","eXo.ecm.blog.postComment('"+uuid+"')");
+          $('#commentform-'+uuid+' input[name=commentCancel]').attr("style","display:none;");
+          $('#commentform-'+uuid+' input[name=action').val('');
+          $('#commentform-'+uuid+' input[name=comment').val('');
           /*
-           gj('html, body').animate({
+           $('html, body').animate({
            scrollTop: destination.offset().top
            }, 2000);
            */
@@ -925,17 +804,17 @@
 
   blog.prototype.commentCancel = function(commentId, type){
     if(type==='rootPostComment'){
-      gj('#commentform-'+commentId+' input[name=commentCancel]').attr("style", "display:none;");
-      gj('#commentform-'+commentId+' input[name=submit]').attr("value", "Post Comment");
-      gj('#commentform-'+commentId+' input[name=comment]').val('');
+      $('#commentform-'+commentId+' input[name=commentCancel]').attr("style", "display:none;");
+      $('#commentform-'+commentId+' input[name=submit]').attr("value", "Post Comment");
+      $('#commentform-'+commentId+' input[name=comment]').val('');
     }
-    gj("#comment-"+commentId+" ul:last-child ").has("form").remove();
+    $("#comment-"+commentId+" ul:last-child ").has("form").remove();
   }
   /**
    reply a comment
    */
   blog.prototype.replyComment = function(commentId){
-    var commentItem = gj("#comment-"+commentId);
+    var commentItem = $("#comment-"+commentId);
     var commentPath = commentItem.find('input[name="cmtPath"]').val();
 //		var CPath = commentItem.find('input[name="postPath"]').val();
     var ws = commentItem.find('input[name="ws"]').val();
@@ -943,7 +822,7 @@
     var viewer = commentItem.find('input[name="viewer"]').val();
     var isAdmin = commentItem.find('input[name="isAdmin"]').val();
 
-    gj("#comment-"+commentId+" ul:last-child ").has("form").remove();
+    $("#comment-"+commentId+" ul:last-child ").has("form").remove();
 
     var commentForm="";
     commentForm += "<ul class=\"commentList children\" id=\"comment-form-"+commentId+"\" >";
@@ -981,11 +860,11 @@
     commentForm += "</li></ul>";
 
     commentItem.append(commentForm);
-    gj("#commentform-"+commentId).find('input[name="comment"]').focus();
+    $("#commentform-"+commentId).find('input[name="comment"]').focus();
   }
 
   //context-menu in comment
-  gj.fn.contextPopup = function(menuData) {
+  $.fn.contextPopup = function(menuData) {
     // Define default settings
     var settings = {
       contextMenuClass: 'ClickPopupContent dropdown-menu dropdownArrowTop',
@@ -996,18 +875,18 @@
     };
 
     // merge them
-    gj.extend(settings, menuData);
+    $.extend(settings, menuData);
 
     // Build popup menu HTML
     function createMenu(e) {
-      var xxx = gj(this.parentNode); //e.toElement.parents('.commentRight').children('input[name="cmtPath"]').val();
+      var xxx = $(this.parentNode); //e.toElement.parents('.commentRight').children('input[name="cmtPath"]').val();
       console.log('xxx: ' + xxx);
 
-      gj('.contextMenuPlugin').remove();
-      var menu = gj('<ul class="' + settings.contextMenuClass + '"><div class="' + settings.gutterLineClass + '"></div></ul>')
+      $('.contextMenuPlugin').remove();
+      var menu = $('<ul class="' + settings.contextMenuClass + '"><div class="' + settings.gutterLineClass + '"></div></ul>')
           .appendTo(document.body);
       if (settings.title) {
-        gj('<li class="' + settings.headerClass + '"></li>').text(settings.title).appendTo(menu);
+        $('<li class="' + settings.headerClass + '"></li>').text(settings.title).appendTo(menu);
       }
       settings.items.forEach(function(item) {
         if (item) {
@@ -1015,9 +894,9 @@
           // if(item.icon)
           //   rowCode += '<img>';
           // rowCode +=  '<span></span></a></li>';
-          var row = gj(rowCode).appendTo(menu);
+          var row = $(rowCode).appendTo(menu);
           if(item.styleclass){
-            var icon = gj('<i>');
+            var icon = $('<i>');
             icon.attr('class', item.styleclass);
             icon.insertBefore(row.find('span'));
           }
@@ -1030,7 +909,7 @@
           }
 
         } else {
-          gj('<li class="' + settings.seperatorClass + '"></li>').appendTo(menu);
+          $('<li class="' + settings.seperatorClass + '"></li>').appendTo(menu);
         }
       });
       menu.find('.' + settings.headerClass ).text(settings.title);
@@ -1042,17 +921,17 @@
           .show();
       var left = e.pageX + 5, /* nudge to the right, so the pointer is covering the title */
           top = e.pageY;
-      if (top + menu.height() >= gj(window).height()) {
+      if (top + menu.height() >= $(window).height()) {
         top -= menu.height();
       }
-      if (left + menu.width() >= gj(window).width()) {
+      if (left + menu.width() >= $(window).width()) {
         left -= menu.width();
       }
       // Create and show menu
       menu.css({zIndex:1000001, left:left, top:top + 50})
           .bind('contextmenu', function() { return false; });
       // Cover rest of page with invisible div that when clicked will cancel the popup.
-      var bg = gj('<div></div>')
+      var bg = $('<div></div>')
           .css({left:0, top:0, width:'100%', height:'100%', position:'absolute', zIndex:1000000})
           .appendTo(document.body)
           .bind('contextmenu click', function() {
@@ -1072,7 +951,7 @@
     return this;
   };
 
-  gj('.comment-context').contextPopup({
+  $('.comment-context').contextPopup({
     items: [
       {
         label:'Edit',
@@ -1092,4 +971,4 @@
   eXo.ecm.blog = new blog();
   return eXo.ecm.blog;
   //-------------------------------------------------------------------------//
-})(gj, sharethis);
+})();
