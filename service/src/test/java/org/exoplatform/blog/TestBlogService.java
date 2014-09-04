@@ -202,15 +202,21 @@ public class TestBlogService extends TestCase {
 
   public void testAddBlog() throws Exception {
     //total blog of 2014/08 before create a new post
-    int postCountBefore = blogService.getArchivesCountInMonth(2014, 7);
+    Calendar cal = Calendar.getInstance();
+    int currentMonth = cal.get(cal.MONTH);
+    int currentYear = cal.get(cal.YEAR);
+
+
+    int postCountBefore = blogService.getArchivesCountInMonth(currentYear, currentMonth);
     //add 5 post
     printBlogArchive();
+
     System.out.println("-----------------------------testAddBlog--------------------------------");
-    Node node1 = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-    Node node2 = addBlog("Post-001-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-    Node node3 = addBlog("Post-002-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-    Node node4 = addBlog("Post-003-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
-    Node node5 = addBlog("Post-004-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(2014, 8, 1));
+    Node node1 = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
+    Node node2 = addBlog("Post-001-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
+    Node node3 = addBlog("Post-002-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
+    Node node4 = addBlog("Post-003-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
+    Node node5 = addBlog("Post-004-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
 
     blogService.addPost(node1);
     blogService.addPost(node2);
@@ -218,7 +224,7 @@ public class TestBlogService extends TestCase {
     blogService.addPost(node4);
     blogService.addPost(node5);
     printBlogArchive();
-    int postCountAfter = blogService.getArchivesCountInMonth(2014, 7);
+    int postCountAfter = blogService.getArchivesCountInMonth(currentYear, currentMonth);
 
     int denta = postCountAfter - postCountBefore;
     assertTrue("Increate blog cached table", denta == 5);
@@ -253,7 +259,7 @@ public class TestBlogService extends TestCase {
       }
     }
   }
-  public Node addBlog(String name, String title, String summary, Calendar date) throws Exception {
+  private Node addBlog(String name, String title, String summary, Calendar date) throws Exception {
     Session session = getSession();
     Node rootNode = session.getRootNode();
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
@@ -264,6 +270,25 @@ public class TestBlogService extends TestCase {
     node.setProperty("exo:dateCreated", date);
     session.save();
     return node;
+  }
+
+  public void testGetPostComments() throws Exception{
+    Calendar cal = Calendar.getInstance();
+    int currentMonth = cal.get(cal.MONTH);
+    int currentYear = cal.get(cal.YEAR);
+
+    Node node1 = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
+
+    // add 6 comment for node1 throught commentService
+    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "1st comment","en");
+    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "2nd comment","en");
+    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "3rd comment","en");
+    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "4th comment","en");
+    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "5th comment","en");
+    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "6th comment","en");
+
+    long commentCount = blogService.getPostComments(node1);
+    System.out.println("commentCount: "+commentCount);
   }
 
   private void reset() throws Exception {

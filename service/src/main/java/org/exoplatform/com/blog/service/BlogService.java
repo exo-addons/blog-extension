@@ -108,4 +108,21 @@ public interface BlogService {
    */
   public long getPostViewCount(Node postNode);
 
+
+  /**
+   * Get count of post comments
+   * Using in blog-article detail viewpost.gtmpl
+   * @param postNode
+   * @return
+   */
+  public long getPostComments(Node postNode);
+
+  /**
+   * Get last comment added
+   * While end user add new comment on a post. This function return that node.
+   * @param postNode
+   * @return
+   */
+  public Node getLastComment(Node postNode);
+
 }

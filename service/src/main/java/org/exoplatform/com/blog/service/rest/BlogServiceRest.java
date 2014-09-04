@@ -211,8 +211,9 @@ public class BlogServiceRest implements ResourceContainer {
     JSONObject obj = new JSONObject();
     try {
       Node nodeComment = getNode(jcrPath, workspaceName);
-      List<Node> comments = commentsService.getComments(nodeComment, BLOG_DEFAULT_LANGUAGE);
-      Node lastComment = comments.get(0);
+//      List<Node> comments = commentsService.getComments(nodeComment, BLOG_DEFAULT_LANGUAGE);
+//      Node lastComment = comments.get(0);
+      Node lastComment = blogService.getLastComment(nodeComment);
       if (lastComment.hasProperty("exo:commentContent")) {
         obj.put("result", true);
         obj.put("commentContent", lastComment.getProperty("exo:commentContent").getString());
@@ -234,6 +235,7 @@ public class BlogServiceRest implements ResourceContainer {
   private Session getSession(String ws) throws RepositoryException {
     SessionProvider sessionProvider = WCMCoreUtils.getUserSessionProvider();
     ManageableRepository manageableRepository = WCMCoreUtils.getRepository();
+
     return sessionProvider.getSession(ws, manageableRepository);
   }
 

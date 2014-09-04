@@ -56,6 +56,7 @@ public class BlogServiceImpl implements BlogService {
 
   private static final String BLOG_COMMENT_NODE = "exo:blogComment";
   private static final String BLOG_COMMENT_STATUS_PROPERTY = "exo:commentStatus";
+  private static final String COMMENT_NODE = "exo:comments";
 
   private static final String TIME_FORMAT_TAIL = "T00:00:00.000";
   private static final SimpleDateFormat formatDateTime = new SimpleDateFormat();
@@ -319,6 +320,45 @@ public class BlogServiceImpl implements BlogService {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
     return 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long getPostComments(Node postNode) {
+    try {
+      StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
+      queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
+
+      QueryManager queryManager = getSystemSession().getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+//      QueryImpl query1 = (QueryImpl)queryManager.createQuery(null,null);
+//      query1.setLimit(1);
+//      query1.setOffset(1);
+      NodeIterator nodes = query.execute().getNodes();
+      return nodes.getSize();
+    }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
+    return -1;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Node getLastComment(Node postNode) {
+    try {
+      StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
+      queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
+      queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
+      QueryManager queryManager = getSession().getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+
+      NodeIterator nodes = query.execute().getNodes();
+
+      return nodes.nextNode();
+    }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
+    return null;
   }
 
   /**
