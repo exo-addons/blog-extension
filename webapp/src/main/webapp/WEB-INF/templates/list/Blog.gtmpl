@@ -134,7 +134,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 <div id="sidebar1" class="fluid-sidebar sidebar span3" role="complementary">
 <!-- categories -->
 <div id="categories" class="uiBox widget-categories widget-blog">
-  <h5 class="title">Categories</h5>
+  <h5 class="title"><%=_ctx.appRes("Blog.Category.Title")%></h5>
   <div class="uiContentBox">
     <ul>
       <%categories()%>
@@ -144,7 +144,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 
 <!-- Tag Cloud -->
 <div id="tagcloud" class="uiBox widget-tag-cloud widget-blog">
-  <h5 class="title">Tags</h5>
+  <h5 class="title"><%=_ctx.appRes("Blog.Tag.Title")%></h5>
   <div class="uiContentBox">
     <div id="tag-cloud" >
       <% tags()%>
@@ -154,7 +154,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 
 <!-- Bloggers -->
 <div id="bloggers" class="uiBox widget-recent-blog widget-blog">
-  <h5 class="title">Recent Bloggers</h5>
+  <h5 class="title"><%=_ctx.appRes("Blog.RecentBloger.Title")%></h5>
   <div class="uiContentBox">
     <ul>
       <%bloggers()%>
@@ -164,7 +164,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 
 <!-- Meta -->
 <div id="meta" class="uiBox widget-meta widget-blog ">
-  <h5 class="title">Meta</h5>
+  <h5 class="title"><%=_ctx.appRes("Blog.Meta.Title")%></h5>
   <div class="uiContentBox">
     <ul>
       <li><i class="uiIconLightGray uiIconEdit"></i>&nbsp;<a href="/portal/intranet/blog/add" class="cat-item" title='Add Post'><%=_ctx.appRes("Blog.Meta.AddPost")%></a></li>
@@ -175,7 +175,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 </div>
 <!--Archives-->
 <div id="archives" class="uiBox widget-blog widget-archive">
-<h5 class="title">Archives</h5>
+<h5 class="title"><%=_ctx.appRes("Blog.Archive.Title")%></h5>
 
 <div class="blog_archive_accordion smk_accordion acc_with_icon uiContentBox">
   <%
@@ -302,7 +302,7 @@ void renderPost(def entry) {
 %>
 	<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
   <i class=" uiIconLightGray"></i>
-  Read full article</a>
+    <%=_ctx.appRes("Blog.ArticleList.Readmore")%></a>
 <%
 
 } catch (Exception e) { print e; }

@@ -8,16 +8,16 @@
       dataType: "text",
       type: "POST"
     })
-    .success(function (data) {
-      var _blogs = $.parseJSON(data);
-      var html = "";
-      $.each(_blogs, function (key, val) {
-        var link = "/portal/intranet/blog/article?content-id=/repository/collaboration" + val.postPath;
-        html += "<div> <a href='" + link + "' >" + val.postTitle + "</a></div>";
-      });
-      $(".blog-archive-post-link").html('');
-      $("#month-" + year + "-" + month).html(html);
-    })
+        .success(function (data) {
+          var _blogs = $.parseJSON(data);
+          var html = "";
+          $.each(_blogs, function (key, val) {
+            var link = "/portal/intranet/blog/article?content-id=/repository/collaboration" + val.postPath;
+            html += "<div> <a href='" + link + "' >" + val.postTitle + "</a></div>";
+          });
+          $(".blog-archive-post-link").html('');
+          $("#month-" + year + "-" + month).html(html);
+        })
   }
 
   $.fn.blogArchiveAccordion = function (options) {
@@ -165,6 +165,15 @@
     var comment = aform.find('input[name="comment"]').val();
     var type = aform.find('input[name="type"]').val();
     var isAdmin = aform.find('input[name="isAdmin"]').val();
+
+    var blog_icon_delete = $("#blog-icon-delete").val();
+    var blog_icon_edit = $("#blog-icon-edit").val();
+    var blog_icon_approve = $("#blog-icon-approve").val();
+    var blog_icon_disapprove = $("#blog-icon-disapprove").val();
+    var blog_icon_reply = $("#blog-icon-reply").val();
+    var blog_message_delete = $("#blog-message.delete").val();
+    var blog_message_comment_placeholder = $("#blog-message-comment-placeholder").val();
+
     if(comment===''){
       //alert('Comment message count empty!');
       aform.find('input[name="comment"]').focus();
@@ -231,11 +240,11 @@
 
               result += "<input name=\"postPath\" type=\"hidden\" value=\""+postPath+"\" />";
 
-              result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> Reply</span>";
+              result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> "+blog_icon_reply+"</span>";
               if(isAdmin == "true"){
                 result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
-                result += "	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"');\" value=\"Disapprove\">";
-                result += "<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>Disapprove"
+                result += "	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"');\" value=\""+blog_icon_disapprove+"\">";
+                result += "<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove
                 result += "</button>"
                 result += " </span>"
               }
@@ -244,8 +253,8 @@
               result += "	  <span class=\"ContentBlock\"  id=\""+timeId+"\">"+commentContent;
               result += "	  </span>";
               result += "	  <span>";
-              result += " 		<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+uuid+"', '"+timeId+"', '"+ws+"')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>";
-              result += "			<a class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+timeId+"' ,'"+ws+"')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>";
+              result += " 		<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_edit+"\"  class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+uuid+"', '"+timeId+"', '"+ws+"')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>";
+              result += "			<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_delete+"\"  class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+timeId+"' ,'"+ws+"')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>";
               result += "		</span>";
               result += "	</div>"
 
@@ -302,12 +311,17 @@
           .success(function (data) {
             var rs = $.parseJSON(data);
             var btn = '<button type="button" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');" ';
+
+
+            var blog_icon_approve = $("#blog-icon-approve").val();
+            var blog_icon_disapprove = $("#blog-icon-disapprove").val();
+
             if (!rs.result) {
-              btn += 'class="btn btn-primary" > <i class="uiIconAnsApprove uiIconAnsWhite"></i>Approve</button>'
+              btn += 'class="btn btn-primary" > <i class="uiIconAnsApprove uiIconAnsWhite"></i>'+blog_icon_approve+'</button>'
               $('#' + elId).removeClass('approved');
               $('#' + elId).addClass('disapproved');
             } else {
-              btn += 'class="btn" ><i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>'
+              btn += 'class="btn" ><i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>'+blog_icon_disapprove+'</button>'
               $('#' + elId).removeClass('disapproved');
               $('#' + elId).addClass('approved');
             }
@@ -316,38 +330,68 @@
           })
     }
   }
+
+
   $(document).ready(function(){
-    $('.rate-wrapper').each(function(i, item) {
-      $(item).rate({
-        uid: $(item).find('input').val(),
-        on_select: function(ui, score) {
+    $('.rate-wrapper-display').on('click', function(){
+      var blog_message_rate_title =  $('#blog-message-rate-title').val();
+      var blog_message_rate_button = $('#blog-message-rate-button').val();
 
-          //send out our ajax call
-          var obj = new Object();
-          obj.score = score;
-          obj.postPath = ui.find("input[name=postPath]").val();
-          obj.ws = ui.find("input[name=ws]").val()
-          $.ajax({
-            url: "/portal/rest/blog/service/updateVote",
-            dataType: "text",
-            data: obj,
-            type: "POST"
-          })
-              .success(function (data) {
+      var rateForm = $('.rate-wrapper-form');
+      $('.UIPopupWindow').remove();
+      rateForm.removeAttr('style');
+      var ex = new Messi(rateForm.html(),{
+        title: ''+blog_message_rate_title,
+        buttons: [{id: 0, label: ''+blog_message_rate_button, val: 'Y'}],
+        callback: function(val) { /*alert('Your selection: '); */}});
+      rateForm.attr('style', 'display:none;');
 
-              })
-          var p = ui.find('input');
-          //alert('sending out product_id: ' + p.val() + ' with score ' + score);
-        },
-        cookie_domain: '.mydomain.com',
-        cookie_name: 'my-rating-cookie-name'
-      });
-    });
 
-    $('.rate-wrapper').on('click', function(){
-      console.log('hehhe');
+      $('.messi-box').find('.rate-wrapper').each(function(i, item) {
+        //var rateForm = $('.rate-wrapper-form');
+        $(item).rate({
+          uid: $(item).find('input').val(),
+          on_click: function(ui, score) {
+            //send out our ajax call
+
+            var obj = new Object();
+            obj.score = score;
+            obj.postPath = ui.find("input[name=postPath]").val();
+            obj.ws = ui.find("input[name=ws]").val()
+            console.log(obj);
+            $.ajax({
+              url: "/portal/rest/blog/service/updateVote",
+              dataType: "text",
+              data: obj,
+              type: "POST"
+            })
+                .success(function (data) {
+                  var _score = score*20;
+                  $('.rate-wrapper-display .rate-current-score').removeAttr('style');
+                  $('.rate-wrapper-display .rate-current-score').attr('style', 'display: block; width: '+_score+' %;');
+                  //$('.rate-wrapper-display .rate-current-score').removeAttr('style');
+
+                  console.log(data);
+                })
+
+            //alert('sending out product_id: ' + p.val() + ' with score ' + score);
+          },
+          cookie_domain: '.mydomain.com',
+          cookie_name: 'my-rating-cookie-name'
+        });
+      })
+
+      $('body').append(rateForm);
     })
-  })
+    $('.rate-wrapper-display').each(function(i, item) {
+      $(item).rate({});
+    })
+
+
+
+  });
+
+
 
 
   //scroll
@@ -723,6 +767,16 @@
   }
 
   blog.prototype.deleteComment = function(commentPath, commendId, ws){
+    /* $.confirm({
+     text: "This is a confirmation dialog manually triggered! Please confirm:",
+     confirm: function(button) {
+     alert("You just confirmed.");
+     },
+     cancel: function(button) {
+     alert("You cancelled.");
+     }
+     });
+     */
     if (confirm("Are u sure?")) {
       var obj = new Object();
       if (commentPath.charAt(1)==='/') commentPath.substr(1, commentPath.length);
@@ -752,6 +806,7 @@
         }
       }); // end ajax
     }
+
   }
   /**
    Edit a comment
@@ -821,17 +876,17 @@
     var avatar = commentItem.find('input[name="avatar"]').val();
     var viewer = commentItem.find('input[name="viewer"]').val();
     var isAdmin = commentItem.find('input[name="isAdmin"]').val();
-
+    var viewerFullname = commentItem.find('input[name="viewerFullname"]').val();
     $("#comment-"+commentId+" ul:last-child ").has("form").remove();
-
+    var blog_message_replycomment_placeholder = $("#blog-message-replycomment-placeholder").val();
     var commentForm="";
     commentForm += "<ul class=\"commentList children\" id=\"comment-form-"+commentId+"\" >";
     commentForm += "<li class=\"commentItem\">";
 
     commentForm += "<div class=\"commentItem commentFormBox clearfix\">";
     commentForm += "	<div class=\"commentLeft\">";
-    commentForm += "		<a data-original-title=\""+viewer+"\" href=\"/portal/intranet/profile/"+viewer+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"avatarXSmall\">";
-    commentForm += "			<img alt=\""+viewer+"\" src=\""+avatar+"\">";
+    commentForm += "		<a data-original-title=\""+viewerFullname+"\" href=\"/portal/intranet/profile/"+viewer+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"avatarXSmall\">";
+    commentForm += "			<img alt=\""+viewerFullname+"\" src=\""+avatar+"\">";
     commentForm += "		</a>";
     commentForm += "	</div><!--end commentLeft-->";
     commentForm += "	<div class=\"commentRight\">";
@@ -844,14 +899,15 @@
     commentForm += "					<input name=\"avatar\" type=\"hidden\" value=\""+avatar+"\" />";
     commentForm += "					<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\" />";
     commentForm += "					<input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\" />";
+    commentForm += "					<input name=\"viewerFullname\" type=\"hidden\" value=\""+viewerFullname+"\" />";
 
-    commentForm += "					<input name=\"fme\" type=\"hidden\" value=\""+viewer+"\" />";
+    commentForm += "					<input name=\"fme\" type=\"hidden\" value=\""+viewerFullname+"\" />";
     commentForm += "					<input name=\"timeId\" type=\"hidden\" value=\""+commentId+"\" />";
     commentForm += "					<input name=\"ws\" type=\"hidden\" value=\""+ws+"\" />";
     commentForm += "					<input name=\"action\" type=\"hidden\" value=\"\" />";
     commentForm += "					<input name=\"commentPath\" type=\"hidden\" value=\"/repository/collaboration"+commentPath+"\"/>";
     commentForm += "					<input name=\"jcrPath\" type=\"hidden\" value=\"/repository/collaboration"+commentPath+"\"/>";
-    commentForm += "					<input type=\"text\" onkeydown=\"return eXo.ecm.blog.prePostComment(event, '"+commentId+"')\" style=\"width:100%\" tabindex=\"0\" placeholder=\"Your Reply Comment Here\" id=\"comment-"+commentId+"\" name=\"comment\">";
+    commentForm += "					<input type=\"text\" onkeydown=\"return eXo.ecm.blog.prePostComment(event, '"+commentId+"')\" style=\"width:100%\" tabindex=\"0\" placeholder=\""+blog_message_replycomment_placeholder+"\" id=\"comment-"+commentId+"\" name=\"comment\">";
     commentForm += "					</div>";
     commentForm += "			</form>";
     commentForm += "		</div> <!--end comment input box-->";

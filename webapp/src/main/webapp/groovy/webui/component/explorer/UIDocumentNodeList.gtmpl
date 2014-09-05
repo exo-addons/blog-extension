@@ -272,13 +272,13 @@ def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "Publ
 		if(driverName=="Blog"){
 		%>
 		
-			<span class="blog-fileview blog-postCategory">Categories<br/>
+			<span class="blog-fileview blog-postCategory"><%=_ctx.appRes("Blog.Admin.Fileview.Category")%><br/>
 						<span class="label-info label">($postCategory)</span>
 				</span>
-			<span class="blog-fileview blog-postCommentCount">Comment<br/>
+			<span class="blog-fileview blog-postCommentCount"><%=_ctx.appRes("Blog.Admin.Fileview.Comment")%><br/>
 				<span class="label-info label">($commentCount)</span>
 			 </span>
-			<span class="blog-fileview blog-postView">Views <br/>
+			<span class="blog-fileview blog-postView"><%=_ctx.appRes("Blog.Admin.Fileview.ViewCount")%> <br/>
 				<span class="label-info label">($viewCount)</span>
 			</span>
 

@@ -102,6 +102,8 @@
 .commentList .commentItem .ContentBlock {
   word-wrap: break-word;
 }
+
+/*Rate css*/
 .rate-current-score {
   background:url(../img/ratings.png) 0 -16px no-repeat;
   display:block;
@@ -139,6 +141,60 @@
 .score-4 {width:80%; z-index:52;}
 .score-5 {width:100%; z-index:51;}
 .score a:hover{ background:url(../img/ratings.png) bottom right no-repeat;}
+.rate-wrapper-display {
+  height: 16px;
+  background: url(../img/ratings.png) 0 0 no-repeat;
+  width: 85px;
+  float: right;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+
+.rate-wrapper-info{
+  height: auto;
+  width: 85px;
+  float: right;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+.rate-wrapper-form {
+  width: 100%;
+  float: left;
+  overflow: hidden;
+}
+.rate-wrapper-display * {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+.rate-wrapper-form * {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+.rate-wrapper-form a {
+  height: 100%;
+  float: left;
+  text-indent: -9999px;
+  position: absolute;
+  overflow: hidden;
+  line-height: 1em;
+}
+
+.rate-wrapper-form a:hover {
+  background: url(../img/ratings.png) bottom right no-repeat;
+}
+
+.rate-text {
+  width: 220px;
+  float: left;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  clear:both;
+}
 
 /*scroll*/
 html {
@@ -536,4 +592,12 @@ a.tag {
   bottom: 0;
   left: 26px;
   z-index: 0;
+}
+
+.modal-backdrop.fade {
+  opacity: 0 !important;
+}
+
+.uiActionBorder{
+  margin:0 !important;
 }

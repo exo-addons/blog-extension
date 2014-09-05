@@ -22,6 +22,8 @@ import org.exoplatform.services.cms.voting.VotingService;
 import org.exoplatform.com.blog.service.BlogService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.exoplatform.services.cms.drives.ManageDriveService;
+import org.exoplatform.services.cms.drives.DriveData;
 
 def node = uicomponent.node;
 def post = uicomponent.originalNode;
@@ -62,6 +64,13 @@ if(currentPostVisited==null || currentPostVisited != uuid){
 
 visitedPost = blogService.getPostViewCount(post);
 def ws = post.getSession().getWorkspace().getName();
+def repoName = WCMCoreUtils.getRepository().getConfiguration().getName();
+
+
+ManageDriveService manageDriveService = WCMCoreUtils.getService(ManageDriveService.class);
+DriveData driveData = manageDriveService.getDriveByName("Blog");
+
+def drivePath = driveData.getHomePath();
 %>
 <script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/popup.min.js" ></script>
@@ -75,6 +84,21 @@ def ws = post.getSession().getWorkspace().getName();
 <script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script-->
 
 <div class="view-post" >
+	<input type="hidden" id="blog-message-delete" value="<%=_ctx.appRes("Blog.Action.Delete.Message")%>" />
+	<input type="hidden" id="blog-icon-delele" value='<%=_ctx.appRes("Blog.Icon.Delete")%>' />
+	<input type="hidden" id="blog-icon-edit" value='<%=_ctx.appRes("Blog.Icon.Edit")%>' />
+	<input type="hidden" id="blog-icon-approve" value='<%=_ctx.appRes("Blog.Icon.Approve")%>' />
+	<input type="hidden" id="blog-icon-disapprove" value='<%=_ctx.appRes("Blog.Icon.Disapprove")%>' />
+	<input type="hidden" id="blog-icon-reply" value='<%=_ctx.appRes("Blog.Icon.Reply")%>' />
+  <input type="hidden" id="blog-icon-cancel" value='<%=_ctx.appRes("Blog.Icon.Cancel")%>' />
+  <input type="hidden" id="blog-icon-updatecomment" value="<%=_ctx.appRes("Blog.Icon.UpdateComment")%>" />
+  <input type="hidden" id="blog-icon-postcomment" value="<%=_ctx.appRes("Blog.Icon.PostComment")%>" />
+	<input type="hidden" id="blog-message-comment-placeholder" value="<%=_ctx.appRes("Blog.Input.Comment.Placeholder")%>" />
+	<input type="hidden" id="blog-message-replycomment-placeholder" value="<%=_ctx.appRes("Blog.Input.ReplyComment.Placeholder")%>" />
+	<input type="hidden" id="blog-message-rate-title" value="<%=_ctx.appRes("Blog.Rate.Title")%>" />
+	<input type="hidden" id="blog-message-rate-button" value="<%=_ctx.appRes("Blog.Rate.Button")%>" />
+
+
   <div id="content" class="clearfix content-blog">
     <div id="main" class="main-content" role="main">
 
@@ -83,7 +107,7 @@ def ws = post.getSession().getWorkspace().getName();
           <div class="page-header"><h3 class="single-title" itemprop="headline">$title</h3></div>
           <div class="meta media">
             <div class="pull-left">
-              <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="author" data-placement="bottom" data-original-title="$author">
+              <a class="avatarXSmall" href="/portal/intranet/profile/$poster" rel="tooltip" data-placement="bottom" data-original-title="$author">
                 <img alt="$author" src="$avatar">
               </a>
             </div>
@@ -114,13 +138,14 @@ def ws = post.getSession().getWorkspace().getName();
 
 					<!--rate article-->
           <div class="blog-vote clearfix">
+          	<div class="rate-wrapper-info">($voteTotal)</div>
 
 						<div class="rate-wrapper-display">
-              <span class="rate-current-score"><%=voteValueOfUser*20%></span>
+              <span class="rate-current-score"><%=voteAvg*20%></span>
             </div>
 						<!--end display vote-->
 						<div class="rate-wrapper-form" style="display: none;" >
-              <div class="rate-text" >My rating:<%=voteValueOfUser*20%></div>
+              <div class="rate-text" ><%=_ctx.appRes("Blog.Rate.Content")%>:<%=voteValueOfUser%></div>
 							<div class="rate-content">
                 <div class="rate-wrapper">
                   <input type="hidden" name="postPath" value="$postPath">
@@ -128,11 +153,11 @@ def ws = post.getSession().getWorkspace().getName();
                   <input type="hidden" name="voteAvg" value="$voteAvg"/>
                   <input type="hidden" name="voteTotal" value="$voteTotal"/>
                   <input type="hidden" name="userVote" value="<%=voteValueOfUser%>"/>
-                  <a class="score-1" href="#">1</a>
-                  <a class="score-2" href="#">2</a>
-                  <a class="score-3" href="#">3</a>
-                  <a class="score-4" href="#">4</a>
-                  <a class="score-5" href="#">5</a>
+                  <a class="score-1" href="#" data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Rate.OneStar")%>">1</a>
+                  <a class="score-2" href="#" data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Rate.TwoStar")%>">2</a>
+                  <a class="score-3" href="#" data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Rate.ThreeStar")%>">3</a>
+                  <a class="score-4" href="#" data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Rate.Four")%>">4</a>
+                  <a class="score-5" href="#" data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Rate.Five")%>">5</a>
                   <span class="rate-current-score"><%=voteValueOfUser*20%></span>
                 </div>
 							</div>
@@ -157,11 +182,12 @@ def ws = post.getSession().getWorkspace().getName();
       // show edit button
       if ((poster == viewer) && (uicomponent.class.name =="org.exoplatform.wcm.webui.scv.UIPresentation")) {
       %>
-      <a class="btn " href="/portal/intranet/blog/admin?edit=true&path=/collaboration/Groups/platform/users/Documents/Blog/${post.name}&backto=/portal/intranet/blog"><i class="uiIconLightGray uiIconEdit"></i> Edit</a>
+      <a class="btn " href="/portal/intranet/blog/admin?edit=true&path=/$ws/$drivePath/${post.name}&backto=/portal/intranet/blog"
+         data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Icon.Edit")%>" ><i class="uiIconLightGray uiIconEdit"></i> <%=_ctx.appRes("Blog.Icon.Edit")%></a>
       <%
       } // end edit button
       %>
-      <a class="btn" href="/portal/intranet/blog" title="Back to top" ><i class="uiIconEcmsGoBack uiIconEcmsLightGray" ></i> Back</a>
+      <a class="btn" href="/portal/intranet/blog" data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Icon.BacktoTop")%>" ><i class="uiIconEcmsGoBack uiIconEcmsLightGray" ></i><%=_ctx.appRes("Blog.Icon.Back")%></a>
     </div> <!-- end sidebar -->
 
   </div> <!-- end #content -->
@@ -176,14 +202,15 @@ void commentList(Node post) {
 		def poster = post.getProperty("exo:owner").string
 		def postPath = post.getPath();
 		def isAdmin = Utils.isAdministratorUser();
-
+		def blogService = WCMCoreUtils.getService(BlogService.class);
+		def postCommentTotal = blogService.getPostComments(post);
 		if (comments) {
 			def plural=""
 			if (comments.size > 1) plural = "s"
 %>
 			<h5 class="title" id="total-comment">
-				${comments.size} comment${plural}
-				<input type="hidden" id="totalCurrentComment" value="${comments.size}" />
+				$postCommentTotal <%=_ctx.appRes("Blog.Comment.Title")%>
+				<input type="hidden" id="totalCurrentComment" value="$postCommentTotal" />
 			</h5>
 <div class="uiContentBox">
   <ul class="commentList" id="commentList">
@@ -205,7 +232,7 @@ void commentList(Node post) {
 				def postUuid = post.getUUID();
 				def _ws = comment.getSession().getWorkspace().getName();
 				if(comment.hasProperty("exo:commentStatus")){
-					approve = comment.getProperty("exo:commentStatus").getBoolean();
+					approve = !(comment.getProperty("exo:commentStatus").getBoolean());
 				}
 				if(isAdmin || viewer==poster){%> <!--is admin || owner -->
 						<li class="commentItem" id="comment-${comment.name}"  >
@@ -220,17 +247,16 @@ void commentList(Node post) {
 									<%if(isAdmin || viewer == poster){%>
 									<span id="approve-$timeId" class="pull-right approve">
 										<%if(!approve){%>
-											<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" >
-												<i class="uiIconAnsApprove uiIconAnsWhite"></i>
-												Approve</button>
+											<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Approve")%>' type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" >
+												<i class="uiIconAnsApprove uiIconAnsWhite"></i> <%=_ctx.appRes("Blog.Icon.Approve")%>  </button>
 										<%}else{%>
-											<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >
-												<i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>
+											<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Disapprove")%>' type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >
+												<i class="uiIconAnsDisapprove uiIconAnsLightGray"></i> <%=_ctx.appRes("Blog.Icon.Disapprove")%></button>
 										<%}%>
 									</span>
 									<%}%>
 
-									<a href="/portal/intranet/profile/$commentor">$commentorName,isAdmin: $isAdmin</a>
+									<a href="/portal/intranet/profile/$commentor">$commentorName $approve</a>
 									<span class="dateTime">$commentDate </span> &nbsp; &nbsp;
 									<input name="cmtPath" type="hidden" value="$cmtPath" />
 									<input name="postPath" type="hidden" value="$postPath" />
@@ -239,7 +265,7 @@ void commentList(Node post) {
 									<input name="viewer" type="hidden" value="$viewer" />
 									<input name="commentor" type="hidden" value="$commentorName" />
 									<input name="isAdmin" type="hidden" value="$isAdmin" />
-									<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${comment.name})"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
+									<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${comment.name})"><i class="uiIconReply uiIconLightGray"></i>  <%=_ctx.appRes("Blog.Icon.Reply")%></span>
 
 								</div> <!--end author-->
 								<div class="contentComment">
@@ -251,8 +277,14 @@ void commentList(Node post) {
 									</span>	 &nbsp; &nbsp;
 									<%if(isOwner || isAdmin){%>
 									<span>
-										<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="uiIconLightGray uiIconEdit"></i></a>
-										<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')"><i class="uiIconLightGray uiIconDelete" ></i></a>
+										<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Icon.Edit")%>"
+											 class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')">
+											<i class="uiIconLightGray uiIconEdit"></i>
+										</a>
+										<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Icon.Delete")%>"
+											 class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')">
+											<i class="uiIconLightGray uiIconDelete" ></i>
+										</a>
 									</span>
 									<%}%>
 								</div>
@@ -272,7 +304,7 @@ void commentList(Node post) {
 							</div><!--end commentLeft-->
 							<div class="commentRight">
 								<div class="author">
-									<a href="/portal/intranet/profile/$commentor">$commentorName,isAdmin: $isAdmin</a>
+									<a href="/portal/intranet/profile/$commentor">$commentorName</a>
 									<span class="dateTime">$commentDate </span> &nbsp; &nbsp;
 									<input name="cmtPath" type="hidden" value="$cmtPath" />
 									<input name="postPath" type="hidden" value="$postPath" />
@@ -281,7 +313,7 @@ void commentList(Node post) {
 									<input name="viewer" type="hidden" value="$viewer" />
 									<input name="commentor" type="hidden" value="$commentorName" />
 									<input name="isAdmin" type="hidden" value="$isAdmin" />
-									<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${comment.name})"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
+									<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${comment.name})"><i class="uiIconReply uiIconLightGray"></i><%=_ctx.appRes("Blog.Icon.Reply")%></span>
 								</div> <!--end author-->
 								<div class="contentComment">
 													<span id="$timeId" class="ContentBlock comment-context
@@ -292,8 +324,10 @@ void commentList(Node post) {
 													</span>	 &nbsp; &nbsp;
 									<%if(isOwner || isAdmin){%>
 													<span>
-														<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="uiIconLightGray uiIconEdit"></i></a>
-														<a class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')"><i class="uiIconLightGray uiIconDelete" ></i></a>
+														<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="Edit"
+															 class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.loadToEdit('$cmtPath', '$postUuid', '$timeId', '$_ws')"><i class="uiIconLightGray uiIconEdit"></i></a>
+														<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="Delete"
+															 class="actionIcon" href="javascript:void(0);" onclick="eXo.ecm.blog.deleteComment('$cmtPath', '${comment.name}' ,'$_ws')"><i class="uiIconLightGray uiIconDelete" ></i></a>
 													</span>
 									<%}%>
 								</div>
@@ -315,7 +349,7 @@ void commentList(Node post) {
 } // end if comments
 		else {
 		%>
-		<h5 class="title" id="total-comment">Comments <input type="hidden" id="totalCurrentComment" value="0"></h5>
+		<h5 class="title" id="total-comment"><%=_ctx.appRes("Blog.Comment.Title")%> <input type="hidden" id="totalCurrentComment" value="0"></h5>
 		<div class="uiContentBox">
 			<ul class="commentList" id="commentList"></ul>
 		</div>
@@ -349,10 +383,10 @@ void commentForm(Node post) {
 					<div class="commentRight">
 						<div class="commentInputBox " id="commentInputBox">
 							<form class="form-inline media" id="commentform-$uuid" name="commentform-$uuid">
-								<input type="button" name="commentCancel" value="Cancel" class="btn pull-right" rel="tooltip" data-placement="bottom" data-original-title="Cancel"
+								<input type="button" name="commentCancel" value='<%=_ctx.appRes("Blog.Icon.Cancel")%>' class="btn pull-right" rel="tooltip" data-placement="bottom" data-original-title='<%=_ctx.appRes("Blog.Icon.Reply")%>'
 											 onclick="eXo.ecm.blog.commentCancel('$uuid', 'rootPostComment')" style="display: none;" />
 
-								<input type="button" name="submit" value="Post Comment" class="btn btn-primary  pull-right" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title="Comment"
+								<input type="button" name="submit" value='<%=_ctx.appRes("Blog.Icon.PostComment")%>' class="btn btn-primary  pull-right" rel="tooltip" data-placement="bottom" id="btn-$uuid" data-original-title='<%=_ctx.appRes("Blog.Icon.PostComment")%>'
 											 onclick="eXo.ecm.blog.postComment('$uuid', 'rootPostComment')" />
 								<div class="media-body">
                   <input type="hidden" name="postPath" value="$postPath" />
@@ -367,7 +401,7 @@ void commentForm(Node post) {
 									<input name="action" type="hidden" value=""/>
 									<input name="type" type="hidden" value="rootPostComment" />
 									<input name="isAdmin" type="hidden" value="$isAdmin" />
-									<input type="text" name="comment" id="comment-$uuid" placeholder="Your Comment Here"   tabindex="0" style="width:100%" onkeydown="return eXo.ecm.blog.prePostComment(event, '$uuid')" />
+									<input type="text" name="comment" id="comment-$uuid" placeholder='<%=_ctx.appRes("Blog.Input.Comment.Placeholder")%>'   tabindex="0" style="width:100%" onkeydown="return eXo.ecm.blog.prePostComment(event, '$uuid')" />
 								</div>
 							</form>
 						</div>
@@ -395,7 +429,7 @@ void tags(def node) {
 	for(tag in tags) {
 		def name = tag.name
 		def url="/portal/intranet/blog?folder-id=repository:collaboration:/tags/$name"
-			%> <a href="$url" title="View all posts in $name" rel="category tag" class="label tag">$name</a> <%
+			%> <a href="$url" title="<%=_ctx.appRes("Blog.Tag.ViewInTag")%> $name" rel="category tag" class="label tag">$name</a> <%
 			if (i++ < (tags.size-1)) print " "
 	} //end loop on  tags
 } //end renderTags
@@ -523,18 +557,22 @@ void printCommentChild(NodeIterator comments, String poster){
 							<li class="commentItem" id="comment-${node.name}">
 								<div class="clearfix comment-container">
 									<div class="commentLeft">
-										<a data-original-title="$_commentor" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/$_commentor" class="avatarXSmall">
-											<img src="$_commentorAvatar" alt="$_commentor">
+										<a data-original-title="<%=fullName(_commentor)%>" data-placement="bottom" rel="tooltip" h
+											 ref="/portal/intranet/profile/$_commentor" class="avatarXSmall">
+											<img src="$_commentorAvatar" alt="<%=fullName(_commentor)%>">
 										</a>
 									</div> <!--end comment left-->
 									<div class="commentRight">
 										<div class="author">
 												<span id="approve-$_timeId" class="pull-right approve">
 													<%if(!_approve){%>
-														<button type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');" >
-															<i class="uiIconAnsApprove uiIconAnsWhite"></i>Approve</button>
+														<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Approve")%>'
+																		type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');" >
+															<i class="uiIconAnsApprove uiIconAnsWhite"></i><%=_ctx.appRes("Blog.Icon.Approve")%></button>
 													<%}else{%>
-														<button type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');"  ><i class="uiIconAnsDisapprove uiIconAnsLightGray"></i>Disapprove</button>
+														<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Disapprove")%>'
+																		type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');"  >
+															<i class="uiIconAnsDisapprove uiIconAnsLightGray"></i><%=_ctx.appRes("Blog.Icon.Disapprove")%></button>
 													<%}%>
 												</span>
 											<a href="/portal/intranet/profile/$_commentor"><%=fullName(_commentor)%></a>
@@ -547,7 +585,7 @@ void printCommentChild(NodeIterator comments, String poster){
 											<input name="viewer" type="hidden" value="$_viewer" />
                       <input name="viewerFullname" type="hidden" value="<%=fullName(_viewer)%>" />
 											<input name="commentor" type="hidden" value="<%=fullName(_viewer)%>" />
-											<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${node.name})"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
+											<!--span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${node.name})"><i class="uiIconReply uiIconLightGray"></i><%=_ctx.appRes("Blog.Icon.Reply")%></span-->
 										</div><!--end author-->
 										<div class="contentComment">
 											<span class="ContentBlock
@@ -558,8 +596,10 @@ void printCommentChild(NodeIterator comments, String poster){
 											</span>&nbsp; &nbsp;
 											<%if(_isOwner || _isAdmin){%>
 											<span>
-												<a onclick="eXo.ecm.blog.loadToEdit('$_commentPath', '${node.name}', '$_timeId', '$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
-												<a onclick="eXo.ecm.blog.deleteComment('$_commentPath', '${node.name}' ,'$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
+												<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Edit")%>'
+													 onclick="eXo.ecm.blog.loadToEdit('$_commentPath', '${node.name}', '$_timeId', '$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
+												<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Delete")%>'
+													 onclick="eXo.ecm.blog.deleteComment('$_commentPath', '${node.name}' ,'$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
 											</span>
 											<%}%>
 										</div>
@@ -578,9 +618,9 @@ void printCommentChild(NodeIterator comments, String poster){
 					<li class="commentItem" id="comment-${node.name}">
 						<div class="clearfix comment-container">
 							<div class="commentLeft">
-								<a data-original-title="$_commentor" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/$_commentor"
+								<a data-original-title="<%=fullName(_commentor)%>" data-placement="bottom" rel="tooltip" href="/portal/intranet/profile/$_commentor"
 									 class="avatarXSmall">
-									<img src="$_commentorAvatar" alt="$_commentor">
+									<img src="$_commentorAvatar" alt="<%=fullName(_commentor)%>">
 								</a>
 							</div> <!--end comment left-->
 							<div class="commentRight">
@@ -595,15 +635,17 @@ void printCommentChild(NodeIterator comments, String poster){
 									<input name="viewer" type="hidden" value="$_viewer" />
                   <input name="viewerFullname" type="hidden" value="<%=fullName(_viewer)%>" />
 									<input name="commentor" type="hidden" value="<%=fullName(_viewer)%>" />
-									<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${node.name})"><i class="uiIconReply uiIconLightGray"></i> Reply</span>
+									<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${node.name})"><i class="uiIconReply uiIconLightGray"></i><%=_ctx.appRes("Blog.Icon.Reply")%></span>
 								</div><!--end author-->
 								<div class="contentComment">
 									<span class="ContentBlock" id="$_timeId"> $_commentContent
 									</span>&nbsp; &nbsp;
 									<%if(_isOwner){%>
 										<span>
-											<a onclick="eXo.ecm.blog.loadToEdit('$_commentPath', '${node.name}', '$_timeId', '$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
-											<a onclick="eXo.ecm.blog.deleteComment('$_commentPath', '${node.name}' ,'$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
+											<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Edit")%>'
+												 onclick="eXo.ecm.blog.loadToEdit('$_commentPath', '${node.name}', '$_timeId', '$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconEdit"></i></a>
+											<a data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Delete")%>'
+												 onclick="eXo.ecm.blog.deleteComment('$_commentPath', '${node.name}' ,'$_ws')" href="javascript:void(0);" class="actionIcon"><i class="uiIconLightGray uiIconDelete"></i></a>
 										</span>
 									<%}%>
 								</div>
@@ -614,7 +656,7 @@ void printCommentChild(NodeIterator comments, String poster){
 				</ul>
 		<%
 				}else{ //end if checkcomment != null
-					printCommentChild(node.getNodes(), poster);
+				//	printCommentChild(node.getNodes(), poster);
 				}
 		}}
 	} // end while

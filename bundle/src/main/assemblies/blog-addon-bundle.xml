@@ -9,17 +9,17 @@
 		<!-- wars -->
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>/</outputDirectory>
+      <outputDirectory>/${project.build.finalName}/webapps</outputDirectory>
 			<includes>
-				<include>${project.groupId}:blog:war</include>
+				<include>${project.groupId}:blog-extension-webapp:war</include>
 			</includes>
 			<scope>provided</scope>
-			<outputFileNameMapping>blog.war</outputFileNameMapping>
+			<outputFileNameMapping>blog-extension-webapp.war</outputFileNameMapping>
 		</dependencySet>
 		<!-- Libraries -->
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>/</outputDirectory>
+      <outputDirectory>/${project.build.finalName}/lib</outputDirectory>
 			<includes>
 				<include>${project.groupId}:*:jar</include>
 			</includes>
