@@ -68,4 +68,12 @@ public class Util {
       return defaultValue;
     }
   }
+
+  public static long getLong(String value, long defaultValue){
+    try{
+      return Long.parseLong(value);
+    }catch(NumberFormatException ex){
+      return defaultValue;
+    }
+  }
 }

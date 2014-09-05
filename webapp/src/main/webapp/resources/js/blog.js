@@ -213,6 +213,7 @@
               var viewer = aform.find('input[name="viewer"]').val();
               var fme = aform.find('input[name="fme"]').val();
               var avatar = aform.find('input[name="avatar"]').val();
+              var viewerFullname  = aform.find('input[name="viewerFullname"]').val();
               var date = new Date();
               var timeId = date.getTime();
 
@@ -220,7 +221,7 @@
 
               //var result = new StringBuffer();
               var result="";
-              result += "<li class=\"commentItem\" id=\"comment-"+timeId+"\">";
+              result += "<li class=\"commentItem\" id=\"comment-"+timeId+"\"><div class=\"clearfix comment-container\">";
               result += "	<div class=\"commentLeft\">";
               result += "		<a class=\"avatarXSmall\" href=\""+avatar+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
               result += "			<img alt=\""+fme+"\" src=\""+avatar+"\">";
@@ -237,10 +238,13 @@
               result += "<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\" />";
               result += "<input name=\"fme\" type=\"hidden\" value=\""+fme+"\" />";
               result += "<input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\" />";
+              result += "<input name=\"viewerFullname\" type=\"hidden\" value=\""+viewerFullname+"\" />";
 
-              result += "<input name=\"postPath\" type=\"hidden\" value=\""+postPath+"\" />";
 
-              result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> "+blog_icon_reply+"</span>";
+              if(type === 'rootPostComment'){
+                result += "	<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+timeId+")\" ><i class=\"uiIconReply uiIconLightGray\"></i> "+blog_icon_reply+"</span>";
+              }
+
               if(isAdmin == "true"){
                 result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
                 result += "	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"');\" value=\""+blog_icon_disapprove+"\">";
@@ -259,20 +263,25 @@
               result += "	</div>"
 
               result += "</div>";
-              //  result += "</div>";
+              result += "</div>";
               result += "</li>";
 
               if(type !== 'rootPostComment'){
                 $("#comment-form-"+uuid+" .commentItem").has("form").remove();
-                $("#comment-"+uuid).append("<ul class=\"commentList children\">"+result + "</ul>");
+
+                $("#reply-comment-more").before(result);
               }else{
-                $("#commentList").append(result);
+                $("#view-more").before(result);
+                $("#view-more").find(".view-more").html('');
               }
               $("#commentInputBox input[name=comment]").val('');
               var plural="";
               totalComment ++ ;
               if(totalComment>1){plural="s";}
               $("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
+
+
+
             }else{//end if (_data.result=false)
               alert("Error, u can trial again!.");
             }
@@ -309,6 +318,7 @@
         type: "POST"
       })
           .success(function (data) {
+            console.log(data);
             var rs = $.parseJSON(data);
             var btn = '<button type="button" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');" ';
 
@@ -356,7 +366,7 @@
 
             var obj = new Object();
             obj.score = score;
-            obj.postPath = ui.find("input[name=postPath]").val();
+            obj.postPath = $("#postPath").val();
             obj.ws = ui.find("input[name=ws]").val()
             console.log(obj);
             $.ajax({
@@ -388,8 +398,120 @@
     })
 
 
+    //lazy load post comments
 
-  });
+    $("body").lazyScrollLoading({
+      lazyItemSelector : ".lazyItem",
+      onScrollToBottom : function(e, $lazyItems, $firstVisibleLazyItems) {
+        var viewMore = $("#view-more");
+
+        var postPath = $('#postPath').val();
+        var limit = viewMore.find('input[name="limit"]').val();
+        var offset = viewMore.find('input[name="offset"]').val();
+        var ws =$("#ws").val()
+        var repo = $("#repo").val()
+        var isAdmin = viewMore.find('input[name="isAdmin"]').val();
+        var viewer = viewMore.find('input[name="viewer"]').val();
+        var fme = viewMore.find('input[name="fme"]').val();
+        var isLoad = viewMore.find('input[name="isLoad"]').val();
+        var postUUID = viewMore.find('input[name="postUuid"]').val();
+
+
+        if(!isLoad) return;
+
+        var obj = new Object();
+        obj.jcrPath = postPath;
+        obj.limit = limit;
+        obj.offset=offset+limit;
+        obj.ws = ws;
+        obj.repo=repo;
+
+        $.ajax({
+          url: "/portal/rest/blog/service/getComments",
+          data:obj,
+          dataType: "text",
+          type: "POST"
+        })
+            .success(function (data) {
+              var _result = $.parseJSON(data);
+              var _data = _result.data;
+
+              if(_result.success && _data.length>0){
+
+                var blog_icon_delete = $("#blog-icon-delete").val();
+                var blog_icon_edit = $("#blog-icon-edit").val();
+                var blog_icon_approve = $("#blog-icon-approve").val();
+                var blog_icon_disapprove = $("#blog-icon-disapprove").val();
+                var blog_icon_reply = $("#blog-icon-reply").val();
+                var blog_message_delete = $("#blog-message.delete").val();
+                var blog_message_comment_placeholder = $("#blog-message-comment-placeholder").val();
+                var result = "";
+                $.each(_data, function(key, val) {
+                  var commentContent = val.commentContent;
+                  var commentDate = val.commentDate;
+                  var workspace = val.workspace;
+                  var commentStatus = val.commentStatus;
+                  var commentor = val.commentor;
+                  var commentPath = val.commentPath;
+
+                  result+="<li class=\"commentItem lazyItem\" id=\"comment-"+commentDate+"\">";
+                  result+="							<div class=\"commentLeft\">";
+                  result+="								<a class=\"avatarXSmall\" href=\"/portal/intranet/profile/"+commentor+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
+                  result+="									<img alt=\""+fme+"\" src=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\">";
+                  result+="								</a>";
+                  result+="							</div><!--end commentLeft-->";
+                  result+="							<div class=\"commentRight\">";
+                  result+="								<div class=\"author\">";
+                  result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
+                  result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
+                  result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
+                  result+="									</span>";
+                  result+="									<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
+                  result+="									<span class=\"dateTime\">on Sep 5, 2014 at 1:43 PM </span> &nbsp; &nbsp;";
+                  result+="									<input name=\"cmtPath\" type=\"hidden\" value=\""+commentPath+"\">";
+                  result += "					      <input name=\"viewerFullname\" type=\"hidden\" value=\""+fme+"\" />";
+                  result+="									<input name=\"ws\" type=\"hidden\" value=\"collaboration\">";
+                  result+="									<input name=\"avatar\" type=\"hidden\" value=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\">";
+                  result+="									<input name=\"fme\" type=\"hidden\" value=\""+fme+"\">";
+                  result+="									<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\">";
+                  result+="									<input name=\"commentor\" type=\"hidden\" value=\""+commentor+"\">";
+                  result+="									<input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\">";
+                  result+="									<span class=\"reply actionIcon\" onclick=\"eXo.ecm.blog.replyComment("+commentDate+")\"><i class=\"uiIconReply uiIconLightGray\"></i>"+blog_icon_reply+"</span>";
+                  result+="								</div> <!--end author-->";
+                  result+="								<div class=\"contentComment\">";
+                  result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context\">"+commentContent;
+                  result+="									</span>	 &nbsp; &nbsp;";
+                  result+="									<span>";
+                  result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
+                  result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
+                  result+="										</a>";
+                  result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
+                  result+="											<i class=\"uiIconLightGray uiIconDelete\"></i>";
+                  result+="										</a>";
+                  result+="									</span>";
+                  result+="								</div>";
+                  result+="							</div><!--end commentRight-->";
+                  result+="							";
+                  result+="						</li>";
+                })
+
+                viewMore.find('input[name="offset"]').val(eval(limit) + eval(offset));
+                $("#view-more").before(result);
+              }else{
+                viewMore.find('input[name="isLoad"]').val(false);
+                $("#view-more").find(".view-more").html('No anymore entry!');
+              }
+            })
+            .error(function(){
+              location.reload();
+              console.log('error');
+            })
+
+
+      },
+    });
+
+  }); // end document.ready();
 
 
 
@@ -751,13 +873,14 @@
             }else{
               $('#commentform-'+postUUID+' input[name=commentCancel]').removeAttr("style");
             }
+            var blog_icon_updatecomment = $("#blog-icon-updatecomment").val();
             $('#commentform-'+postUUID+' input[name=comment]').val(_result.commentContent);
             $('#commentform-'+postUUID+' input[name=comment]').focus();
             $('#commentform-'+postUUID+' input[name=commentPath]').val(_result.commentPath);
             $('#commentform-'+postUUID+' input[name=timeId]').val(timeId);
             $('#commentform-'+postUUID+' input[name=ws]').val(ws);
             $('#commentform-'+postUUID+' input[name=action]').val("Edit");
-            $('#commentform-'+postUUID+' input[name=submit]').attr("value","Update Comment");
+            $('#commentform-'+postUUID+' input[name=submit]').attr("value", blog_icon_updatecomment);
             $('#commentform-'+postUUID+' input[name=submit]').attr("onclick","eXo.ecm.blog.editComment('"+postUUID+"')");
           }else{
             alert('Comment in '+commentPath+ ' doesnt exist!');
@@ -767,16 +890,6 @@
   }
 
   blog.prototype.deleteComment = function(commentPath, commendId, ws){
-    /* $.confirm({
-     text: "This is a confirmation dialog manually triggered! Please confirm:",
-     confirm: function(button) {
-     alert("You just confirmed.");
-     },
-     cancel: function(button) {
-     alert("You cancelled.");
-     }
-     });
-     */
     if (confirm("Are u sure?")) {
       var obj = new Object();
       if (commentPath.charAt(1)==='/') commentPath.substr(1, commentPath.length);
@@ -816,7 +929,7 @@
     var comment = aform.find('input[name="comment"]').val();
     var path = aform.find('input[name="commentPath"]').val();
     var timeId = aform.find('input[name="timeId"]').val();
-    var ws = aform.find('input[name="ws"]').val();
+    var ws = $("#ws").val();
     var type = aform.find('input[name="type"]').val();
     var obj = new Object();
     obj.commentPath = path;
@@ -842,11 +955,8 @@
           $('#commentform-'+uuid+' input[name=commentCancel]').attr("style","display:none;");
           $('#commentform-'+uuid+' input[name=action').val('');
           $('#commentform-'+uuid+' input[name=comment').val('');
-          /*
-           $('html, body').animate({
-           scrollTop: destination.offset().top
-           }, 2000);
-           */
+          var position = $('#'+timeId).offset().top - $(document).height()/4;
+          $('html, body').animate({scrollTop: position}, 1000);
         }else{
           alert('Edit comment failed. Please retry again!.');
           aform.find('input[name="comment"]').focus();
@@ -872,13 +982,16 @@
     var commentItem = $("#comment-"+commentId);
     var commentPath = commentItem.find('input[name="cmtPath"]').val();
 //		var CPath = commentItem.find('input[name="postPath"]').val();
-    var ws = commentItem.find('input[name="ws"]').val();
+    var ws = $("#ws").val();
     var avatar = commentItem.find('input[name="avatar"]').val();
     var viewer = commentItem.find('input[name="viewer"]').val();
     var isAdmin = commentItem.find('input[name="isAdmin"]').val();
     var viewerFullname = commentItem.find('input[name="viewerFullname"]').val();
     $("#comment-"+commentId+" ul:last-child ").has("form").remove();
     var blog_message_replycomment_placeholder = $("#blog-message-replycomment-placeholder").val();
+    var blog_icon_updatecomment = $("#blog-icon-updatecomment").val();
+    var blog_icon_cancel = $("#blog-icon-cancel").val();
+    var blog_icon_reply = $("#blog-icon-reply").val();
     var commentForm="";
     commentForm += "<ul class=\"commentList children\" id=\"comment-form-"+commentId+"\" >";
     commentForm += "<li class=\"commentItem\">";
@@ -892,9 +1005,9 @@
     commentForm += "	<div class=\"commentRight\">";
     commentForm += "		<div id=\"commentInputBox\" class=\"commentInputBox\">";
     commentForm += "			<form name=\"commentform-"+commentId+"\" id=\"commentform-"+commentId+"\" class=\"form-inline media\">";
-    commentForm += "				<input type=\"button\" onclick=\"eXo.ecm.blog.commentCancel('"+commentId+"')\" data-original-title=\"Cancel\" id=\"btn-cancel"+commentId+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"btn pull-right\" value=\"Cancel\" />";
+    commentForm += "				<input type=\"button\" onclick=\"eXo.ecm.blog.commentCancel('"+commentId+"')\" data-original-title=\""+blog_icon_cancel+"\" id=\"btn-cancel"+commentId+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"btn pull-right\" value=\""+blog_icon_cancel+"\" />";
 
-    commentForm += "				<input type=\"button\" name=\"submit\" onclick=\"eXo.ecm.blog.postComment('"+commentId+"')\" data-original-title=\"Reply Comment\" id=\"btn-"+commentId+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"btn btn-primary  pull-right\" value=\"Reply\" />";
+    commentForm += "				<input type=\"button\" name=\"submit\" onclick=\"eXo.ecm.blog.postComment('"+commentId+"')\" data-original-title=\""+blog_icon_cancel+"\" id=\"btn-"+commentId+"\" data-placement=\"bottom\" rel=\"tooltip\" class=\"btn btn-primary  pull-right\" value=\""+blog_icon_reply+"\" />";
     commentForm += "					<div class=\"media-body\">";
     commentForm += "					<input name=\"avatar\" type=\"hidden\" value=\""+avatar+"\" />";
     commentForm += "					<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\" />";
@@ -1024,6 +1137,32 @@
       }
     ]
   });
+
+
+  $.fn.scrollTo = function( target, options, callback ){
+    if(typeof options == 'function' && arguments.length == 2){ callback = options; options = target; }
+    var settings = $.extend({
+      scrollTarget  : target,
+      offsetTop     : 50,
+      duration      : 500,
+      easing        : 'swing'
+    }, options);
+    return this.each(function(){
+      var scrollPane = $(this);
+      var scrollTarget = (typeof settings.scrollTarget == "number") ? settings.scrollTarget : $(settings.scrollTarget);
+      var scrollY = (typeof scrollTarget == "number") ? scrollTarget : scrollTarget.offset().top + scrollPane.scrollTop() - parseInt(settings.offsetTop);
+      scrollPane.animate({scrollTop : scrollY }, parseInt(settings.duration), settings.easing, function(){
+        if (typeof callback == 'function') { callback.call(this); }
+      });
+    });
+  }
+
+  blog.prototype.loadReply = function(){
+    var parent = $(this).parent();
+    var limit = parent.find('input[name="limit"]').val();
+    console.log(limit);
+  }
+
   eXo.ecm.blog = new blog();
   return eXo.ecm.blog;
   //-------------------------------------------------------------------------//

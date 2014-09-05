@@ -18,6 +18,7 @@
 package org.exoplatform.com.blog.service;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import java.util.List;
 
 /**
@@ -124,5 +125,14 @@ public interface BlogService {
    * @return
    */
   public Node getLastComment(Node postNode);
+
+  /**
+   * Get post comments
+   * Using for lazy load comment
+   * @param limit
+   * @param offset
+   * @return
+   */
+  public NodeIterator getComments(Node postNode, long limit, long offset);
 
 }

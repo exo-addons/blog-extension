@@ -26,6 +26,7 @@ import org.exoplatform.services.jcr.RepositoryService;
 import org.exoplatform.services.jcr.core.ManageableRepository;
 import org.exoplatform.services.jcr.ext.app.SessionProviderService;
 import org.exoplatform.services.jcr.ext.common.SessionProvider;
+import org.exoplatform.services.jcr.impl.core.query.QueryImpl;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -53,6 +54,7 @@ public class BlogServiceImpl implements BlogService {
   private static final String EXO_DATE_CREATED = "exo:dateCreated";
   private static final String BLOG_POST_VIEWCOUNT_PROPERTY = "exo:blogViewCount";
   private static final String BLOG_DEFAULT_LANGUAGE = "en";
+  private static final String COMMENTS = "comments";
 
   private static final String BLOG_COMMENT_NODE = "exo:blogComment";
   private static final String BLOG_COMMENT_STATUS_PROPERTY = "exo:commentStatus";
@@ -331,11 +333,10 @@ public class BlogServiceImpl implements BlogService {
       StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
 
-      QueryManager queryManager = getSystemSession().getWorkspace().getQueryManager();
+//      Session session = getSystemSession(); //only unitest
+      Session session = getSession();
+      QueryManager queryManager = session.getWorkspace().getQueryManager();
       Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
-//      QueryImpl query1 = (QueryImpl)queryManager.createQuery(null,null);
-//      query1.setLimit(1);
-//      query1.setOffset(1);
       NodeIterator nodes = query.execute().getNodes();
       return nodes.getSize();
     }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
@@ -351,12 +352,36 @@ public class BlogServiceImpl implements BlogService {
       StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
       queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
-      QueryManager queryManager = getSession().getWorkspace().getQueryManager();
+//      Session session = getSystemSession(); //only unitest
+      Session session = getSession();
+      QueryManager queryManager = session.getWorkspace().getQueryManager();
       Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
 
       NodeIterator nodes = query.execute().getNodes();
 
       return nodes.nextNode();
+    }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public NodeIterator getComments(Node postNode, long limit, long offset) {
+    try {
+      StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
+      queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
+      queryBuilder.append(" AND NOT jcr:path LIKE '" + postNode.getPath() + "/comments/%/%' ");
+      queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
+//      Session session = getSystemSession(); //only unitest
+      Session session = getSession();
+      QueryManager queryManager = session.getWorkspace().getQueryManager();
+      QueryImpl query = (QueryImpl)queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+      query.setLimit(limit);
+      query.setOffset(offset);
+      NodeIterator nodes = query.execute().getNodes();
+      return nodes;
     }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
     return null;
   }

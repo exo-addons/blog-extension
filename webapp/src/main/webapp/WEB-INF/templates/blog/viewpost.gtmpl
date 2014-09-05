@@ -71,6 +71,8 @@ ManageDriveService manageDriveService = WCMCoreUtils.getService(ManageDriveServi
 DriveData driveData = manageDriveService.getDriveByName("Blog");
 
 def drivePath = driveData.getHomePath();
+
+
 %>
 <script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/popup.min.js" ></script>
@@ -78,6 +80,7 @@ def drivePath = driveData.getHomePath();
 <script type="text/javascript" src="/blog/resources/js/blog-rate.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog-scroll.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/jquery.lazyscrollloading-min.js" ></script>
 
 <!--script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
@@ -97,7 +100,9 @@ def drivePath = driveData.getHomePath();
 	<input type="hidden" id="blog-message-replycomment-placeholder" value="<%=_ctx.appRes("Blog.Input.ReplyComment.Placeholder")%>" />
 	<input type="hidden" id="blog-message-rate-title" value="<%=_ctx.appRes("Blog.Rate.Title")%>" />
 	<input type="hidden" id="blog-message-rate-button" value="<%=_ctx.appRes("Blog.Rate.Button")%>" />
-
+  <input type="hidden" id="postPath" value="$postPath">
+  <input id="ws" type="hidden" value="$ws" />
+  <input id="repo" type="hidden" value="$repoName" />
 
   <div id="content" class="clearfix content-blog">
     <div id="main" class="main-content" role="main">
@@ -148,7 +153,6 @@ def drivePath = driveData.getHomePath();
               <div class="rate-text" ><%=_ctx.appRes("Blog.Rate.Content")%>:<%=voteValueOfUser%></div>
 							<div class="rate-content">
                 <div class="rate-wrapper">
-                  <input type="hidden" name="postPath" value="$postPath">
                   <input type="hidden" name="ws" value="$ws">
                   <input type="hidden" name="voteAvg" value="$voteAvg"/>
                   <input type="hidden" name="voteTotal" value="$voteTotal"/>
@@ -196,14 +200,24 @@ def drivePath = driveData.getHomePath();
 /* display comments of this post */
 void commentList(Node post) {
 	try {
-		def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(post, null)
+		def blogService = WCMCoreUtils.getService(BlogService.class);
+		def limit=5;
+		def offset=0;
+
+		//def comments = uicomponent.getApplicationComponent(CommentsService.class).getComments(post, null)
+		def comments = blogService.getComments(post, limit, offset);
 		def formatter =  new SimpleDateFormat("'on' MMM d, yyyy 'at' h:mm a")
 		def viewer = _ctx.getRequestContext().getRemoteUser()
 		def poster = post.getProperty("exo:owner").string
 		def postPath = post.getPath();
 		def isAdmin = Utils.isAdministratorUser();
-		def blogService = WCMCoreUtils.getService(BlogService.class);
+		def postUuid = post.getUUID();
 		def postCommentTotal = blogService.getPostComments(post);
+
+
+		def ws = post.getSession().getWorkspace().getName();
+		def repoName = WCMCoreUtils.getRepository().getConfiguration().getName();
+
 		if (comments) {
 			def plural=""
 			if (comments.size > 1) plural = "s"
@@ -217,6 +231,7 @@ void commentList(Node post) {
     <%
     int i=0;
     for (comment in comments) {
+		if(i==limit) break;
 			try {
 				def rem = ((i++)%2 == 0)?"even":"odd"
 				def commentor = comment.getProperty("exo:commentor").string
@@ -229,13 +244,13 @@ void commentList(Node post) {
 				def cmtPath = comment.getPath();
 				def timeId = comment.getProperty("exo:commentDate").date.time.time;
 				def approve = true;
-				def postUuid = post.getUUID();
+
 				def _ws = comment.getSession().getWorkspace().getName();
 				if(comment.hasProperty("exo:commentStatus")){
 					approve = !(comment.getProperty("exo:commentStatus").getBoolean());
 				}
 				if(isAdmin || viewer==poster){%> <!--is admin || owner -->
-						<li class="commentItem" id="comment-${comment.name}"  >
+						<li class="commentItem lazyItem" id="comment-${comment.name}"  >
 							<div class="commentLeft">
 								<a class="avatarXSmall" href="/portal/intranet/profile/$commentor" rel="tooltip" data-placement="bottom"
 									 data-original-title="$commentorName">
@@ -256,15 +271,15 @@ void commentList(Node post) {
 									</span>
 									<%}%>
 
-									<a href="/portal/intranet/profile/$commentor">$commentorName $approve</a>
+									<a href="/portal/intranet/profile/$commentor">$commentorName</a>
 									<span class="dateTime">$commentDate </span> &nbsp; &nbsp;
 									<input name="cmtPath" type="hidden" value="$cmtPath" />
-									<input name="postPath" type="hidden" value="$postPath" />
-									<input name="ws" type="hidden" value="$_ws" />
+
 									<input name="avatar" type="hidden" value="$commentorAvatar" />
 									<input name="viewer" type="hidden" value="$viewer" />
 									<input name="commentor" type="hidden" value="$commentorName" />
 									<input name="isAdmin" type="hidden" value="$isAdmin" />
+
 									<span class="reply actionIcon" onclick="eXo.ecm.blog.replyComment(${comment.name})"><i class="uiIconReply uiIconLightGray"></i>  <%=_ctx.appRes("Blog.Icon.Reply")%></span>
 
 								</div> <!--end author-->
@@ -289,7 +304,7 @@ void commentList(Node post) {
 									<%}%>
 								</div>
 							</div><!--end commentRight-->
-							<% printCommentChild(comment.getNodes(), poster); %>
+							<% printCommentChild(comment, poster); %>
 						</li><!--end commentItem-->
 				<%
 				}else{
@@ -332,7 +347,7 @@ void commentList(Node post) {
 									<%}%>
 								</div>
 							</div><!--end commentRight-->
-							<% printCommentChild(comment.getNodes(), poster); %>
+							<!--% printCommentChild(comment, poster); %-->
 						</li><!--end commentItem-->
 				<%
 							}
@@ -342,7 +357,21 @@ void commentList(Node post) {
 			continue; //skip broken comments
     } // end trycatch
 	} // end loop on comments
+
 		%>
+    <li id="view-more">
+      <input name="postPath" type="hidden" value="$postPath" />
+      <input name="limit" type="hidden" value="$limit" />
+      <input name="offset" type="hidden" value="$offset" />
+      <input name="isAdmin" type="hidden" value="$isAdmin" />
+      <input name="viewer" type="hidden" value="$viewer" />
+      <input name="fme" type="hidden" value="<%=fullName(viewer)%>" />
+			<input name="isLoad" type="hidden" value="true" />
+      <input name="avatar" type="hidden" value="/social-resources/skin/images/ShareImages/UserAvtDefault.png" />
+      <input name="type" type="hidden" value="rootPostComment" />
+      <input name="postUuid" type="hidden" value="$postUuid" />
+      <div class="view-more" ></div>
+    </li>
   </ul> <!--end commentlist-->
 </div> <!--end uiContentBox-->
 		<%
@@ -394,12 +423,13 @@ void commentForm(Node post) {
                   <input name="viewerFullname" type="hidden" value="<%=fullName(viewer)%>" />
 									<input name="fme" type="hidden" value="<%=fullName(viewer)%>" />
 									<input name="avatar" type="hidden" value="/social-resources/skin/images/ShareImages/UserAvtDefault.png" />
+                  <input name="type" type="hidden" value="rootPostComment" />
 									<input name="jcrPath" type="hidden" value="/repository/collaboration${post.path}"/>
 									<input name="commentPath" type="hidden" value="${post.path}"/>
 									<input name="timeId" type="hidden" value=""/>
 									<input name="ws" type="hidden" value=""/>
 									<input name="action" type="hidden" value=""/>
-									<input name="type" type="hidden" value="rootPostComment" />
+
 									<input name="isAdmin" type="hidden" value="$isAdmin" />
 									<input type="text" name="comment" id="comment-$uuid" placeholder='<%=_ctx.appRes("Blog.Input.Comment.Placeholder")%>'   tabindex="0" style="width:100%" onkeydown="return eXo.ecm.blog.prePostComment(event, '$uuid')" />
 								</div>
@@ -522,13 +552,21 @@ String avatarUrl(def poster) {
 	return avatar
 }
 
-void printCommentChild(NodeIterator comments, String poster){
-	//	def nodes = comment.getNodes();
+void printCommentChild(Node commentsNode, String poster){
+
+	def blogService = WCMCoreUtils.getService(BlogService.class);
+	def limit =5;
+	def offset = 0;
+	def commentTimeId = commentsNode.getProperty("exo:commentDate").date.time;
+	def comments = blogService.getComments(commentsNode, limit, offset);
+
 	def size = comments.getSize();
 	def formatter =  new SimpleDateFormat("'on' MMM d, yyyy 'at' h:mm a");
 
 	while(comments.hasNext()){
 		def node = comments.nextNode();
+
+		def nodeCommentTotal = commentsNode.getNode("comments").getNodes().getSize();
 		def _commentContent;
 		def _commentDate;
 		def _commentor;
@@ -539,6 +577,7 @@ void printCommentChild(NodeIterator comments, String poster){
 		def isAdmin = Utils.isAdministratorUser();
 		def _timeId;
 		def _ws = node.getSession().getWorkspace().getName();
+
 		if(node.hasProperty("exo:commentContent")){ _commentContent = node.getProperty("exo:commentContent").string; }
 		if(node.hasProperty("exo:commentDate")){ _commentDate = formatter.format(node.getProperty("exo:commentDate").date.time);}
 		if(node.hasProperty("exo:commentor")){ _commentor=node.getProperty("exo:commentor").string }
@@ -604,12 +643,28 @@ void printCommentChild(NodeIterator comments, String poster){
 											<%}%>
 										</div>
 									</div><!--end commentRight-->
-									<% printCommentChild(node.getNodes(), poster); %>
+
 								</div>
 							</li>
+              <%if(!comments.hasNext() && nodeCommentTotal>limit){%>
+                <li id="reply-comment-more-$commentTimeId">
+                  <input name="cmtPath" type="hidden" value="$_commentPath" />
+                  <input name="isOwner" type="hidden" value="$_isOwner" />
+                  <input name="avatar" type="hidden" value="$_commentorAvatar" />
+                  <input name="viewer" type="hidden" value="$_viewer" />
+                  <input name="viewerFullname" type="hidden" value="<%=fullName(_viewer)%>" />
+                  <input name="commentor" type="hidden" value="<%=fullName(_viewer)%>" />
+                  <input name="limit" type="hidden" value="$limit" />
+                  <input name="offset" type="hidden" value="$offset" />
+                  <div class="reply-comment-more" onclick="eXo.ecm.blog.loadReply();"><a href="javascript:void(0)"  >Read more... </a></div>
+                </li>
+              <%}%>
 						</ul>
 		<%
-				}else{ printCommentChild(node.getNodes(), poster);}
+				}else{
+
+					/*printCommentChild(node, poster);*/
+				}
 		}else{ //normal user
 			if(_approve){
 				if(_commentContent != null){
@@ -650,15 +705,20 @@ void printCommentChild(NodeIterator comments, String poster){
 									<%}%>
 								</div>
 							</div><!--end commentRight-->
-							<% printCommentChild(node.getNodes(), poster); %>
+
 						</div>
 					</li>
 				</ul>
+
+
 		<%
 				}else{ //end if checkcomment != null
-				//	printCommentChild(node.getNodes(), poster);
+				/*	printCommentChild(node, poster);*/
 				}
 		}}
 	} // end while
+%>
+
+<%
 }// enf function
 %>

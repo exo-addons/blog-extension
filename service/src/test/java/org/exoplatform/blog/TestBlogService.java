@@ -32,6 +32,7 @@ import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.security.IdentityConstants;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.Session;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -273,22 +274,70 @@ public class TestBlogService extends TestCase {
   }
 
   public void testGetPostComments() throws Exception{
+    // You have to change getSession() --> getSystemSession() in run unit test
     Calendar cal = Calendar.getInstance();
     int currentMonth = cal.get(cal.MONTH);
     int currentYear = cal.get(cal.YEAR);
 
     Node node1 = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
 
+    String user = node1.getSession().getUserID();
     // add 6 comment for node1 throught commentService
-    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "1st comment","en");
-    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "2nd comment","en");
-    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "3rd comment","en");
-    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "4th comment","en");
-    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "5th comment","en");
-    commentsService.addComment(node1,"toannh", "toannh@exoplatform.com", "blog", "6th comment","en");
+    commentsService.addComment(node1, user, "toannh@exoplatform.com", "blog", "1st comment", "en");
+    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "2nd comment","en");
+    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "3rd comment","en");
+    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "4th comment","en");
+    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "5th comment","en");
+    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "6th comment","en");
 
     long commentCount = blogService.getPostComments(node1);
-    System.out.println("commentCount: "+commentCount);
+    assertTrue("TestGetPostComment Failed", commentCount==6);
+  }
+
+  public void testGetLastComment() throws Exception{
+    // You have to change getSession() --> getSystemSession() in run unit test
+    Calendar cal = Calendar.getInstance();
+    int currentMonth = cal.get(cal.MONTH);
+    int currentYear = cal.get(cal.YEAR);
+
+    Node postNode = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
+    String user = postNode.getSession().getUserID();
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "1st comment", "en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "2nd comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "3rd comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "4th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "5th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "6th comment","en");
+
+    Node lasComment = blogService.getLastComment(postNode);
+
+    assertNotNull("Test get lastcomment failed", lasComment);
+  }
+
+  public void testGetComments() throws Exception{
+    // You have to change getSession() --> getSystemSession() in run unit test
+    Calendar cal = Calendar.getInstance();
+    int currentMonth = cal.get(cal.MONTH);
+    int currentYear = cal.get(cal.YEAR);
+
+    Node postNode = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
+    String user = postNode.getSession().getUserID();
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "1st comment", "en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "2nd comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "3rd comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "4th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "5th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "6th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "7th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "8th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "9th comment","en");
+    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "10th comment","en");
+
+    int limit=3;
+    int offset =0;
+    NodeIterator comments = blogService.getComments(postNode, limit, offset);
+
+    assertNotNull("Test get comments failed", comments.getSize() == 3);
   }
 
   private void reset() throws Exception {

@@ -36,6 +36,7 @@ import org.json.JSONObject;
 
 import javax.annotation.security.RolesAllowed;
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.ws.rs.FormParam;
@@ -61,8 +62,13 @@ public class BlogServiceRest implements ResourceContainer {
   private Log log = ExoLogger.getExoLogger(BlogServiceRest.class);
   private final String BLOG_DEFAULT_LANGUAGE = "en";
   private static final String BLOG_COMMENT_STATUS_PROPERTY = "exo:commentStatus";
+  private static final String BLOG_COMMENT_COMMENTOR_PROPERTY = "exo:commentor";
+  private static final String BLOG_COMMENT_CONTENT_PROPERTY = "exo:commentContent";
+  private static final String BLOG_COMMENT_DATE_PROPERTY = "exo:commentDate";
+
   private BlogService blogService = WCMCoreUtils.getService(BlogService.class);
   private CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
+
   public BlogServiceRest() {
   }
 
@@ -158,12 +164,16 @@ public class BlogServiceRest implements ResourceContainer {
   @RolesAllowed("users")
   public Response delComment(MultivaluedMap<String, String> data) {
     String commentPath = data.getFirst("commentPath");
+    String postPath = data.getFirst("postPath");
     String ws = data.getFirst("ws");
     JSONObject obj = new JSONObject();
     try {
       Node nodeComment = getNode(commentPath, ws);
+      Node postNode = getNode(postPath,ws);
+      long postComment = blogService.getPostComments(postNode);
       commentsService.deleteComment(nodeComment);
       obj.put("result", true);
+      obj.put("total", postComment);
       return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
     } catch (Exception e) {
       if (log.isErrorEnabled()) log.error(e.getMessage());
@@ -181,7 +191,6 @@ public class BlogServiceRest implements ResourceContainer {
     JSONObject obj = new JSONObject();
     try {
       Node nodeComment = getNode(commentPath, ws);
-
       if (nodeComment.hasProperty("exo:commentContent")) {
         obj.put("result", true);
         obj.put("commentContent", nodeComment.getProperty("exo:commentContent").getString());
@@ -206,8 +215,8 @@ public class BlogServiceRest implements ResourceContainer {
     String[] path = jcrPath.split("/");
     String repositoryName = path[1];
     String workspaceName = path[2];
-    jcrPath = jcrPath.substring(repositoryName.length()+workspaceName.length()+2);
-    if (jcrPath.charAt(1)=='/') jcrPath.substring(1);
+    jcrPath = jcrPath.substring(repositoryName.length() + workspaceName.length() + 2);
+    if (jcrPath.charAt(1) == '/') jcrPath.substring(1);
     JSONObject obj = new JSONObject();
     try {
       Node nodeComment = getNode(jcrPath, workspaceName);
@@ -226,6 +235,68 @@ public class BlogServiceRest implements ResourceContainer {
     }
     return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
   }
+
+  @POST
+  @Path("/getComments")
+  @RolesAllowed("users")
+  public Response getComments(MultivaluedMap<String, String> data) {
+    String jcrPath = data.getFirst("jcrPath");
+    long limit = Util.getLong(data.getFirst("limit"), 5);
+    long offset = Util.getLong(data.getFirst("offset"), 0);
+    String workspaceName = data.getFirst("ws");
+    String repositoryName = data.getFirst("repo");
+
+    JSONArray result = new JSONArray();
+
+    try {
+      Node nodeComment = getNode(jcrPath, workspaceName);
+      NodeIterator comments = blogService.getComments(nodeComment, limit, offset);
+
+      while (comments.hasNext()) {
+        JSONObject obj = new JSONObject();
+        Node comment = comments.nextNode();
+
+        obj.put("workspace", comment.getSession().getWorkspace().getName());
+
+        if (comment.hasProperty(BLOG_COMMENT_CONTENT_PROPERTY)) {
+          obj.put("commentContent", comment.getProperty(BLOG_COMMENT_CONTENT_PROPERTY).getString());
+        }
+
+        if (comment.hasProperty(BLOG_COMMENT_DATE_PROPERTY)) {
+          obj.put("commentDate", comment.getProperty(BLOG_COMMENT_DATE_PROPERTY).getDate().getTime().getTime());
+        }
+
+        if (comment.hasProperty(BLOG_COMMENT_COMMENTOR_PROPERTY)) {
+          obj.put("commentor", comment.getProperty(BLOG_COMMENT_COMMENTOR_PROPERTY).getString());
+        }
+
+        if (comment.hasProperty(BLOG_COMMENT_STATUS_PROPERTY)) {
+          obj.put("commentStatus", comment.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean());
+        }else{
+          obj.put("commentStatus", true);
+        }
+
+        obj.put("commentPath", comment.getPath());
+        result.put(obj);
+      }
+      JSONObject obj = new JSONObject();
+      long commentTotal = blogService.getPostComments(nodeComment);
+      obj.put("total", commentTotal);
+      obj.put("data", result);
+      if(result!=null && result.length()>0) {
+        obj.put("success", true);
+      }else{
+        obj.put("success", false);
+      }
+
+
+      return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
+  }
+
 
   private Node getNode(String nodePath, String ws) throws RepositoryException {
     Session session = getSession(ws);

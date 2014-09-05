@@ -40,6 +40,15 @@
       </propertyDefinition>
 
     </propertyDefinitions>
+
+    <childNodeDefinitions>
+      <childNodeDefinition name="comments" defaultPrimaryType="" autoCreated="false" mandatory="false"
+                           onParentVersion="COPY" protected="false" sameNameSiblings="false">
+        <requiredPrimaryTypes>
+          <requiredPrimaryType>nt:unstructured</requiredPrimaryType>
+        </requiredPrimaryTypes>
+      </childNodeDefinition>
+    </childNodeDefinitions>
   </nodeType>
 
   <nodeType name="exo:blogComment" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
@@ -184,6 +193,8 @@
   </nodeType>
 
   <nodeType name="exo:hiddenable" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
+    <propertyDefinitions>
+    </propertyDefinitions>
   </nodeType>
 
   <nodeType name="exo:sortable" isMixin="true" hasOrderableChildNodes="false" primaryItemName="">
