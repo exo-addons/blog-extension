@@ -164,6 +164,7 @@
     var aform = $("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     var type = aform.find('input[name="type"]').val();
+    var fme = aform.find('input[name="fme"]').val();
     var isAdmin = $("#isAdmin").val();
 
     var blog_icon_delete = $("#blog-icon-delete").val();
@@ -267,7 +268,7 @@
               result += "</li>";
 
               if(type !== 'rootPostComment'){
-                $("#comment-form-"+uuid+" .commentItem").has("form").remove();
+                $("#comment-"+uuid).find('ul[id ^="comment-form-"]').remove();
                 $("#comment-"+uuid).append("<ul class=\"commentList children\">"+result+"</ul>");
                 $("#reply-comment-more").before(result);
               }else{
@@ -376,10 +377,18 @@
               type: "POST"
             })
                 .success(function (data) {
-                  var _score = score*20;
-                  $('.rate-wrapper-display .rate-current-score').removeAttr('style');
-                  $('.rate-wrapper-display .rate-current-score').attr('style', 'display: block; width: '+_score+' %;');
-                  //$('.rate-wrapper-display .rate-current-score').removeAttr('style');
+                  if(data.result){
+                    var voteValueOfUser = data.voteValueOfUser;
+                    var voteAvg = data.voteAvg;
+                    var voteTotal = data.voteTotal;
+
+                    var _score = voteValueOfUser*20;
+                    $('.rate-wrapper-display .rate-current-score').removeAttr('style');
+                    $('.rate-wrapper-display .rate-wrapper-info').html('('+voteTotal+')');
+
+                    $('.rate-wrapper-display .rate-current-score').attr('style', 'display: block; width: '+_score+'%;');
+                    //$('.rate-wrapper-display .rate-current-score').removeAttr('style');
+                  }
 
                   console.log(data);
                 })
@@ -462,7 +471,7 @@
                   result+="							</div><!--end commentLeft-->";
                   result+="							<div class=\"commentRight\">";
                   result+="								<div class=\"author\">";
-                  if(isAdmin){
+                  if(eval(isAdmin)){
                     result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
                     result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
                     result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
@@ -483,7 +492,7 @@
                   result+="								<div class=\"contentComment\">";
                   result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context\">"+commentContent;
                   result+="									</span>	 &nbsp; &nbsp;";
-                  if(isAdmin){
+                  if(eval(isAdmin)){
                     result+="									<span>";
                     result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
                     result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
@@ -525,9 +534,33 @@
                             var _commentor = val.commentor;
                             var _commentPath = val.commentPath;
 
-                            htmlChild+="<ul class=\"commentList children\"><li class=\"commentItem\" id=\"comment-"+_commentDate+"\"><div class=\"clearfix comment-container\">	<div class=\"commentLeft\">		<a class=\"avatarXSmall\" href=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+viewer+"\">			<img alt=\""+fme+"\" src=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\">		</a>	</div><div class=\"commentRight\"><div class=\"author\">	<a href=\"/portal/intranet/profile/"+viewer+"\">"+_commentor+"</a>	<span class=\"dateTime\">"+_strCommentDate+"</span> &nbsp; &nbsp;<input name=\"cmtPath\" type=\"hidden\" value=\""+_commentPath+"\"><input name=\"ws\" type=\"hidden\" value=\""+_workspace+"\"><input name=\"avatar\" type=\"hidden\" value=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\"><input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\"><input name=\"fme\" type=\"hidden\" value=\""+fme+"\"><input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\"><input name=\"viewerFullname\" type=\"hidden\" value=\""+fme+"\"> <span id=\"approve-"+_commentDate+"\" class=\"pull-right approve\">	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentContent+"', '"+_commentDate+"', 'collaboration');\" value=\""+blog_icon_disapprove+"\"><i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button> </span>	<div class=\"contentComment\">	  <span class=\"ContentBlock\" id=\""+_commentDate+"\">"+_commentContent+"</span>	  <span> 		<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('/Groups/platform/users/Documents/2014/09/03/23423/comments/1409972833661/comments/1409973327883', '1409972833661', '1409973328010', 'collaboration')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>			<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"undefined\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('/Groups/platform/users/Documents/2014/09/03/23423/comments/1409972833661/comments/1409973327883', '1409973328010' ,'collaboration')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>		</span>	</div></div></div></div></li>";
-                            console.log("key "+key);
-                            console.log("datalength "+__data.length);
+                            htmlChild+="<ul class=\"commentList children\">";
+                            htmlChild+="<li class=\"commentItem\" id=\"comment-"+_commentDate+"\">";
+                            htmlChild+="<div class=\"clearfix comment-container\">";
+                            htmlChild+="<div class=\"commentLeft\">";
+                            htmlChild+="<a class=\"avatarXSmall\" href=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+viewer+"\">";
+                            htmlChild+="<img alt=\""+fme+"\" src=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\"></a>";
+                            htmlChild+="</div>";
+                            htmlChild+="<div class=\"commentRight\">";
+                            htmlChild+="<div class=\"author\"><a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
+                            htmlChild+="<span class=\"dateTime\">"+_strCommentDate+"</span> &nbsp; &nbsp;";
+
+                            htmlChild+="<input name=\"cmtPath\" type=\"hidden\" value=\""+_commentPath+"\"/>";
+                            htmlChild+="<input name=\"ws\" type=\"hidden\" value=\""+_workspace+"\"/>";
+                            htmlChild+="<input name=\"avatar\" type=\"hidden\" value=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\" />";
+                            htmlChild+="<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\"/>";
+                            htmlChild+="<input name=\"fme\" type=\"hidden\" value=\""+fme+"\"/>";
+                            htmlChild+="<input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\" />";
+                            htmlChild+="<input name=\"viewerFullname\" type=\"hidden\" value=\""+fme+"\" />";
+                            if(eval(isAdmin)){
+                              htmlChild+="<span id=\"approve-"+_commentDate+"\" class=\"pull-right approve\">	";
+                              htmlChild+="<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentContent+"', '"+_commentDate+"', 'collaboration');\" value=\""+blog_icon_disapprove+"\">";
+                              htmlChild+="<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button> </span>	";
+                            }
+                            htmlChild+="<div class=\"contentComment\">	  <span class=\"ContentBlock\" id=\""+_commentDate+"\">"+_commentContent+"</span>";
+                            htmlChild+="<span><a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_edit+"\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+_commentPath+"', '"+commentDate+"', '"+_commentDate+"', '"+_workspace+"')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>";
+                            htmlChild+="<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+viewer+"\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+_commentPath+"', '"+_commentDate+"' ,'"+workspace+"')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>";
+                            htmlChild+="</span>	</div></div></div></div></li>";
                             if (key === __data.length-1 ) {
                               if(_totalChild>5){
                                 htmlChild+= "<li id=\"reply-comment-more-"+commentDate+"\" onclick=\"eXo.ecm.blog.loadReply(this);\">";
@@ -618,9 +651,11 @@
 
   blog.prototype.deleteComment = function(commentPath, commendId, ws){
     if (confirm("Are u sure?")) {
+      var postPath = $("#postPath").val();
       var obj = new Object();
-      if (commentPath.charAt(1)==='/') commentPath.substr(1, commentPath.length);
 
+      if (commentPath.charAt(1)==='/') commentPath.substr(1, commentPath.length);
+      obj.postPath =postPath;
       obj.commentPath = commentPath;
       obj.ws = ws;
       $.ajax({
@@ -629,9 +664,9 @@
         url: "/portal/rest/blog/service/delComment",
         success: function (data) {
           if(data.result){
+
             //var totalComment = data.totalComment;
-            var totalComment = $("#totalCurrentComment").val();//data.totalComment;
-            totalComment--;
+            totalComment = data.total;
             var plural="";
             if(totalComment>1){plural="s";}
             $('#comment-'+commendId).remove();
@@ -923,7 +958,7 @@
             $(element).before(result);
           }else{ //end if has data
             $(element).find('input[name="isLoad"]').val(false);
-            $(element).find(".reply-comment-more").html('No more entry!');
+            $(element).find(".reply-comment-more").html('');
           }
         })//end success
         .error(function(){
@@ -965,12 +1000,14 @@
       result+="							</div><!--end commentLeft-->";
       result+="							<div class=\"commentRight\">";
       result+="								<div class=\"author\">";
-      if(isAdmin){
+
+      if(eval(isAdmin)){
         result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
         result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
         result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
         result+="									</span>";
       }
+
       result+="									<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
       result+="									<span class=\"dateTime\">"+strCommentDate+"</span> &nbsp; &nbsp;";
 
@@ -981,7 +1018,7 @@
       if(!commentStatus){result+="disapproved";}
       result+= "\">"+commentContent;
       result+="									</span>	 &nbsp; &nbsp;";
-      if(isAdmin || isOwner){
+      if(eval(isAdmin) || eval(isOwner)){
         result+="									<span>";
         result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
         result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";

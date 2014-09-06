@@ -73,7 +73,7 @@
       <version>${exoplatform.jcr.version}</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <!--only 4 unitest-->
     <dependency>
       <groupId>org.exoplatform.core</groupId>
