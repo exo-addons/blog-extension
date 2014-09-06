@@ -66,16 +66,18 @@ public class BlogServiceRest implements ResourceContainer {
   private static final String BLOG_COMMENT_CONTENT_PROPERTY = "exo:commentContent";
   private static final String BLOG_COMMENT_DATE_PROPERTY = "exo:commentDate";
 
-  private BlogService blogService = WCMCoreUtils.getService(BlogService.class);
+  private BlogService blogService = null;// WCMCoreUtils.getService(BlogService.class);
   private CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
 
   public BlogServiceRest() {
+
   }
 
   @POST
   @Path("/get-blogs")
   @RolesAllowed("users")
   public Response getBlogs(@QueryParam("year") Integer year, @QueryParam("month") Integer month) {
+    blogService = WCMCoreUtils.getService(BlogService.class);
     if (year == null || month == null) return Response.ok("false").build();
     JSONArray result = new JSONArray();
     List<Node> blogs = blogService.getPosts(year, month);
@@ -97,6 +99,7 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/changeCommentStatus")
   @RolesAllowed("users")
   public Response getBlogs(MultivaluedMap<String, String> data) {
+    blogService = WCMCoreUtils.getService(BlogService.class);
     String postPath = data.getFirst("postPath");
     String commentPath = data.getFirst("nodePath");
     String ws = data.getFirst("ws");
@@ -175,6 +178,7 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/delComment")
   @RolesAllowed("users")
   public Response delComment(MultivaluedMap<String, String> data) {
+    blogService = WCMCoreUtils.getService(BlogService.class);
     String commentPath = data.getFirst("commentPath");
     String postPath = data.getFirst("postPath");
     String ws = data.getFirst("ws");
@@ -219,6 +223,7 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/getLastComment")
   @RolesAllowed("users")
   public Response getLastComment(@FormParam("jcrPath") String jcrPath) {
+    blogService = WCMCoreUtils.getService(BlogService.class);
     if (jcrPath.contains("%20")) try {
       jcrPath = URLDecoder.decode(jcrPath, "UTF-8");
     } catch (UnsupportedEncodingException ex) {
@@ -252,6 +257,7 @@ public class BlogServiceRest implements ResourceContainer {
   @Path("/getComments")
   @RolesAllowed("users")
   public Response getComments(MultivaluedMap<String, String> data) {
+    blogService = WCMCoreUtils.getService(BlogService.class);
     String jcrPath = data.getFirst("jcrPath");
     long limit = Util.getLong(data.getFirst("limit"), 5);
     long offset = Util.getLong(data.getFirst("offset"), 0);

@@ -38,7 +38,7 @@
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
-      <version>${exoplatform.kernel.version}</version>
+      <version>${exoplatform.kernel.container.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

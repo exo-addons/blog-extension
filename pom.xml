@@ -35,6 +35,7 @@
     <exoplatform.kernel.version>2.5.x-SNAPSHOT</exoplatform.kernel.version>
     <exoplatform.core.version>2.6.x-SNAPSHOT</exoplatform.core.version>
     <exoplatform.jcr.version>1.16.x-SNAPSHOT</exoplatform.jcr.version>
+    <exoplatform.kernel.container.version>2.4.x-SNAPSHOT</exoplatform.kernel.container.version>
   </properties>
 
 

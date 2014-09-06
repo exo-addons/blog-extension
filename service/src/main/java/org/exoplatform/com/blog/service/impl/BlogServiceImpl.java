@@ -333,8 +333,8 @@ public class BlogServiceImpl implements BlogService {
       StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
 
-//      Session session = getSystemSession(); //only unitest
-      Session session = getSession();
+      Session session = getSystemSession(); //only unitest
+//      Session session = getSession();
       QueryManager queryManager = session.getWorkspace().getQueryManager();
       Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
       NodeIterator nodes = query.execute().getNodes();
@@ -352,8 +352,8 @@ public class BlogServiceImpl implements BlogService {
       StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
       queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
-//      Session session = getSystemSession(); //only unitest
-      Session session = getSession();
+      Session session = getSystemSession(); //only unitest
+//      Session session = getSession();
       QueryManager queryManager = session.getWorkspace().getQueryManager();
       Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
 
@@ -374,8 +374,8 @@ public class BlogServiceImpl implements BlogService {
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
       queryBuilder.append(" AND NOT jcr:path LIKE '" + postNode.getPath() + "/comments/%/%' ");
       queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
-//      Session session = getSystemSession(); //only unitest
-      Session session = getSession();
+      Session session = getSystemSession(); //only unitest
+//      Session session = getSession();
       QueryManager queryManager = session.getWorkspace().getQueryManager();
       QueryImpl query = (QueryImpl)queryManager.createQuery(queryBuilder.toString(), Query.SQL);
       query.setLimit(limit);
