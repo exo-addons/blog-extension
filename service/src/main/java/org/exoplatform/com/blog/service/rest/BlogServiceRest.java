@@ -126,11 +126,23 @@ public class BlogServiceRest implements ResourceContainer {
     String ws = data.getFirst("ws");
     double score = Util.getDouble(data.getFirst("score"), 0);
     Identity identity = ConversationState.getCurrent().getIdentity();
+
     JSONObject obj = new JSONObject();
     try {
       Node nodeToVote = getNode(postPath, ws);
       votingService.vote(nodeToVote, score, identity.getUserId(), BLOG_DEFAULT_LANGUAGE);
+
+      double voteValueOfUser = votingService.getVoteValueOfUser(nodeToVote, identity.getUserId(), "en");
+      double voteTotal = votingService.getVoteTotal(nodeToVote);
+      double voteAvg = 0;
+      if(nodeToVote.hasProperty("exo:votingRate")) {
+        voteAvg = nodeToVote.getProperty("exo:votingRate").getValue().getDouble();
+      }
+
       obj.put("result", true);
+      obj.put("voteValueOfUser", voteValueOfUser);
+      obj.put("voteTotal", voteTotal);
+      obj.put("voteAvg", voteAvg);
       return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
     } catch (Exception ex) {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
@@ -170,8 +182,8 @@ public class BlogServiceRest implements ResourceContainer {
     try {
       Node nodeComment = getNode(commentPath, ws);
       Node postNode = getNode(postPath,ws);
-      long postComment = blogService.getPostComments(postNode);
       commentsService.deleteComment(nodeComment);
+      long postComment = blogService.getPostComments(postNode);
       obj.put("result", true);
       obj.put("total", postComment);
       return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();

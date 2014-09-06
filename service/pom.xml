@@ -5,29 +5,32 @@
   <parent>
     <artifactId>blog-extension</artifactId>
     <groupId>org.exoplatform.addons.blog</groupId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.x-blog-improvement-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.exoplatform.addons.blog</groupId>
   <artifactId>blog-extension-service</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>${project.parent.version}</version>
 
   <dependencies>
     <dependency>
       <groupId>org.exoplatform.ecms</groupId>
       <artifactId>ecms-core-services</artifactId>
+      <version>4.1.x-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.commons</artifactId>
+      <version>2.5.x-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.exoplatform.ecms</groupId>
       <artifactId>ecms-core-publication</artifactId>
+      <version>${exoplatform.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -35,67 +38,68 @@
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.container</artifactId>
+      <version>${exoplatform.kernel.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.common</artifactId>
+      <version>${exoplatform.kernel.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.component.cache</artifactId>
+      <version>${exoplatform.kernel.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.kernel</groupId>
       <artifactId>exo.kernel.commons</artifactId>
+      <version>${exoplatform.kernel.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.database</artifactId>
+      <version>${exoplatform.core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.api</artifactId>
+      <version>${exoplatform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.exoplatform.core</groupId>
       <artifactId>exo.core.component.organization.jdbc</artifactId>
+      <version>${exoplatform.core.version}</version>
       <scope>provided</scope>
     </dependency>
-    <!--dependency>
-      <groupId>org.exoplatform.portal</groupId>
-      <artifactId>exo.portal.component.common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.exoplatform.portal</groupId>
-      <artifactId>exo.portal.component.portal</artifactId>
-      <scope>provided</scope>
-    </dependency-->
     <dependency>
       <groupId>org.exoplatform.jcr</groupId>
       <artifactId>exo.jcr.component.ext</artifactId>
+      <version>${exoplatform.jcr.version}</version>
       <scope>provided</scope>
     </dependency>
         
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
+      <version>2.3.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>    
 

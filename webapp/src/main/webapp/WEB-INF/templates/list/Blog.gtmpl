@@ -245,7 +245,7 @@ return name?name:poster
 
 String avatarUrl(def username) {
 String avatar = "/social-resources/skin/images/ShareImages/UserAvtDefault.png";
-/*
+
 try {
 	def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
 	def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username)
@@ -257,7 +257,7 @@ try {
 } catch (Exception e) {
 print e.message // ugly old school debug
 }
-*/
+
 return avatar
 
 }
