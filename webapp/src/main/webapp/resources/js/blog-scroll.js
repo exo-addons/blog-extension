@@ -1,4 +1,16 @@
-  var ScrollToTop = function (options) {
+/*
+ * scrollToTop
+ * https://github.com/amazingsurge/jquery-scrollToTop
+ *
+ * Copyright (c) 2014 amazingsurge
+ * Licensed under the GPL license.
+ */
+
+(function(window, document, $, undefined) {
+  'use strict';
+
+  // Constructor
+  var ScrollToTop = function(options) {
     this.$doc = $('body');
     this.options = $.extend(ScrollToTop.defaults, options);
 
@@ -21,7 +33,7 @@
 
     var self = this;
     $.extend(self, {
-      init: function () {
+      init: function() {
         self.transition = self.transition();
         self.build();
 
@@ -36,13 +48,13 @@
           self.target = 0;
         }
 
-        self.$trigger.on('click.scrollToTop', function () {
+        self.$trigger.on('click.scrollToTop', function() {
           self.$doc.trigger('ScrollToTop::jump');
           return false;
         });
 
         // bind events
-        self.$doc.on('ScrollToTop::jump', function () {
+        self.$doc.on('ScrollToTop::jump', function() {
           if (self.disabled) {
             return;
           }
@@ -74,19 +86,19 @@
 
             self.$doc.addClass('easing_' + easing + ' duration_' + speed).css({
               'margin-top': ''
-            }).one(self.transition.end, function () {
+            }).one(self.transition.end, function() {
               self.$doc.removeClass(self.classes.animating + ' easing_' + easing + ' duration_' + speed);
             });
           } else {
             $('html, body').stop(true, false).animate({
               scrollTop: self.target
-            }, speed, function () {
+            }, speed, function() {
               self.$doc.removeClass(self.classes.animating);
             });
             return;
           }
         })
-            .on('ScrollToTop::show', function () {
+            .on('ScrollToTop::show', function() {
               if (self.isShow) {
                 return;
               }
@@ -94,23 +106,23 @@
 
               self.$trigger.addClass(self.classes.show);
             })
-            .on('ScrollToTop::hide', function () {
+            .on('ScrollToTop::hide', function() {
               if (!self.isShow) {
                 return;
               }
               self.isShow = false;
               self.$trigger.removeClass(self.classes.show);
             })
-            .on('ScrollToTop::disable', function () {
+            .on('ScrollToTop::disable', function() {
               self.disabled = true;
               self.$doc.trigger('ScrollToTop::hide');
             })
-            .on('ScrollToTop::enable', function () {
+            .on('ScrollToTop::enable', function() {
               self.disabled = false;
               self.toggle();
             });
 
-        $(window).on('scroll', self._throttle(function () {
+        $(window).on('scroll', self._throttle(function() {
           if (self.disabled) {
             return;
           }
@@ -119,7 +131,7 @@
         }, self.options.throttle));
 
         if (self.options.mobile) {
-          $(window).on('resize', self._throttle(function () {
+          $(window).on('resize', self._throttle(function() {
             if (self.disabled) {
               return;
             }
@@ -130,7 +142,7 @@
 
         self.toggle();
       },
-      checkMobile: function () {
+      checkMobile: function() {
         var width = $(window).width();
 
         if (width < self.options.mobile.width) {
@@ -139,7 +151,7 @@
           self.useMobile = false;
         }
       },
-      build: function () {
+      build: function() {
         if (self.options.trigger) {
           self.$trigger = $(self.options.trigger);
         } else {
@@ -152,7 +164,7 @@
           self.insertRule('@media (max-width: ' + self.options.mobile.width + 'px){.' + self.classes.show + '{' + self.transition.prefix + 'animation-duration: ' + self.options.mobile.animationSpeed + 'ms !important;' + self.transition.prefix + 'animation-name: ' + self.options.namespace + '_' + self.options.mobile.animation + '  !important;}}');
         }
       },
-      can: function () {
+      can: function() {
         var distance;
         if (self.useMobile) {
           distance = self.options.mobile.distance;
@@ -165,7 +177,7 @@
           return false;
         }
       },
-      toggle: function () {
+      toggle: function() {
         if (self.can()) {
           self.$doc.trigger('ScrollToTop::show');
         } else {
@@ -173,7 +185,7 @@
         }
       },
 
-      transition: function () {
+      transition: function() {
         var e,
             end,
             prefix = '',
@@ -201,7 +213,7 @@
           supported: supported
         };
       },
-      insertRule: function (rule) {
+      insertRule: function(rule) {
         if (self.rules && self.rules[rule]) {
           return;
         } else if (self.rules === undefined) {
@@ -222,20 +234,20 @@
        * _throttle
        * @description Borrowed from Underscore.js
        */
-      _throttle: function (func, wait) {
-        var _now = Date.now || function () {
+      _throttle: function(func, wait) {
+        var _now = Date.now || function() {
           return new Date().getTime();
         };
         var context, args, result;
         var timeout = null;
         var previous = 0;
-        var later = function () {
+        var later = function() {
           previous = _now();
           timeout = null;
           result = func.apply(context, args);
           context = args = null;
         };
-        return function () {
+        return function() {
           var now = _now();
           var remaining = wait - (now - previous);
           context = this;
@@ -278,7 +290,7 @@
     target: null, // Set a custom target element for scrolling to. Can be element or number
     text: 'Scroll To Top', // Text for element, can contain HTML
 
-    skin: null,
+    skin: 'cycle',
     throttle: 250,
 
     namespace: 'scrollToTop'
@@ -286,16 +298,16 @@
 
   ScrollToTop.prototype = {
     constructor: ScrollToTop,
-    jump: function () {
+    jump: function() {
       this.$doc.trigger('ScrollToTop::jump');
     },
-    disable: function () {
+    disable: function() {
       this.$doc.trigger('ScrollToTop::disable');
     },
-    enable: function () {
+    enable: function() {
       this.$doc.trigger('ScrollToTop::enable');
     },
-    destroy: function () {
+    destroy: function() {
       this.$trigger.remove();
       this.$doc.data('ScrollToTop', null);
       this.$doc.off('ScrollToTop::enable')
@@ -306,12 +318,12 @@
     }
   };
 
-  $.fn.scrollToTop = function (options) {
+  $.fn.scrollToTop = function(options) {
     if (typeof options === 'string') {
       var method = options;
       var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
 
-      return this.each(function () {
+      return this.each(function() {
         var api = $.data(this, 'scrollToTop');
 
         if (api && typeof api[method] === 'function') {
@@ -319,7 +331,7 @@
         }
       });
     } else {
-      return this.each(function () {
+      return this.each(function() {
         var api = $.data(this, 'scrollToTop');
         if (!api) {
           api = new ScrollToTop(options);
@@ -328,3 +340,4 @@
       });
     }
   };
+}(window, document, jQuery));

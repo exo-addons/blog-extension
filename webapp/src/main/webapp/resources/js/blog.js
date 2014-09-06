@@ -164,7 +164,7 @@
     var aform = $("#commentform-" + uuid);
     var comment = aform.find('input[name="comment"]').val();
     var type = aform.find('input[name="type"]').val();
-    var isAdmin = aform.find('input[name="isAdmin"]').val();
+    var isAdmin = $("#isAdmin").val();
 
     var blog_icon_delete = $("#blog-icon-delete").val();
     var blog_icon_edit = $("#blog-icon-edit").val();
@@ -268,11 +268,16 @@
 
               if(type !== 'rootPostComment'){
                 $("#comment-form-"+uuid+" .commentItem").has("form").remove();
-
+                $("#comment-"+uuid).append("<ul class=\"commentList children\">"+result+"</ul>");
                 $("#reply-comment-more").before(result);
               }else{
-                $("#view-more").before(result);
+
+                //$("#view-more").before(result);
+                $("#commentList").prepend(result);
                 $("#view-more").find(".view-more").html('');
+                var position = $("#commentList").offset().top - $(document).height()/4;
+                $('html, body').animate({scrollTop: position}, 1000);
+
               }
               $("#commentInputBox input[name=comment]").val('');
               var plural="";
@@ -299,11 +304,6 @@
     return false;
   }; // end click on button
 
-  //sharethis
-  blog.prototype.intShare = function () {
-    var switchTo5x= true;
-    sharethis.stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});
-  };
   // approve a post
   blog.prototype.changeStatus = function (elId, nodePath, postPath, ws) {
     if (confirm("Are u sure?")) {
@@ -410,12 +410,11 @@
         var offset = viewMore.find('input[name="offset"]').val();
         var ws =$("#ws").val()
         var repo = $("#repo").val()
-        var isAdmin = viewMore.find('input[name="isAdmin"]').val();
+        var isAdmin = $("#isAdmin").val();
         var viewer = viewMore.find('input[name="viewer"]').val();
         var fme = viewMore.find('input[name="fme"]').val();
         var isLoad = viewMore.find('input[name="isLoad"]').val();
         var postUUID = viewMore.find('input[name="postUuid"]').val();
-
 
         if(!isLoad) return;
 
@@ -449,6 +448,7 @@
                 $.each(_data, function(key, val) {
                   var commentContent = val.commentContent;
                   var commentDate = val.commentDate;
+                  var strCommentDate = getBlogTime(new Date(commentDate));
                   var workspace = val.workspace;
                   var commentStatus = val.commentStatus;
                   var commentor = val.commentor;
@@ -462,12 +462,14 @@
                   result+="							</div><!--end commentLeft-->";
                   result+="							<div class=\"commentRight\">";
                   result+="								<div class=\"author\">";
-                  result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
-                  result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
-                  result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
-                  result+="									</span>";
+                  if(isAdmin){
+                    result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
+                    result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
+                    result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
+                    result+="									</span>";
+                  }
                   result+="									<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
-                  result+="									<span class=\"dateTime\">on Sep 5, 2014 at 1:43 PM </span> &nbsp; &nbsp;";
+                  result+="									<span class=\"dateTime\">"+strCommentDate+"</span> &nbsp; &nbsp;";
                   result+="									<input name=\"cmtPath\" type=\"hidden\" value=\""+commentPath+"\">";
                   result += "					      <input name=\"viewerFullname\" type=\"hidden\" value=\""+fme+"\" />";
                   result+="									<input name=\"ws\" type=\"hidden\" value=\"collaboration\">";
@@ -481,17 +483,78 @@
                   result+="								<div class=\"contentComment\">";
                   result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context\">"+commentContent;
                   result+="									</span>	 &nbsp; &nbsp;";
-                  result+="									<span>";
-                  result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
-                  result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
-                  result+="										</a>";
-                  result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
-                  result+="											<i class=\"uiIconLightGray uiIconDelete\"></i>";
-                  result+="										</a>";
-                  result+="									</span>";
+                  if(isAdmin){
+                    result+="									<span>";
+                    result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
+                    result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
+                    result+="										</a>";
+                    result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
+                    result+="											<i class=\"uiIconLightGray uiIconDelete\"></i>";
+                    result+="										</a>";
+                    result+="										</span>";
+                  }
                   result+="								</div>";
                   result+="							</div><!--end commentRight-->";
-                  result+="							";
+
+                  // check & get child
+                  var obj = new Object();
+                  obj.jcrPath = commentPath;
+                  obj.limit = 5;
+                  obj.offset=0;
+                  obj.ws = workspace;
+                  $.ajax({
+                    url: "/portal/rest/blog/service/getComments",
+                    data:obj,
+                    dataType: "text",
+                    async:false,
+                    type: "POST"
+                  }) //end ajax
+                      .success(function (_data) {
+
+                        var __result = $.parseJSON(_data);
+                        var __data = __result.data;
+                        if(__result.success && __data.length>0){
+                          var htmlChild = "";
+                          var _totalChild = __result.total;
+                          $.each(__data, function(key, val) {
+                            var _commentContent = val.commentContent;
+                            var _commentDate = val.commentDate;
+                            var _strCommentDate = getBlogTime(new Date(commentDate));
+                            var _workspace = val.workspace;
+                            var _commentStatus = val.commentStatus;
+                            var _commentor = val.commentor;
+                            var _commentPath = val.commentPath;
+
+                            htmlChild+="<ul class=\"commentList children\"><li class=\"commentItem\" id=\"comment-"+_commentDate+"\"><div class=\"clearfix comment-container\">	<div class=\"commentLeft\">		<a class=\"avatarXSmall\" href=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+viewer+"\">			<img alt=\""+fme+"\" src=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\">		</a>	</div><div class=\"commentRight\"><div class=\"author\">	<a href=\"/portal/intranet/profile/"+viewer+"\">"+_commentor+"</a>	<span class=\"dateTime\">"+_strCommentDate+"</span> &nbsp; &nbsp;<input name=\"cmtPath\" type=\"hidden\" value=\""+_commentPath+"\"><input name=\"ws\" type=\"hidden\" value=\""+_workspace+"\"><input name=\"avatar\" type=\"hidden\" value=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\"><input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\"><input name=\"fme\" type=\"hidden\" value=\""+fme+"\"><input name=\"isAdmin\" type=\"hidden\" value=\""+isAdmin+"\"><input name=\"viewerFullname\" type=\"hidden\" value=\""+fme+"\"> <span id=\"approve-"+_commentDate+"\" class=\"pull-right approve\">	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentContent+"', '"+_commentDate+"', 'collaboration');\" value=\""+blog_icon_disapprove+"\"><i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button> </span>	<div class=\"contentComment\">	  <span class=\"ContentBlock\" id=\""+_commentDate+"\">"+_commentContent+"</span>	  <span> 		<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('/Groups/platform/users/Documents/2014/09/03/23423/comments/1409972833661/comments/1409973327883', '1409972833661', '1409973328010', 'collaboration')\"><i class=\"uiIconLightGray uiIconEdit\"></i></a>			<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"undefined\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('/Groups/platform/users/Documents/2014/09/03/23423/comments/1409972833661/comments/1409973327883', '1409973328010' ,'collaboration')\"><i class=\"uiIconLightGray uiIconDelete\"></i></a>		</span>	</div></div></div></div></li>";
+                            console.log("key "+key);
+                            console.log("datalength "+__data.length);
+                            if (key === __data.length-1 ) {
+                              if(_totalChild>5){
+                                htmlChild+= "<li id=\"reply-comment-more-"+commentDate+"\" onclick=\"eXo.ecm.blog.loadReply(this);\">";
+                                htmlChild+= "<input name=\"postUuid\" type=\"hidden\" value=\""+postUUID+"\">";
+                                htmlChild+= "<input name=\"cmtPath\" type=\"hidden\" value=\""+commentPath+"\">";
+                                htmlChild+= "<input name=\"isOwner\" type=\"hidden\" value=\"true\">";
+                                htmlChild+= "<input name=\"avatar\" type=\"hidden\" value=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\">";
+                                htmlChild+= "<input name=\"viewer\" type=\"hidden\" value=\""+viewer+"\">";
+                                htmlChild+= "<input name=\"fme\" type=\"hidden\" value=\""+fme+"\">";
+                                htmlChild+= "<input name=\"viewerFullname\" type=\"hidden\" value=\""+fme+"\">";
+                                htmlChild+= "<input name=\"commentor\" type=\"hidden\" value=\""+fme+"\">";
+                                htmlChild+= "<input name=\"limit\" type=\"hidden\" value=\"5\">";
+                                htmlChild+= "<input name=\"offset\" type=\"hidden\" value=\"0\">";
+                                htmlChild+= "<input name=\"isLoad\" type=\"hidden\" value=\"true\">";
+                                htmlChild+= "<div class=\"reply-comment-more\"><a href=\"javascript:void(0)\">Read more... </a></div>";
+                                htmlChild+= "</li>";
+                              }
+                            }
+                            htmlChild+="</ul>";
+                          }) //end each data
+
+
+
+                          result+=htmlChild;
+                        } //end if has data
+                      }) // end ajax success
+
                   result+="						</li>";
                 })
 
@@ -499,7 +562,7 @@
                 $("#view-more").before(result);
               }else{
                 viewMore.find('input[name="isLoad"]').val(false);
-                $("#view-more").find(".view-more").html('No anymore entry!');
+                $("#view-more").find(".view-more").html('No more entry!');
               }
             })
             .error(function(){
@@ -511,347 +574,11 @@
       },
     });
 
-  }); // end document.ready();
-
-
-
-
-  //scroll
-  var ScrollToTop = function (options) {
-    this.$doc = $('body');
-    this.options = $.extend(ScrollToTop.defaults, options);
-
-    var namespace = this.options.namespace;
-
-    if (this.options.skin === null) {
-      this.options.skin = 'cycle';
-    }
-
-    this.classes = {
-      skin: namespace + '_' + this.options.skin,
-      trigger: namespace,
-      animating: namespace + '_animating',
-      show: namespace + '_show'
-    };
-
-    this.disabled = false;
-    this.useMobile = false;
-    this.isShow = false;
-
-    var self = this;
-    $.extend(self, {
-      init: function () {
-        self.transition = self.transition();
-        self.build();
-
-
-        if (self.options.target) {
-          if (typeof self.options.target === 'number') {
-            self.target = self.options.target;
-          } else if (typeof self.options.target === 'string') {
-            self.target = Math.floor($(self.options.target).offset().top);
-          }
-        } else {
-          self.target = 0;
-        }
-
-        self.$trigger.on('click.scrollToTop', function () {
-          self.$doc.trigger('ScrollToTop::jump');
-          return false;
-        });
-
-        // bind events
-        self.$doc.on('ScrollToTop::jump', function () {
-          if (self.disabled) {
-            return;
-          }
-
-          self.checkMobile();
-
-          var speed, easing;
-
-          if (self.useMobile) {
-            speed = self.options.mobile.speed;
-            easing = self.options.mobile.easing;
-          } else {
-            speed = self.options.speed;
-            easing = self.options.easing;
-          }
-
-          self.$doc.addClass(self.classes.animating);
-
-
-          if (self.transition.supported) {
-            var pos = $(window).scrollTop();
-
-            self.$doc.css({
-              'margin-top': -pos + self.target + 'px'
-            });
-            $(window).scrollTop(self.target);
-
-            self.insertRule('.duration_' + speed + '{' + self.transition.prefix + 'transition-duration: ' + speed + 'ms;}');
-
-            self.$doc.addClass('easing_' + easing + ' duration_' + speed).css({
-              'margin-top': ''
-            }).one(self.transition.end, function () {
-              self.$doc.removeClass(self.classes.animating + ' easing_' + easing + ' duration_' + speed);
-            });
-          } else {
-            $('html, body').stop(true, false).animate({
-              scrollTop: self.target
-            }, speed, function () {
-              self.$doc.removeClass(self.classes.animating);
-            });
-            return;
-          }
-        })
-            .on('ScrollToTop::show', function () {
-              if (self.isShow) {
-                return;
-              }
-              self.isShow = true;
-
-              self.$trigger.addClass(self.classes.show);
-            })
-            .on('ScrollToTop::hide', function () {
-              if (!self.isShow) {
-                return;
-              }
-              self.isShow = false;
-              self.$trigger.removeClass(self.classes.show);
-            })
-            .on('ScrollToTop::disable', function () {
-              self.disabled = true;
-              self.$doc.trigger('ScrollToTop::hide');
-            })
-            .on('ScrollToTop::enable', function () {
-              self.disabled = false;
-              self.toggle();
-            });
-
-        $(window).on('scroll', self._throttle(function () {
-          if (self.disabled) {
-            return;
-          }
-
-          self.toggle();
-        }, self.options.throttle));
-
-        if (self.options.mobile) {
-          $(window).on('resize', self._throttle(function () {
-            if (self.disabled) {
-              return;
-            }
-
-            self.checkMobile();
-          }, self.options.throttle));
-        }
-
-        self.toggle();
-      },
-      checkMobile: function () {
-        var width = $(window).width();
-
-        if (width < self.options.mobile.width) {
-          self.useMobile = true;
-        } else {
-          self.useMobile = false;
-        }
-      },
-      build: function () {
-        if (self.options.trigger) {
-          self.$trigger = $(self.options.trigger);
-        } else {
-          self.$trigger = $('<a href="#" class="' + self.classes.trigger + ' ' + self.classes.skin + '">' + self.options.text + '</a>').appendTo($('body'));
-        }
-
-        self.insertRule('.' + self.classes.show + '{' + self.transition.prefix + 'animation-duration: ' + self.options.animationSpeed + 'ms;' + self.transition.prefix + 'animation-name: ' + self.options.namespace + '_' + self.options.animation + ';}');
-
-        if (self.options.mobile) {
-          self.insertRule('@media (max-width: ' + self.options.mobile.width + 'px){.' + self.classes.show + '{' + self.transition.prefix + 'animation-duration: ' + self.options.mobile.animationSpeed + 'ms !important;' + self.transition.prefix + 'animation-name: ' + self.options.namespace + '_' + self.options.mobile.animation + '  !important;}}');
-        }
-      },
-      can: function () {
-        var distance;
-        if (self.useMobile) {
-          distance = self.options.mobile.distance;
-        } else {
-          distance = self.options.distance;
-        }
-        if ($(window).scrollTop() > distance) {
-          return true;
-        } else {
-          return false;
-        }
-      },
-      toggle: function () {
-        if (self.can()) {
-          self.$doc.trigger('ScrollToTop::show');
-        } else {
-          self.$doc.trigger('ScrollToTop::hide');
-        }
-      },
-
-      transition: function () {
-        var e,
-            end,
-            prefix = '',
-            supported = false,
-            el = document.createElement("fakeelement"),
-            transitions = {
-              "WebkitTransition": "webkitTransitionEnd",
-              "MozTransition": "transitionend",
-              "OTransition": "oTransitionend",
-              "transition": "transitionend"
-            };
-        for (e in transitions) {
-          if (el.style[e] !== undefined) {
-            end = transitions[e];
-            supported = true;
-            break;
-          }
-        }
-        if (/(WebKit)/i.test(window.navigator.userAgent)) {
-          prefix = '-webkit-';
-        }
-        return {
-          prefix: prefix,
-          end: end,
-          supported: supported
-        };
-      },
-      insertRule: function (rule) {
-        if (self.rules && self.rules[rule]) {
-          return;
-        } else if (self.rules === undefined) {
-          self.rules = {};
-        } else {
-          self.rules[rule] = true;
-        }
-
-        if (document.styleSheets && document.styleSheets.length) {
-          document.styleSheets[0].insertRule(rule, 0);
-        } else {
-          var style = document.createElement('style');
-          style.innerHTML = rule;
-          document.head.appendChild(style);
-        }
-      },
-      /**
-       * _throttle
-       * @description Borrowed from Underscore.js
-       */
-      _throttle: function (func, wait) {
-        var _now = Date.now || function () {
-          return new Date().getTime();
-        };
-        var context, args, result;
-        var timeout = null;
-        var previous = 0;
-        var later = function () {
-          previous = _now();
-          timeout = null;
-          result = func.apply(context, args);
-          context = args = null;
-        };
-        return function () {
-          var now = _now();
-          var remaining = wait - (now - previous);
-          context = this;
-          args = arguments;
-          if (remaining <= 0) {
-            clearTimeout(timeout);
-            timeout = null;
-            previous = now;
-            result = func.apply(context, args);
-            context = args = null;
-          } else if (!timeout) {
-            timeout = setTimeout(later, remaining);
-          }
-          return result;
-        };
-      }
-    });
-
-    this.init();
-  };
-
-  // Default options
-  ScrollToTop.defaults = {
-    distance: 200,
-    speed: 1000,
-    easing: 'linear',
-    animation: 'fade', // fade, slide, none
-    animationSpeed: 500,
-
-    mobile: {
-      width: 768,
-      distance: 100,
-      speed: 1000,
-      easing: 'easeInOutElastic',
-      animation: 'slide',
-      animationSpeed: 200
-    },
-
-    trigger: null, // Set a custom triggering element. Can be an HTML string or jQuery object
-    target: null, // Set a custom target element for scrolling to. Can be element or number
-    text: 'Scroll To Top', // Text for element, can contain HTML
-
-    skin: null,
-    throttle: 250,
-
-    namespace: 'scrollToTop'
-  };
-
-  ScrollToTop.prototype = {
-    constructor: ScrollToTop,
-    jump: function () {
-      this.$doc.trigger('ScrollToTop::jump');
-    },
-    disable: function () {
-      this.$doc.trigger('ScrollToTop::disable');
-    },
-    enable: function () {
-      this.$doc.trigger('ScrollToTop::enable');
-    },
-    destroy: function () {
-      this.$trigger.remove();
-      this.$doc.data('ScrollToTop', null);
-      this.$doc.off('ScrollToTop::enable')
-          .off('ScrollToTop::disable')
-          .off('ScrollToTop::jump')
-          .off('ScrollToTop::show')
-          .off('ScrollToTop::hide');
-    }
-  };
-
-  $.fn.scrollToTop = function (options) {
-    if (typeof options === 'string') {
-      var method = options;
-      var method_arguments = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : undefined;
-
-      return this.each(function () {
-        var api = $.data(this, 'scrollToTop');
-
-        if (api && typeof api[method] === 'function') {
-          api[method].apply(api, method_arguments);
-        }
-      });
-    } else {
-      return this.each(function () {
-        var api = $.data(this, 'scrollToTop');
-        if (!api) {
-          api = new ScrollToTop(options);
-          $.data(this, 'scrollToTop', api);
-        }
-      });
-    }
-  };
-
-  blog.prototype.initScroll = function(){
+    //add scroll
     $('body').scrollToTop();
     $( ".scrollToTop" ).attr("title", "Back to top");
-  }
+
+  }); // end document.ready();
 
   //edit comment
   blog.prototype.loadToEdit = function(commentPath, postUUID, timeId, ws){
@@ -985,7 +712,7 @@
     var ws = $("#ws").val();
     var avatar = commentItem.find('input[name="avatar"]').val();
     var viewer = commentItem.find('input[name="viewer"]').val();
-    var isAdmin = commentItem.find('input[name="isAdmin"]').val();
+    var isAdmin = $("#isAdmin").val();
     var viewerFullname = commentItem.find('input[name="viewerFullname"]').val();
     $("#comment-"+commentId+" ul:last-child ").has("form").remove();
     var blog_message_replycomment_placeholder = $("#blog-message-replycomment-placeholder").val();
@@ -1157,10 +884,119 @@
     });
   }
 
-  blog.prototype.loadReply = function(){
-    var parent = $(this).parent();
-    var limit = parent.find('input[name="limit"]').val();
-    console.log(limit);
+  blog.prototype.loadReply = function(element){
+
+    var cmtPath = $(element).find('input[name="cmtPath"]').val();
+    var avatar = $(element).find('input[name="avatar"]').val();
+
+    var commentor = $(element).find('input[name="commentor"]').val();
+    var offset = $(element).find('input[name="offset"]').val();
+    var limit = $(element).find('input[name="limit"]').val();
+    var isLoad = $(element).find('input[name="isLoad"]').val();
+
+    var postPath = $('#postPath').val();
+    var ws =$("#ws").val()
+    var repo = $("#repo").val()
+
+    if(!isLoad) return;
+    var obj = new Object();
+    obj.jcrPath = cmtPath;
+    obj.limit = limit;
+    obj.offset=offset+limit;
+    obj.ws = ws;
+    obj.repo=repo;
+    $.ajax({
+      url: "/portal/rest/blog/service/getComments",
+      data:obj,
+      dataType: "text",
+      type: "POST"
+    }) //end ajax
+        .success(function (data) {
+          var _result = $.parseJSON(data);
+          var _data = _result.data;
+          console.log(data);
+          if(_result.success && _data.length>0){
+
+            var result=getReplyHtml(_data, element);
+
+            $(element).find('input[name="offset"]').val(eval(limit) + eval(offset));
+            $(element).before(result);
+          }else{ //end if has data
+            $(element).find('input[name="isLoad"]').val(false);
+            $(element).find(".reply-comment-more").html('No more entry!');
+          }
+        })//end success
+        .error(function(){
+          location.reload();
+          console.log('error');
+        })
+
+  }// end reply function
+
+  function getReplyHtml(data, element){
+    var blog_icon_delete = $("#blog-icon-delete").val();
+    var blog_icon_edit = $("#blog-icon-edit").val();
+    var blog_icon_approve = $("#blog-icon-approve").val();
+    var blog_icon_disapprove = $("#blog-icon-disapprove").val();
+    var blog_icon_reply = $("#blog-icon-reply").val();
+    var blog_message_delete = $("#blog-message.delete").val();
+    var blog_message_comment_placeholder = $("#blog-message-comment-placeholder").val();
+    var isAdmin = $("#isAdmin").val();
+    var fme = $(element).find('input[name="fme"]').val();
+    var viewerFullname = $(element).find('input[name="viewerFullname"]').val();
+    var viewer = $(element).find('input[name="viewer"]').val();
+    var isOwner = $(element).find('input[name="isOwner"]').val();
+    var postUUID = $(element).find('input[name="postUuid"]').val();
+    var result="";
+    $.each(data, function(key, val) {
+      var commentContent = val.commentContent;
+      var commentDate = val.commentDate;
+      var strCommentDate = getBlogTime(new Date(commentDate));
+      var workspace = val.workspace;
+      var commentStatus = val.commentStatus;
+      var commentor = val.commentor;
+      var commentPath = val.commentPath;
+
+      result+="<li class=\"commentItem lazyItem\" id=\"comment-"+commentDate+"\">";
+      result+="							<div class=\"commentLeft\">";
+      result+="								<a class=\"avatarXSmall\" href=\"/portal/intranet/profile/"+commentor+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
+      result+="									<img alt=\""+fme+"\" src=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\">";
+      result+="								</a>";
+      result+="							</div><!--end commentLeft-->";
+      result+="							<div class=\"commentRight\">";
+      result+="								<div class=\"author\">";
+      if(isAdmin){
+        result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
+        result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
+        result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
+        result+="									</span>";
+      }
+      result+="									<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
+      result+="									<span class=\"dateTime\">"+strCommentDate+"</span> &nbsp; &nbsp;";
+
+      result+="								</div> <!--end author-->";
+      result+="								<div class=\"contentComment\">";
+
+      result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context ";
+      if(!commentStatus){result+="disapproved";}
+      result+= "\">"+commentContent;
+      result+="									</span>	 &nbsp; &nbsp;";
+      if(isAdmin || isOwner){
+        result+="									<span>";
+        result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
+        result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
+        result+="										</a>";
+        result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
+        result+="											<i class=\"uiIconLightGray uiIconDelete\"></i>";
+        result+="										</a>";
+        result+="									</span>";
+      }
+      result+="								</div>";
+      result+="							</div><!--end commentRight-->";
+      result+="							";
+      result+="						</li>";
+    }) //end each data
+    return result;
   }
 
   eXo.ecm.blog = new blog();
