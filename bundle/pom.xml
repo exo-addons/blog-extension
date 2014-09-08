@@ -10,7 +10,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>bundle</artifactId>
+  <artifactId>blog-extension-bundle</artifactId>
   <packaging>pom</packaging>
   <name>Blog Extension - Bundle</name>
   <description>Blog Extension - Bundle</description>
