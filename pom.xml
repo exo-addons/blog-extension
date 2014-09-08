@@ -38,9 +38,6 @@
     <jenkins.job.name>blog-extension-master-ci</jenkins.job.name>
     <commons-lang3.version>3.1</commons-lang3.version>
     <exoplatform.version>4.1.x-SNAPSHOT</exoplatform.version>
-    <exoplatform.kernel.version>2.4.x-SNAPSHOT</exoplatform.kernel.version>
-    <exoplatform.core.version>2.5.x-SNAPSHOT</exoplatform.core.version>
-    <exoplatform.jcr.version>1.15.x-SNAPSHOT</exoplatform.jcr.version>
   </properties>
 
 
