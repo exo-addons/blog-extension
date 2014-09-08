@@ -278,7 +278,7 @@ public class BlogServiceImpl implements BlogService {
       Session session = getSession();
       if (nodeUpdate.canAddMixin(BLOG_COMMENT_NODE)) {
         nodeUpdate.addMixin(BLOG_COMMENT_NODE);
-        nodeUpdate.setProperty(BLOG_COMMENT_STATUS_PROPERTY, true);
+        nodeUpdate.setProperty(BLOG_COMMENT_STATUS_PROPERTY, false);
       } else {
         boolean status = nodeUpdate.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean();
         nodeUpdate.setProperty(BLOG_COMMENT_STATUS_PROPERTY, !status);
