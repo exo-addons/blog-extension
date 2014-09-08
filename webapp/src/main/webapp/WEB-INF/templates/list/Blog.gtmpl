@@ -71,9 +71,11 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
     if (isValidBlogEntry(entry)) {
     count ++ ;
     String uuid = entry.getUUID();
+		print "first: "+uuid;
     if(entry.hasProperty("jcr:frozenUuid")){
-    uuid = entry.getProperty("jcr:frozenUuid").getString()
+    	uuid = entry.getProperty("jcr:frozenUuid").getString()
     }
+    print "after: "+uuid;
     def originalNode = entry.getSession().getNodeByUUID(uuid)
     def link = uicomponent.getURL(entry)
 
@@ -90,7 +92,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
     <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" >
       <header>
         <div class="page-header">
-          <h3><a href="$link" rel="bookmark" title="$title">$title</a></h3>
+          <h3><a href="$link" rel="bookmark" title="$title">$title <%=entry.hasProperty("jcr:frozenUuid")%> <%=originalNode.getPath()%></a></h3>
         </div>
         <p class="meta">
         <div class="commentLeft" style="float:left">

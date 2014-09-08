@@ -251,8 +251,9 @@ if (comments.size > 1) plural = "s"
 
     def _ws = comment.getSession().getWorkspace().getName();
     if(comment.hasProperty("exo:commentStatus")){
-    approve = !(comment.getProperty("exo:commentStatus").getBoolean());
+    	approve = (comment.getProperty("exo:commentStatus").getBoolean());
     }
+		print "approve: "+approve;
     if(isAdmin || viewer==poster){%> <!--is admin || owner -->
     <li class="commentItem lazyItem" id="comment-${comment.name}"  >
       <div class="commentLeft">
@@ -606,6 +607,8 @@ def _isAdmin = (isAdmin || _viewer == poster);
 
 if(_isAdmin){
 if(_commentContent != null){
+
+print "commentsst: "+_approve;
 %>
 <ul class="commentList children">
   <li class="commentItem" id="comment-${node.name}">
@@ -618,6 +621,7 @@ if(_commentContent != null){
       </div> <!--end comment left-->
       <div class="commentRight">
         <div class="author">
+
 												<span id="approve-$_timeId" class="pull-right approve">
 													<%if(!_approve){%>
 														<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Approve")%>'

@@ -10,11 +10,12 @@ def jsFormId = "ContentJS[" + uicomponent.hashCode() + "]";
 //  rcontext.getJavascriptManager().addOnLoadJavascript("eXo.ecm.CKEditor.insertCSS('$htmlWYSIWYGFormId', '$cssFormId')")
 Node webContentNode = uicomponent.getNode();
 def String dateTimePath = "";
+
 if(webContentNode != null){
-def parrentDateNodePath =  webContentNode.getParent().getPath();
-dateTimePath = parrentDateNodePath.substring(parrentDateNodePath.length()-10, parrentDateNodePath.length());
+	def parrentDateNodePath =  webContentNode.getParent().getPath();
+	dateTimePath = parrentDateNodePath.substring(parrentDateNodePath.length()-10, parrentDateNodePath.length());
 }else{
-dateTimePath =  DateFormatUtils.format(new Date(), "yyyy/MM/dd");
+	dateTimePath =  DateFormatUtils.format(new Date(), "yyyy/MM/dd");
 }
 
 //def jsManager = rcontext.getJavascriptManager();
@@ -26,8 +27,8 @@ String[] webContentFieldName = ["jcrPath=/node", "nodetype=exo:blog", "options=n
 String[] blogContent = ["jcrPath=/node/exo:blogContent", "options=toolbar:CompleteWCM,height:'410px',noSanitization", ""];
 
 try {
-WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-String b = context.getURLBuilder().createURL(uiform, null, null);
+	WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+	String b = context.getURLBuilder().createURL(uiform, null, null);
 %>
 <script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog.js" ></script>

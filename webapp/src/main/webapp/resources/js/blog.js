@@ -8,9 +8,12 @@
       dataType: "text",
       type: "POST"
     })
+
         .success(function (data) {
           var _blogs = $.parseJSON(data);
           var html = "";
+//			var repository = $("#repository").val();
+//			var collaboration = $("#collaboration").val();
           $.each(_blogs, function (key, val) {
             var link = "/portal/intranet/blog/article?content-id=/repository/collaboration" + val.postPath;
             html += "<div> <a href='" + link + "' >" + val.postTitle + "</a></div>";
@@ -288,6 +291,8 @@
 
   // approve a post
   blog.prototype.changeStatus = function (elId, nodePath, postPath, ws) {
+    var blog_action_unpublish_message = $("#blog-action-unpublish-message").val();
+    var blog_action_publish_message = $("#blog-action-publish-message").val();
     if (confirm("Are u sure?")) {
       var obj = new Object();
       obj.nodePath = nodePath;
@@ -308,7 +313,7 @@
             var blog_icon_approve = $("#blog-icon-approve").val();
             var blog_icon_disapprove = $("#blog-icon-disapprove").val();
 
-            if (!rs.result) {
+            if (rs.result) {
               btn += 'class="btn btn-primary" > <i class="uiIconAnsApprove uiIconAnsWhite"></i>'+blog_icon_approve+'</button>'
               $('#' + elId).removeClass('approved');
               $('#' + elId).addClass('disapproved');
@@ -452,7 +457,8 @@
   }
 
   blog.prototype.deleteComment = function(commentPath, commendId, ws){
-    if (confirm("Are u sure?")) {
+    var blog_action_delete_message = $("#blog-action-delete-message").val();
+    if (confirm(blog_action_delete_message)) {
       var postPath = $("#postPath").val();
       var obj = new Object();
 
@@ -805,8 +811,13 @@
 
       if(eval(isAdmin)){
         result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
-        result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
-        result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
+        if(eval(commentStatus)){
+          result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
+          result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
+        }else{
+          result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn btn btn-primary\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
+          result+="												<i class=\"uiIconAnsApprove uiIconAnsLightGray\"></i>"+blog_icon_approve+"</button>";
+        }
         result+="									</span>";
       }
 
@@ -817,7 +828,7 @@
       result+="								<div class=\"contentComment\">";
 
       result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context ";
-      if(!commentStatus){result+="disapproved";}
+      if(!eval(commentStatus)){result+="disapproved";}
       result+= "\">"+commentContent;
       result+="									</span>	 &nbsp; &nbsp;";
       if(eval(isAdmin) || eval(isOwner)){
