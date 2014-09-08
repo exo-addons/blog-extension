@@ -41,6 +41,8 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 %>
 <script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/blog-scroll.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/jquery.lazyscrollloading-min.js" ></script>
 
 <script type="text/javascript">
   jQuery(document).ready(function() {
@@ -66,21 +68,21 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
     def entries = uicomponent.getCurrentPageData()
     // loop on entries
     for (entry in entries) {
-			// if blog entry
-			if (isValidBlogEntry(entry)) {
-				count ++ ;
-				String uuid = entry.getProperty("jcr:frozenUuid").getString()
-				def originalNode = entry.getSession().getNodeByUUID(uuid)
-				def link = uicomponent.getURL(entry)
+    // if blog entry
+    if (isValidBlogEntry(entry)) {
+    count ++ ;
+    String uuid = entry.getProperty("jcr:frozenUuid").getString()
+    def originalNode = entry.getSession().getNodeByUUID(uuid)
+    def link = uicomponent.getURL(entry)
 
-				//def title = entry.getProperty("exo:title").string
-				def title = originalNode.getProperty("exo:title").string;
+    //def title = entry.getProperty("exo:title").string
+    def title = originalNode.getProperty("exo:title").string;
 
-				def username = uicomponent.getAuthor(entry)
-				def author = fullName(username)
-				def poster = username
-				def avatar = avatarUrl(username)
-				def date = uicomponent.getCreatedDate(entry)
+    def username = uicomponent.getAuthor(entry)
+    def author = fullName(username)
+    def poster = username
+    def avatar = avatarUrl(username)
+    def date = uicomponent.getCreatedDate(entry)
     %>
 
     <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" >
@@ -116,15 +118,15 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 
     <%      //commentPreview(originalNode, link) %>
     <%
-    		} // if blog entry
+    } // if blog entry
 
-    	} // end loop on entries
+    } // end loop on entries
     } // end else has entries
     %>
     <!-- Paginator-->
     <div class="CaptionFunc ClearFix">
       <% if (uicomponent.showPaginator()) { uicomponent.renderChild(UICustomizeablePaginator.class) } %>
-		</div>
+    </div>
 
   </div>
 
@@ -200,7 +202,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
       %>
       <div class="month" onclick="eXo.ecm.blog.getPost(this, $year, $month)" >
 				$monthTitle ($monthPostCount)
-      <div id="month-$year-$month" class="blog-archive-post-link" ></div>
+        <div id="month-$year-$month" class="blog-archive-post-link" ></div>
       </div>
       <%}%>
     </div>
@@ -210,28 +212,28 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 
 <%
 void tags(def entry) {
-	def folkService = uicomponent.getApplicationComponent(NewFolksonomyService.class)
-	def tags = folkService.getLinkedTagsOfDocument(entry, "collaboration")
-	def i = 0;
+def folkService = uicomponent.getApplicationComponent(NewFolksonomyService.class)
+def tags = folkService.getLinkedTagsOfDocument(entry, "collaboration")
+def i = 0;
 %>
 <%
-	if (!tags) {
-		tags = [];
-	}
+if (!tags) {
+tags = [];
+}
 else {
 %>
 <span class="tags-title">Tags:</span>
 <%
 }
-	for(tag in tags) {
-		def name = tag.name;
-		def path = tag.getPath();
-		def url="/portal/intranet/blog?folder-id=repository:collaboration:$path";
-	%>
-			<a href="$url" title="View all posts in $name" rel="category tag" class="label">$name</a>
-	<%
-		if (i++ < (tags.size-1)) print " "
-	} //end loop on  tags
+for(tag in tags) {
+def name = tag.name;
+def path = tag.getPath();
+def url="/portal/intranet/blog?folder-id=repository:collaboration:$path";
+%>
+<a href="$url" title="View all posts in $name" rel="category tag" class="label">$name</a>
+<%
+if (i++ < (tags.size-1)) print " "
+} //end loop on  tags
 } //end renderTags
 
 // get the full name from username
@@ -247,13 +249,13 @@ String avatarUrl(def username) {
 String avatar = "/social-resources/skin/images/ShareImages/UserAvtDefault.png";
 
 try {
-	def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
-	def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username)
+def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
+def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, username)
 
-	if(userIdentity!=null){
-		def userProfile = userIdentity.getProfile()
-		if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
-	}
+if(userIdentity!=null){
+def userProfile = userIdentity.getProfile()
+if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
+}
 } catch (Exception e) {
 print e.message // ugly old school debug
 }
@@ -265,62 +267,62 @@ return avatar
 // (only display  viewable webcontents here)
 boolean isValidBlogEntry(def entry) {
 /*
-	def frozen = entry.primaryNodeType.name == "nt:frozenNode"
-	if (frozen) {
-		def viewable = Utils.isViewable(entry)
-		def type = entry.getProperty("jcr:frozenPrimaryType").string
-		if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
-			return true;
-		}
-	}
+def frozen = entry.primaryNodeType.name == "nt:frozenNode"
+if (frozen) {
+def viewable = Utils.isViewable(entry)
+def type = entry.getProperty("jcr:frozenPrimaryType").string
+if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
+return true;
+}
+}
 */
 return true;
 }
 
 // render a blog entry
 void renderPost(def entry) {
-	try {
-	def cssOption = "CSSData=";
-	def excerpt = uicomponent.getSummary(entry);
-	def html = "";
-	if(entry.hasProperty("exo:blogSummary")){html=entry.getProperty("exo:blogSummary").getString();}
-	// if there is no summary, we use an inline marker
-	if (!excerpt) {
-		def marker = "<!-- more -->";
-		if (html.contains(marker)) {
-			def idx = html.indexOf(marker)
-			excerpt = html.substring(0,idx)
-			html = html.substring(idx + marker.length(), html.length())
-		}
-	}
+try {
+def cssOption = "CSSData=";
+def excerpt = uicomponent.getSummary(entry);
+def html = "";
+if(entry.hasProperty("exo:blogSummary")){html=entry.getProperty("exo:blogSummary").getString();}
+// if there is no summary, we use an inline marker
+if (!excerpt) {
+def marker = "<!-- more -->";
+if (html.contains(marker)) {
+def idx = html.indexOf(marker)
+excerpt = html.substring(0,idx)
+html = html.substring(idx + marker.length(), html.length())
+}
+}
 
-	if(entry.hasProperty("exo:blogSummary")){
-		def blogSummary = entry.getProperty("exo:blogSummary").getString();
-		print blogSummary;
-		//print uicomponent.getInlineEditingField(entry, blogSummary, html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
-	}
+if(entry.hasProperty("exo:blogSummary")){
+def blogSummary = entry.getProperty("exo:blogSummary").getString();
+print blogSummary;
+//print uicomponent.getInlineEditingField(entry, blogSummary, html, "WYSIWYG", "Text", "Content", true, cssOption, "toolbar=CompleteWCM");
+}
 %>
-	<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
+<a type="button" href="${uicomponent.getURL(entry)}" class="btn">
   <i class=" uiIconLightGray"></i>
-    <%=_ctx.appRes("Blog.ArticleList.Readmore")%></a>
+  <%=_ctx.appRes("Blog.ArticleList.Readmore")%></a>
 <%
 
 } catch (Exception e) { print e; }
 } // end render post
 
 void bloggers() {
-	def bloggers = new HashSet();
-	def entries = uicomponent.getCurrentPageData()
-	entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
-	int maxbloggers = 5
-	for (blogger in bloggers) {
-		if (maxbloggers-- == 0) break;
-		def author = fullName(blogger)
-		def avatar = avatarUrl(blogger)
+def bloggers = new HashSet();
+def entries = uicomponent.getCurrentPageData()
+entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
+int maxbloggers = 5
+for (blogger in bloggers) {
+if (maxbloggers-- == 0) break;
+def author = fullName(blogger)
+def avatar = avatarUrl(blogger)
 %>
 <a class="avatarXSmall" href="/portal/intranet/profile/$blogger" style="display: inline-block;"> <img src="$avatar" alt="$author"> </a>
 <%
-	}
+}
 }
 
 void categories() {
@@ -382,7 +384,7 @@ List<Node> publicTags() {
 
     for(tag in publicTags()) {
     def name = tag.name
-		def path = tag.getPath();
+    def path = tag.getPath();
     def selected = ((name == currentTag)?"label-info":"")
     def url="/portal/intranet/blog?folder-id=repository:collaboration:$path"
     %>

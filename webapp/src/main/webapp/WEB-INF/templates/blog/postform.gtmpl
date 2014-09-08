@@ -1,60 +1,65 @@
 <%
-  import javax.jcr.Node;
-  import org.exoplatform.webui.application.WebuiRequestContext;
-  import org.apache.commons.lang.time.DateFormatUtils;
-  
-  def rcontext = _ctx.getRequestContext() ;
-  def htmlWYSIWYGFormId = "htmlData" + uicomponent.hashCode();
-  def cssFormId = "ContentCSS[" + uicomponent.hashCode() + "]";
-  def jsFormId = "ContentJS[" + uicomponent.hashCode() + "]";
-  //  rcontext.getJavascriptManager().addOnLoadJavascript("eXo.ecm.CKEditor.insertCSS('$htmlWYSIWYGFormId', '$cssFormId')")
-  Node webContentNode = uicomponent.getNode();
-  def String dateTimePath = "";
-  if(webContentNode != null){
-     def parrentDateNodePath =  webContentNode.getParent().getPath();
-     dateTimePath = parrentDateNodePath.substring(parrentDateNodePath.length()-10, parrentDateNodePath.length());
-  }else{
-     dateTimePath =  DateFormatUtils.format(new Date(), "yyyy/MM/dd");
-  }
+import javax.jcr.Node;
+import org.exoplatform.webui.application.WebuiRequestContext;
+import org.apache.commons.lang.time.DateFormatUtils;
 
-	def jsManager = rcontext.getJavascriptManager();
-	jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.syncuri("+dateTimePath+");");
+def rcontext = _ctx.getRequestContext() ;
+def htmlWYSIWYGFormId = "htmlData" + uicomponent.hashCode();
+def cssFormId = "ContentCSS[" + uicomponent.hashCode() + "]";
+def jsFormId = "ContentJS[" + uicomponent.hashCode() + "]";
+//  rcontext.getJavascriptManager().addOnLoadJavascript("eXo.ecm.CKEditor.insertCSS('$htmlWYSIWYGFormId', '$cssFormId')")
+Node webContentNode = uicomponent.getNode();
+def String dateTimePath = "";
+if(webContentNode != null){
+def parrentDateNodePath =  webContentNode.getParent().getPath();
+dateTimePath = parrentDateNodePath.substring(parrentDateNodePath.length()-10, parrentDateNodePath.length());
+}else{
+dateTimePath =  DateFormatUtils.format(new Date(), "yyyy/MM/dd");
+}
 
-	String[] webContentFieldTitle = ["jcrPath=/node/exo:title", "options=noSanitization", "validate=empty", "editable=if-null", "options=width:'950px'"];
-	String[] fieldSummary = ["jcrPath=/node/exo:blogSummary", "options=Basic", ""] ;
-	String[] webContentFieldName = ["jcrPath=/node", "nodetype=exo:blog", "options=noSanitization", "mixintype=mix:votable,mix:commentable,mix:i18n", "editable=if-null","validate=name,empty"] ;
-	String[] blogContent = ["jcrPath=/node/exo:blogContent", "options=toolbar:CompleteWCM,height:'410px',noSanitization", ""];
+//def jsManager = rcontext.getJavascriptManager();
+//jsManager.require("SHARED/blogjs", "blogjs").addScripts("blogjs.syncuri("+dateTimePath+");");
+
+String[] webContentFieldTitle = ["jcrPath=/node/exo:title", "options=noSanitization", "validate=empty", "editable=if-null", "options=width:'950px'"];
+String[] fieldSummary = ["jcrPath=/node/exo:blogSummary", "options=Basic", ""] ;
+String[] webContentFieldName = ["jcrPath=/node", "nodetype=exo:blog", "options=noSanitization", "mixintype=mix:votable,mix:commentable,mix:i18n", "editable=if-null","validate=name,empty"] ;
+String[] blogContent = ["jcrPath=/node/exo:blogContent", "options=toolbar:CompleteWCM,height:'410px',noSanitization", ""];
 
 try {
-  WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-	String b = context.getURLBuilder().createURL(uiform, null, null);
+WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
+String b = context.getURLBuilder().createURL(uiform, null, null);
 %>
+<script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/blog.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/blog-scroll.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/jquery.lazyscrollloading-min.js" ></script>
+
 <form class="UIForm well form-horizontal" id="${uiform.id}" action="$b" method="post">
   <input type="hidden" name="formOp" value="">
-<% /* start render action*/ if (uiform.isShowActionsOnTop()) { uiform.processRenderAction() } /* end render action*/ %>
+  <% /* start render action*/ if (uiform.isShowActionsOnTop()) { uiform.processRenderAction() } /* end render action*/ %>
   <fieldset>
     <div class="control-group">
       <label class="control-label" for="title"><%=_ctx.appRes("WebContent.dialog.label.title")%></label>
       <div class="controls"> <% uicomponent.addTextField("title", webContentFieldTitle) ; %></div>
     </div>
-   <div class="control-group">
+    <div class="control-group">
       <label for="$htmlWYSIWYGFormId" class="control-label">Post Content</label>
       <div class="controls"> <% uicomponent.addRichtextField("blogContent", blogContent) ;%></div>
-	 </div>
+    </div>
 
     <div class="control-group">
       <label for="name" class="control-label">Permalink URI</label>
       <div class="controls"> <% uicomponent.addTextField("name", webContentFieldName) ; %>
         <p class="help-block muted">http://int.exoplatform.org/portal/content/blog/article/<span id="uri"></span></p>
-     </div>
-   </div>     
+      </div>
+    </div>
     <div class="control-group">
       <label for="description" class="control-label">Excerpt</label>
       <div class="controls"> <% uicomponent.addRichtextField("summary", fieldSummary) ; %>
         <p class="help-block">Excerpts are optional hand-crafted summaries of your content that can be used in your theme.</p>
       </div>
     </div>
-        <% if (!uiform.isShowActionsOnTop()) { uiform.processRenderAction() } %>
-	</fieldset>
-  </form>
+    <% if (!uiform.isShowActionsOnTop()) { uiform.processRenderAction() } %>
+  </fieldset>
+</form>
 <% } catch (Exception e) { print e; } %>

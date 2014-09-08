@@ -138,7 +138,7 @@ public class BlogServiceRest implements ResourceContainer {
       double voteValueOfUser = votingService.getVoteValueOfUser(nodeToVote, identity.getUserId(), "en");
       double voteTotal = votingService.getVoteTotal(nodeToVote);
       double voteAvg = 0;
-      if(nodeToVote.hasProperty("exo:votingRate")) {
+      if (nodeToVote.hasProperty("exo:votingRate")) {
         voteAvg = nodeToVote.getProperty("exo:votingRate").getValue().getDouble();
       }
 
@@ -185,7 +185,7 @@ public class BlogServiceRest implements ResourceContainer {
     JSONObject obj = new JSONObject();
     try {
       Node nodeComment = getNode(commentPath, ws);
-      Node postNode = getNode(postPath,ws);
+      Node postNode = getNode(postPath, ws);
       commentsService.deleteComment(nodeComment);
       long postComment = blogService.getPostComments(postNode);
       obj.put("result", true);
@@ -290,7 +290,7 @@ public class BlogServiceRest implements ResourceContainer {
 
         if (comment.hasProperty(BLOG_COMMENT_STATUS_PROPERTY)) {
           obj.put("commentStatus", comment.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean());
-        }else{
+        } else {
           obj.put("commentStatus", true);
         }
 
@@ -301,9 +301,9 @@ public class BlogServiceRest implements ResourceContainer {
       long commentTotal = blogService.getPostComments(nodeComment);
       obj.put("total", commentTotal);
       obj.put("data", result);
-      if(result!=null && result.length()>0) {
+      if (result != null && result.length() > 0) {
         obj.put("success", true);
-      }else{
+      } else {
         obj.put("success", false);
       }
 

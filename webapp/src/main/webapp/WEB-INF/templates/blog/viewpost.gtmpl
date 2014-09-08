@@ -82,9 +82,9 @@ def drivePath = driveData.getHomePath();
 <script type="text/javascript" src="/blog/resources/js/blog-scroll.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/jquery.lazyscrollloading-min.js" ></script>
 
-<!--script type="text/javascript">var switchTo5x=true;</script>
+<script type="text/javascript">var switchTo5x=true;</script>
 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script-->
+<script type="text/javascript">stLight.options({publisher: "131ce3d5-a240-42f0-9945-f882036f2d00", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
 
 <div class="view-post" >
 	<input type="hidden" id="blog-message-delete" value="<%=_ctx.appRes("Blog.Action.Delete.Message")%>" />
@@ -537,14 +537,20 @@ return desc;
 
 /* get the full name from poster */
 String fullName(def poster) {
-	def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
-	def user = userHandler.findUserByName(poster)
-	def name = user.fullName
-	return name?name:poster
+	try{
+		def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
+		def user = userHandler.findUserByName(poster)
+		def name = user.fullName
+		return name?name:poster;
+	}catch(Exception ex){
+
+	}
+	return poster;
 }
 
 /* get the url of the avatar */
 String avatarUrl(def poster) {
+
 	String avatar = "/social-resources/skin/images/ShareImages/UserAvtDefault.png";
 	try {
 		def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
