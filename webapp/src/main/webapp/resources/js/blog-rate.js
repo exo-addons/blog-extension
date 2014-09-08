@@ -3,7 +3,7 @@
     el: null,
     init: function(options, el) {
       this.settings = $.extend({}, {
-            on_select: function(ui, score) {
+            on_click: function(ui, score) {
             },
             uid: 0,
             star_count: 5,
@@ -26,7 +26,7 @@
         $(star).bind('click', function(ev) {
           score = +$(star).html();
           ev.preventDefault();
-          $.rate_wrapper.settings.on_select(el, score);
+          $.rate_wrapper.settings.on_click(el, score);
           $.rate_wrapper.set_cookie_score(uid, score);
           $.rate_wrapper.set_score(el, uid, score);
         });

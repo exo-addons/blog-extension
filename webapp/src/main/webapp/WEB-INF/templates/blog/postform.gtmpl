@@ -32,7 +32,6 @@ String b = context.getURLBuilder().createURL(uiform, null, null);
 <script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog-scroll.js" ></script>
-<script type="text/javascript" src="/blog/resources/js/jquery.lazyscrollloading-min.js" ></script>
 
 <form class="UIForm well form-horizontal" id="${uiform.id}" action="$b" method="post">
   <input type="hidden" name="formOp" value="">

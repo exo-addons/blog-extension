@@ -42,7 +42,6 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
 <script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/blog-scroll.js" ></script>
-<script type="text/javascript" src="/blog/resources/js/jquery.lazyscrollloading-min.js" ></script>
 
 <script type="text/javascript">
   jQuery(document).ready(function() {
@@ -71,7 +70,10 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
     // if blog entry
     if (isValidBlogEntry(entry)) {
     count ++ ;
-    String uuid = entry.getProperty("jcr:frozenUuid").getString()
+    String uuid = entry.getUUID();
+    if(entry.hasProperty("jcr:frozenUuid")){
+    uuid = entry.getProperty("jcr:frozenUuid").getString()
+    }
     def originalNode = entry.getSession().getNodeByUUID(uuid)
     def link = uicomponent.getURL(entry)
 
