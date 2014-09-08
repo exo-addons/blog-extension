@@ -108,7 +108,7 @@ public class BlogServiceRest implements ResourceContainer {
       Node commentNode = blogService.changeCommentStatus(getNode(postPath, ws), getNode(commentPath, ws));
       if (commentNode != null && commentNode.hasProperty(BLOG_COMMENT_STATUS_PROPERTY)) {
         boolean status = commentNode.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean();
-        obj.put("result", !status);
+        obj.put("result", status);
         return Response.ok(obj.toString(), MediaType.APPLICATION_JSON).build();
       }
       return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();

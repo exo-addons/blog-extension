@@ -313,7 +313,7 @@
             var blog_icon_approve = $("#blog-icon-approve").val();
             var blog_icon_disapprove = $("#blog-icon-disapprove").val();
 
-            if (rs.result) {
+            if (!rs.result) {
               btn += 'class="btn btn-primary" > <i class="uiIconAnsApprove uiIconAnsWhite"></i>'+blog_icon_approve+'</button>'
               $('#' + elId).removeClass('approved');
               $('#' + elId).addClass('disapproved');
@@ -828,7 +828,7 @@
       result+="								<div class=\"contentComment\">";
 
       result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context ";
-      if(!eval(commentStatus)){result+="disapproved";}
+      if(eval(commentStatus)){result+="disapproved";}
       result+= "\">"+commentContent;
       result+="									</span>	 &nbsp; &nbsp;";
       if(eval(isAdmin) || eval(isOwner)){
