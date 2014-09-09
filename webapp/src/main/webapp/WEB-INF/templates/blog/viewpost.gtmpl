@@ -29,6 +29,7 @@ def node = uicomponent.node;
 def post = uicomponent.originalNode;
 def uuid = post.getUUID();
 def viewer = _ctx.getRequestContext().getRemoteUser();
+def avatarViewer = avatarUrl(viewer);
 def title = post.getProperty("exo:blogTitle").string;
 
 def poster = post.getProperty("exo:owner").string;
@@ -108,6 +109,8 @@ def drivePath = driveData.getHomePath();
   <input id="isAdmin" type="hidden" value="$isAdmin" />
   <input id="ws" type="hidden" value="$ws" />
   <input id="repo" type="hidden" value="$repoName" />
+  <input id="avatarViewer" type="hidden" value="$avatarViewer" />
+
 
   <div id="content" class="clearfix content-blog">
     <div id="main" class="main-content" role="main">
@@ -241,6 +244,7 @@ if (comments.size > 1) plural = "s"
     def rem = ((i++)%2 == 0)?"even":"odd"
     def commentor = comment.getProperty("exo:commentor").string
     def commentorAvatar = avatarUrl(commentor)
+		def viewerAvt = avatarUrl(viewer);
     def commentorName = fullName(commentor);
     def commentContent = comment.getProperty("exo:commentContent").string
     def commentDate = formatter.format(comment.getProperty("exo:commentDate").date.time);
@@ -281,7 +285,7 @@ if (comments.size > 1) plural = "s"
           <input name="cmtPath" type="hidden" value="$cmtPath" />
           <input name="fme" type="hidden" value="<%=fullName(viewer)%>" />
           <input name="viewerFullname" type="hidden" value="<%=fullName(viewer)%>" />
-          <input name="avatar" type="hidden" value="$commentorAvatar" />
+          <input name="avatar" type="hidden" value="$viewerAvt" />
           <input name="viewer" type="hidden" value="$viewer" />
           <input name="commentor" type="hidden" value="$commentorName" />
           <input name="isAdmin" type="hidden" value="$isAdmin" />
@@ -330,7 +334,7 @@ if (comments.size > 1) plural = "s"
           <input name="cmtPath" type="hidden" value="$cmtPath" />
           <input name="postPath" type="hidden" value="$postPath" />
           <input name="ws" type="hidden" value="$_ws" />
-          <input name="avatar" type="hidden" value="$commentorAvatar" />
+          <input name="avatar" type="hidden" value="$viewerAvt" />
           <input name="viewer" type="hidden" value="$viewer" />
           <input name="fme" type="hidden" value="<%=fullName(viewer)%>" />
           <input name="viewerFullname" type="hidden" value="<%=fullName(viewer)%>" />
@@ -370,7 +374,7 @@ if (comments.size > 1) plural = "s"
     <li id="view-more">
       <input name="postPath" type="hidden" value="$postPath" />
       <input name="limit" type="hidden" value="$limit" />
-      <input name="offset" type="hidden" value="$offset" />
+      <input name="offset" type="hidden" value="($offset + 5)" />
       <input name="isAdmin" type="hidden" value="$isAdmin" />
       <input name="viewer" type="hidden" value="$viewer" />
       <input name="fme" type="hidden" value="<%=fullName(viewer)%>" />
@@ -433,7 +437,7 @@ def postPath = post.getPath();
             <input name="viewerFullname" type="hidden" value="<%=fullName(viewer)%>" />
             <input name="fme" type="hidden" value="<%=fullName(viewer)%>" />
             <input name="viewerFullname" type="hidden" value="<%=fullName(viewer)%>" />
-            <input name="avatar" type="hidden" value="/social-resources/skin/images/ShareImages/UserAvtDefault.png" />
+            <input name="avatar" type="hidden" value="$avt" />
             <input name="type" type="hidden" value="rootPostComment" />
             <input name="jcrPath" type="hidden" value="/repository/collaboration${post.path}"/>
             <input name="commentPath" type="hidden" value="${post.path}"/>
@@ -541,14 +545,14 @@ return desc;
 
 /* get the full name from poster */
 String fullName(def poster) {
-try{
-def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
-def user = userHandler.findUserByName(poster)
-def name = user.fullName
-return name?name:poster;
-}catch(Exception ex){
+	try{
+		def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
+		def user = userHandler.findUserByName(poster)
+		def name = user.fullName
+		return name?name:poster;
+	}catch(Exception ex){
 
-}
+	}
 return poster;
 }
 
@@ -556,14 +560,14 @@ return poster;
 String avatarUrl(def poster) {
 
 String avatar = "/social-resources/skin/images/ShareImages/UserAvtDefault.png";
-try {
-def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
-def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, poster)
-def userProfile = userIdentity.getProfile()
-if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
-} catch (Exception e) {
-print e.message // ugly old school debug
-}
+	try {
+		def identityManager = uicomponent.getApplicationComponent(IdentityManager.class)
+		def userIdentity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, poster)
+		def userProfile = userIdentity.getProfile()
+		if (userProfile.getAvatarImageSource()) avatar = userProfile.getAvatarImageSource()
+	} catch (Exception e) {
+		print e.message // ugly old school debug
+	}
 return avatar
 }
 
@@ -589,6 +593,7 @@ def _commentor;
 def _commentPath = node.getPath();
 def _approve = true;
 def _viewer = _ctx.getRequestContext().getRemoteUser();
+def _viewerAvt = avatarUrl(_viewer);
 
 def isAdmin = Utils.isAdministratorUser();
 def _timeId;
@@ -607,8 +612,6 @@ def _isAdmin = (isAdmin || _viewer == poster);
 
 if(_isAdmin){
 if(_commentContent != null){
-
-print "commentsst: "+_approve;
 %>
 <ul class="commentList children">
   <li class="commentItem" id="comment-${node.name}">
@@ -639,7 +642,7 @@ print "commentsst: "+_approve;
           <input name="isAdmin" type="hidden" value="$_isAdmin" />
           <input name="isOwner" type="hidden" value="$_isOwner" />
           <input name="ws" type="hidden" value="$_ws" />
-          <input name="avatar" type="hidden" value="$_commentorAvatar" />
+          <input name="avatar" type="hidden" value="$_viewerAvt" />
           <input name="viewer" type="hidden" value="$_viewer" />
           <input name="fme" type="hidden" value="<%=fullName(_viewer)%>" />
           <input name="viewerFullname" type="hidden" value="<%=fullName(_viewer)%>" />
@@ -666,23 +669,26 @@ print "commentsst: "+_approve;
 
     </div>
   </li>
-  <%if(!comments.hasNext()){%>
-  <li id="reply-comment-more-$commentTimeId" onclick="eXo.ecm.blog.loadReply(this);">
-    <input name="postUuid" type="hidden" value="$postUuid" />
-    <input name="cmtPath" type="hidden" value="<%=commentsNode.getPath()%>" />
-    <input name="isOwner" type="hidden" value="$_isOwner" />
-    <input name="avatar" type="hidden" value="$_commentorAvatar" />
-    <input name="viewer" type="hidden" value="$_viewer" />
-    <input name="fme" type="hidden" value="<%=fullName(_viewer)%>" />
-    <input name="viewerFullname" type="hidden" value="<%=fullName(_viewer)%>" />
-    <input name="commentor" type="hidden" value="<%=fullName(_viewer)%>" />
-    <input name="limit" type="hidden" value="$limit" />
-    <input name="offset" type="hidden" value="$offset" />
-    <input name="isLoad" type="hidden" value="true" />
-    <div class="reply-comment-more"><a href="javascript:void(0)"  >Read more... </a></div>
-  </li>
-  <%}%>
+
 </ul>
+<%if(!comments.hasNext()){%>
+<ul class="commentList children">
+<li id="reply-comment-more-$commentTimeId" onclick="eXo.ecm.blog.loadReply(this);">
+  <input name="postUuid" type="hidden" value="$postUuid" />
+  <input name="cmtPath" type="hidden" value="<%=commentsNode.getPath()%>" />
+  <input name="isOwner" type="hidden" value="$_isOwner" />
+  <input name="avatar" type="hidden" value="$_viewerAvt" />
+  <input name="viewer" type="hidden" value="$_viewer" />
+  <input name="fme" type="hidden" value="<%=fullName(_viewer)%>" />
+  <input name="viewerFullname" type="hidden" value="<%=fullName(_viewer)%>" />
+  <input name="commentor" type="hidden" value="<%=fullName(_viewer)%>" />
+  <input name="limit" type="hidden" value="$limit" />
+  <input name="offset" type="hidden" value="5" />
+  <input name="isLoad" type="hidden" value="true" />
+  <div class="reply-comment-more"><a href="javascript:void(0)"  >Read more... </a></div>
+</li></ul>
+<%}%>
+
 <%
 }else{
 /*printCommentChild(node, poster);*/
@@ -721,24 +727,25 @@ if(_commentContent != null){
 
     </div>
   </li>
-  <%if(!comments.hasNext()){%>
+
+</ul>
+<%if(!comments.hasNext()){%>
+<ul class="commentList children">
   <li id="reply-comment-more-$commentTimeId" onclick="eXo.ecm.blog.loadReply(this);">
     <input name="postUuid" type="hidden" value="$postUuid" />
     <input name="cmtPath" type="hidden" value="<%=commentsNode.getPath()%>" />
     <input name="isOwner" type="hidden" value="$_isOwner" />
-    <input name="avatar" type="hidden" value="$_commentorAvatar" />
+    <input name="avatar" type="hidden" value="$_viewerAvt" />
     <input name="viewer" type="hidden" value="$_viewer" />
     <input name="fme" type="hidden" value="<%=fullName(_viewer)%>" />
     <input name="viewerFullname" type="hidden" value="<%=fullName(_viewer)%>" />
     <input name="commentor" type="hidden" value="<%=fullName(_viewer)%>" />
     <input name="limit" type="hidden" value="$limit" />
-    <input name="offset" type="hidden" value="$offset" />
+    <input name="offset" type="hidden" value="5" />
     <input name="isLoad" type="hidden" value="true" />
     <div class="reply-comment-more"><a href="javascript:void(0)"  >Read more... </a></div>
-  </li>
-  <%}%>
-
-</ul>
+  </li></ul>
+<%}%>
 
 
 <%

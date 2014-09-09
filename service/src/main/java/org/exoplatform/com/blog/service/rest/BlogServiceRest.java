@@ -30,6 +30,9 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
+import org.exoplatform.social.core.identity.model.Profile;
+import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
+import org.exoplatform.social.core.manager.IdentityManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -285,7 +288,16 @@ public class BlogServiceRest implements ResourceContainer {
         }
 
         if (comment.hasProperty(BLOG_COMMENT_COMMENTOR_PROPERTY)) {
-          obj.put("commentor", comment.getProperty(BLOG_COMMENT_COMMENTOR_PROPERTY).getString());
+          String commentor = comment.getProperty(BLOG_COMMENT_COMMENTOR_PROPERTY).getString();
+          obj.put("commentor", commentor);
+
+          IdentityManager identityManager = WCMCoreUtils.getService(IdentityManager.class);
+          org.exoplatform.social.core.identity.model.Identity identity = identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, commentor, false);
+          Profile profile = identity.getProfile();
+          String avt = profile.getAvatarUrl();
+          obj.put("avatar", avt);
+          obj.put("fullName", profile.getFullName());
+
         }
 
         if (comment.hasProperty(BLOG_COMMENT_STATUS_PROPERTY)) {
@@ -293,6 +305,7 @@ public class BlogServiceRest implements ResourceContainer {
         } else {
           obj.put("commentStatus", true);
         }
+
 
         obj.put("commentPath", comment.getPath());
         result.put(obj);

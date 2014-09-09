@@ -66,6 +66,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.exoplatform.social</groupId>
+      <artifactId>social-component-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <!--only 4 unitest-->
     <dependency>
       <groupId>org.exoplatform.core</groupId>

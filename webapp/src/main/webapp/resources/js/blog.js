@@ -553,7 +553,7 @@
     var commentPath = commentItem.find('input[name="cmtPath"]').val();
 //		var CPath = commentItem.find('input[name="postPath"]').val();
     var ws = $("#ws").val();
-    var avatar = commentItem.find('input[name="avatar"]').val();
+    var avatar = $("#avatarViewer").val();
     var viewer = commentItem.find('input[name="viewer"]').val();
     var isAdmin = $("#isAdmin").val();
     var viewerFullname = commentItem.find('input[name="viewerFullname"]').val();
@@ -562,6 +562,8 @@
     var blog_icon_updatecomment = $("#blog-icon-updatecomment").val();
     var blog_icon_cancel = $("#blog-icon-cancel").val();
     var blog_icon_reply = $("#blog-icon-reply").val();
+
+
     var commentForm="";
     commentForm += "<ul class=\"commentList children\" id=\"comment-form-"+commentId+"\" >";
     commentForm += "<li class=\"commentItem\">";
@@ -730,7 +732,7 @@
   blog.prototype.loadReply = function(element){
 
     var cmtPath = $(element).find('input[name="cmtPath"]').val();
-    var avatar = $(element).find('input[name="avatar"]').val();
+    var avatar = $("#avatarViewer").val();
 
     var commentor = $(element).find('input[name="commentor"]').val();
     var offset = $(element).find('input[name="offset"]').val();
@@ -741,11 +743,12 @@
     var ws =$("#ws").val()
     var repo = $("#repo").val()
 
+    var offset = eval(offset);
     if(!isLoad) return;
     var obj = new Object();
     obj.jcrPath = cmtPath;
     obj.limit = limit;
-    obj.offset=offset+limit;
+    obj.offset=offset;
     obj.ws = ws;
     obj.repo=repo;
     $.ajax({
@@ -759,11 +762,17 @@
           var _data = _result.data;
           console.log(data);
           if(_result.success && _data.length>0){
-
+            var isLoaded = eval(offset) + eval(limit);
             var result=getReplyHtml(_data, element);
 
-            $(element).find('input[name="offset"]').val(eval(limit) + eval(offset));
-            $(element).before(result);
+            $(element).find('input[name="offset"]').val(isLoaded);
+            $(element).closest( "ul" ).before(result);
+
+
+            if(isLoaded >= _result.total){
+              $(element).find('input[name="isLoad"]').val(false);
+              $(element).find(".reply-comment-more").html('');
+            }
           }else{ //end if has data
             $(element).find('input[name="isLoad"]').val(false);
             $(element).find(".reply-comment-more").html('');
@@ -799,17 +808,21 @@
       var commentStatus = val.commentStatus;
       var commentor = val.commentor;
       var commentPath = val.commentPath;
-
-      result+="<li class=\"commentItem lazyItem\" id=\"comment-"+commentDate+"\">";
-      result+="							<div class=\"commentLeft\">";
-      result+="								<a class=\"avatarXSmall\" href=\"/portal/intranet/profile/"+commentor+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+fme+"\">";
-      result+="									<img alt=\""+fme+"\" src=\"/social-resources/skin/images/ShareImages/UserAvtDefault.png\">";
-      result+="								</a>";
-      result+="							</div><!--end commentLeft-->";
-      result+="							<div class=\"commentRight\">";
-      result+="								<div class=\"author\">";
+      var commentorAvatar = val.avatar;
+      var commentorFullname = val.fullName;
+      isOwner = (commentor === viewer);
 
       if(eval(isAdmin)){
+        result += "<ul class=\"commentList children\">";
+        result+="<li class=\"commentItem lazyItem\" id=\"comment-"+commentDate+"\">";
+        result+="<div class=\"clearfix comment-container\">";
+        result+="							<div class=\"commentLeft\">";
+        result+="								<a class=\"avatarXSmall\" href=\"/portal/intranet/profile/"+commentor+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+commentorFullname+"\">";
+        result+="									<img alt=\""+commentorFullname+"\" src=\""+commentorAvatar+"\">";
+        result+="								</a>";
+        result+="							</div><!--end commentLeft-->";
+        result+="							<div class=\"commentRight\">";
+        result+="								<div class=\"author\">";
         result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
         if(eval(commentStatus)){
           result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
@@ -819,32 +832,69 @@
           result+="												<i class=\"uiIconAnsApprove uiIconAnsLightGray\"></i>"+blog_icon_approve+"</button>";
         }
         result+="									</span>";
+
+        result+="									<a href=\"/portal/intranet/profile/"+commentor+"\">"+commentorFullname+"</a>";
+        result+="									<span class=\"dateTime\">"+strCommentDate+"</span> &nbsp; &nbsp;";
+
+        result+="								</div> <!--end author-->";
+        result+="								<div class=\"contentComment\">";
+
+        result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context ";
+        if(eval(!commentStatus)){
+          result+="disapproved";
+        }
+        result+= "\">"+commentContent;
+        result+="									</span>	 &nbsp; &nbsp;";
+        if(eval(isAdmin) || eval(isOwner)){
+          result+="									<span>";
+          result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
+          result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
+          result+="										</a>";
+          result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
+          result+="											<i class=\"uiIconLightGray uiIconDelete\"></i>";
+          result+="										</a>";
+          result+="									</span>";
+        }
+        result+="								</div>";
+        result+="							</div><!--end commentRight-->";
+        result+="							</div>";
+        result+="						</li></ul>";
+      }else{//end isadmin, start with normal user
+        if(eval(commentStatus)){
+          result += "<ul class=\"commentList children\">";
+          result+="<li class=\"commentItem lazyItem\" id=\"comment-"+commentDate+"\">";
+          result+="<div class=\"clearfix comment-container\">";
+          result+="							<div class=\"commentLeft\">";
+          result+="								<a class=\"avatarXSmall\" href=\"/portal/intranet/profile/"+commentor+"\" rel=\"tooltip\" data-placement=\"bottom\" data-original-title=\""+commentorFullname+"\">";
+          result+="									<img alt=\""+commentorFullname+"\" src=\""+commentorAvatar+"\">";
+          result+="								</a>";
+          result+="							</div><!--end commentLeft-->";
+          result+="							<div class=\"commentRight\">";
+          result+="								<div class=\"author\">";
+          result+="									<a href=\"/portal/intranet/profile/"+commentor+"\">"+commentorFullname+"</a>";
+          result+="									<span class=\"dateTime\">"+strCommentDate+"</span> &nbsp; &nbsp;";
+          result+="								</div> <!--end author-->";
+          result+="								<div class=\"contentComment\">";
+          result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context ";
+          result+= "\">"+commentContent;
+          result+="									</span>	 &nbsp; &nbsp;";
+
+          if(eval(isOwner)){
+            result+="									<span>";
+            result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
+            result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
+            result+="										</a>";
+            result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
+            result+="											<i class=\"uiIconLightGray uiIconDelete\"></i>";
+            result+="										</a>";
+            result+="									</span>";
+          }
+          result+="								</div>";
+          result+="							</div><!--end commentRight-->";
+          result+="							</div>";
+          result+="						</li></ul>";
+        }
       }
-
-      result+="									<a href=\"/portal/intranet/profile/"+viewer+"\">"+fme+"</a>";
-      result+="									<span class=\"dateTime\">"+strCommentDate+"</span> &nbsp; &nbsp;";
-
-      result+="								</div> <!--end author-->";
-      result+="								<div class=\"contentComment\">";
-
-      result+="									<span id=\""+commentDate+"\" class=\"ContentBlock comment-context ";
-      if(eval(commentStatus)){result+="disapproved";}
-      result+= "\">"+commentContent;
-      result+="									</span>	 &nbsp; &nbsp;";
-      if(eval(isAdmin) || eval(isOwner)){
-        result+="									<span>";
-        result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
-        result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
-        result+="										</a>";
-        result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
-        result+="											<i class=\"uiIconLightGray uiIconDelete\"></i>";
-        result+="										</a>";
-        result+="									</span>";
-      }
-      result+="								</div>";
-      result+="							</div><!--end commentRight-->";
-      result+="							";
-      result+="						</li>";
     }) //end each data
     return result;
   }
