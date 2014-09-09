@@ -147,7 +147,7 @@ public class TestBlogService extends TestCase {
     for (Node node : nodes) {
       String _name = "";
       try {
-        _name = node.getProperty("exo:title").getString();
+        _name = node.getProperty("exo:blogTitle").getString();
       } catch (Exception ex) {
         log.error(ex.getMessage());
       }
@@ -266,7 +266,7 @@ public class TestBlogService extends TestCase {
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     Node node = blog.addNode(name, BLOG_NODE);
 
-    node.setProperty("exo:title", title);
+    node.setProperty("exo:blogTitle", title);
     node.setProperty("exo:blogSummary", summary);
     node.setProperty("exo:dateCreated", date);
     session.save();

@@ -109,6 +109,9 @@ def preferenceWS = data.getSession().getWorkspace().getName() ;
 String nodePath = data.getPath() ;
 String name = nodePath.substring(nodePath.lastIndexOf("/") + 1, nodePath.length()) ;
 String title = uiWorkingArea.getTitle(data);
+if(data.hasProperty("exo:blogTitle")){
+title = data.getProperty("exo:blogTitle").getString();
+}
 String fileName = uicomponent.getFileName(data, title);
 String fileExtension = uicomponent.getFileExtension(data, title);
 String fileDate = uicomponent.getFileDate(data);
@@ -266,11 +269,11 @@ if (isLocked) iconLabel += " - " + lockedLabel
 def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "PublicationDraftIcon"
 %>
 <div class="columnText" data-placement="bottom" rel="tooltip" title="$lockedLabel">
-<div class="clearfix">
-	 <div class="fileInfo pull-right">
-	 <%
-		if(driverName=="Blog"){
-		%>
+  <div class="clearfix">
+    <div class="fileInfo pull-right">
+      <%
+      if(driverName=="Blog"){
+      %>
 		
 			<span class="blog-fileview blog-postCategory"><%=_ctx.appRes("Blog.Admin.Fileview.Category")%><br/>
 						<span class="label-info label">($postCategory)</span>
@@ -282,25 +285,25 @@ def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "Publ
 				<span class="label-info label">($viewCount)</span>
 			</span>
 
-		<%}%>
-	   
+      <%}%>
 
-	  </div>
-  <a href="javascript:void(0);" onmousedown="$actionLink" onmouseup="eXo.ecm.UIFileView.cancelEvent(event);">
-    <span class="nodeName"><%=fileName%></span>
-    <%if ("draft".equals(status)) {%> -
-    <span class="label label-important"  ><%=statusLabel%></span>
-    <span class="label label-important label-success" >Published</span>
-    <%}else if("published".equals(status)) {%>
-    <span class="label label-important" >Darf</span>
-    <span class="label label-important label-success"><%=statusLabel%></span>
-    <%}%>
 
-  </a>
-  
-  <span class="nodeLabel fileExtension"><%=fileExtension%></span>
+    </div>
+    <a href="javascript:void(0);" onmousedown="$actionLink" onmouseup="eXo.ecm.UIFileView.cancelEvent(event);">
+      <span class="nodeName"><%=fileName%></span>
+      <%if ("draft".equals(status)) {%> -
+      <span class="label label-important"  ><%=statusLabel%></span>
+      <span class="label label-important label-success" >Published</span>
+      <%}else if("published".equals(status)) {%>
+      <span class="label label-important" >Darf</span>
+      <span class="label label-important label-success"><%=statusLabel%></span>
+      <%}%>
+
+    </a>
+
+    <span class="nodeLabel fileExtension"><%=fileExtension%></span>
   </div>
-	<div class="date-info">
+  <div class="date-info">
 	  <span>
     <% if(!"".equals(versionNum)) {%>
     <a href="<%=manageVersionAction%>" class="fileInfoVersion"><%=versionNum%></a>
@@ -315,8 +318,8 @@ def statusIcon = ("published".equals(status)) ? "PublicationPublishIcon" : "Publ
 postCategory
 commentCount
 --></span>
-	</div>
- 
+  </div>
+
 </div>
 </div>
 <%

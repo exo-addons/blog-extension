@@ -14,7 +14,7 @@
 				<include>${project.groupId}:blog-extension-webapp:war</include>
 			</includes>
 			<scope>provided</scope>
-			<outputFileNameMapping>blog-extension-webapp.war</outputFileNameMapping>
+			<outputFileNameMapping>blog.war</outputFileNameMapping>
 		</dependencySet>
 		<!-- Libraries -->
 		<dependencySet>

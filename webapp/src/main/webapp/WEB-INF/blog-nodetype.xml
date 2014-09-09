@@ -11,7 +11,7 @@
     </supertypes>
 
     <propertyDefinitions>
-      <propertyDefinition name="exo:title" requiredType="String" autoCreated="false" mandatory="false"
+      <propertyDefinition name="exo:blogTitle" requiredType="String" autoCreated="false" mandatory="false"
                           onParentVersion="COPY" protected="false" multiple="false">
         <valueConstraints/>
       </propertyDefinition>

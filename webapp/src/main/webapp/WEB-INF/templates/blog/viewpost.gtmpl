@@ -29,7 +29,8 @@ def node = uicomponent.node;
 def post = uicomponent.originalNode;
 def uuid = post.getUUID();
 def viewer = _ctx.getRequestContext().getRemoteUser();
-def title = post.getProperty("exo:title").string;
+def title = post.getProperty("exo:blogTitle").string;
+
 def poster = post.getProperty("exo:owner").string;
 def author = fullName(poster);
 def avatar = avatarUrl(poster);
@@ -253,7 +254,6 @@ if (comments.size > 1) plural = "s"
     if(comment.hasProperty("exo:commentStatus")){
     	approve = (comment.getProperty("exo:commentStatus").getBoolean());
     }
-		print "approve: "+approve;
     if(isAdmin || viewer==poster){%> <!--is admin || owner -->
     <li class="commentItem lazyItem" id="comment-${comment.name}"  >
       <div class="commentLeft">

@@ -71,16 +71,17 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
     if (isValidBlogEntry(entry)) {
     count ++ ;
     String uuid = entry.getUUID();
-		print "first: "+uuid;
     if(entry.hasProperty("jcr:frozenUuid")){
     	uuid = entry.getProperty("jcr:frozenUuid").getString()
     }
-    print "after: "+uuid;
     def originalNode = entry.getSession().getNodeByUUID(uuid)
     def link = uicomponent.getURL(entry)
 
     //def title = entry.getProperty("exo:title").string
     def title = originalNode.getProperty("exo:title").string;
+		if(originalNode.hasProperty("exo:blogTitle")){
+			title = originalNode.getProperty("exo:blogTitle").string;
+		}
 
     def username = uicomponent.getAuthor(entry)
     def author = fullName(username)
@@ -92,7 +93,7 @@ def blogService = WCMCoreUtils.getService(BlogService.class)
     <article id="post-$uuid" class="uiBox post type-post status-publish format-standard hentry clearfix" role="article" >
       <header>
         <div class="page-header">
-          <h3><a href="$link" rel="bookmark" title="$title">$title <%=entry.hasProperty("jcr:frozenUuid")%> <%=originalNode.getPath()%></a></h3>
+          <h3><a href="$link" rel="bookmark" title="$title">$title</a></h3>
         </div>
         <p class="meta">
         <div class="commentLeft" style="float:left">
@@ -243,10 +244,13 @@ if (i++ < (tags.size-1)) print " "
 // get the full name from username
 /* get the full name from poster */
 String fullName(def username) {
-def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
-def user = userHandler.findUserByName(username)
-def name = user.fullName
-return name?name:poster
+	try{
+		def userHandler = uicomponent.getApplicationComponent(OrganizationService.class).userHandler
+		def user = userHandler.findUserByName(username)
+		def name = user.fullName
+		return name?name:poster
+	}catch(Exception ex){print ex}
+return username;
 }
 
 String avatarUrl(def username) {
@@ -270,17 +274,15 @@ return avatar
 
 // (only display  viewable webcontents here)
 boolean isValidBlogEntry(def entry) {
-/*
-def frozen = entry.primaryNodeType.name == "nt:frozenNode"
-if (frozen) {
-def viewable = Utils.isViewable(entry)
-def type = entry.getProperty("jcr:frozenPrimaryType").string
-if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
-return true;
-}
-}
-*/
-return true;
+	def frozen = entry.primaryNodeType.name == "nt:frozenNode"
+	if (frozen) {
+		def viewable = Utils.isViewable(entry)
+		def type = entry.getProperty("jcr:frozenPrimaryType").string
+		if (viewable && ((type == "exo:webContent") || (type == "exo:blog"))) {
+			return true;
+		}
+	}
+	return false;
 }
 
 // render a blog entry
