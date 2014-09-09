@@ -63,7 +63,7 @@
               <preference>
                 <name>contextualFolder</name>
                 <value>contextualDisable</value>
-                <read-only>true</read-only>
+                <read-only>false</read-only>
               </preference>
             </preferences>
 

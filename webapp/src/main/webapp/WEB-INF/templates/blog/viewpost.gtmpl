@@ -582,8 +582,9 @@ def comments = blogService.getComments(commentsNode, limit, offset);
 def size = comments.getSize();
 def formatter =  new SimpleDateFormat("'on' MMM d, yyyy 'at' h:mm a");
 def commentTimeId = commentsNode.getProperty("exo:commentDate").date.time.time;
-
+int i=0;
 while(comments.hasNext()){
+i++;
 def node = comments.nextNode();
 
 def nodeCommentTotal = commentsNode.getNode("comments").getNodes().getSize();
@@ -671,7 +672,7 @@ if(_commentContent != null){
   </li>
 
 </ul>
-<%if(!comments.hasNext()){%>
+<%if(!comments.hasNext() && i==limit){%>
 <ul class="commentList children">
 <li id="reply-comment-more-$commentTimeId" onclick="eXo.ecm.blog.loadReply(this);">
   <input name="postUuid" type="hidden" value="$postUuid" />
@@ -729,7 +730,7 @@ if(_commentContent != null){
   </li>
 
 </ul>
-<%if(!comments.hasNext()){%>
+<%if(!comments.hasNext() && i==limit){%>
 <ul class="commentList children">
   <li id="reply-comment-more-$commentTimeId" onclick="eXo.ecm.blog.loadReply(this);">
     <input name="postUuid" type="hidden" value="$postUuid" />
