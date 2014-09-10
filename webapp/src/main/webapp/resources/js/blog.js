@@ -232,7 +232,7 @@
 
               if(isAdmin == "true"){
                 result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
-                result += "	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"', true);\" value=\""+blog_icon_disapprove+"\">";
+                result += "	<button type=\"button\" data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"', true);\" value=\""+blog_icon_disapprove+"\">";
                 result += "<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove
                 result += "</button>"
                 result += " </span>"
@@ -293,7 +293,13 @@
   blog.prototype.changeStatus = function (elId, nodePath, postPath, ws, status) {
     var blog_action_unpublish_message = $("#blog-action-unpublish-message").val();
     var blog_action_publish_message = $("#blog-action-publish-message").val();
-    if (confirm("Are u sure?")) {
+    var msg="";
+    if(status){
+      msg = blog_action_unpublish_message;
+    }else{
+      msg = blog_action_publish_message;
+    }
+    if (confirm(msg)) {
       var obj = new Object();
       obj.nodePath = nodePath;
       obj.postPath = postPath;
@@ -908,7 +914,6 @@
     }) //end each data
     return result;
   }
-
   eXo.ecm.blog = new blog();
   return eXo.ecm.blog;
   //-------------------------------------------------------------------------//
