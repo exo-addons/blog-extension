@@ -232,7 +232,7 @@
 
               if(isAdmin == "true"){
                 result += " <span id=\"approve-"+timeId+"\" class=\"pull-right approve\">";
-                result += "	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"');\" value=\""+blog_icon_disapprove+"\">";
+                result += "	<button type=\"button\" class=\"btn\" onclick=\"eXo.ecm.blog.changeStatus("+timeId+", '"+commentPath+"', '"+commentPath+"', '"+ws+"', true);\" value=\""+blog_icon_disapprove+"\">";
                 result += "<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove
                 result += "</button>"
                 result += " </span>"
@@ -270,7 +270,7 @@
               if(totalComment>1){plural="s";}
               $("#total-comment").html(totalComment + " comment" + plural + "<input type=\"hidden\" id=\"totalCurrentComment\" value=\""+totalComment+"\">");
 
-
+              $("[rel=tooltip]").tooltip({ placement: 'bottom'});
 
             }else{//end if (_data.result=false)
               alert("Error, u can trial again!.");
@@ -290,7 +290,7 @@
   }; // end click on button
 
   // approve a post
-  blog.prototype.changeStatus = function (elId, nodePath, postPath, ws) {
+  blog.prototype.changeStatus = function (elId, nodePath, postPath, ws, status) {
     var blog_action_unpublish_message = $("#blog-action-unpublish-message").val();
     var blog_action_publish_message = $("#blog-action-publish-message").val();
     if (confirm("Are u sure?")) {
@@ -307,7 +307,7 @@
           .success(function (data) {
             console.log(data);
             var rs = $.parseJSON(data);
-            var btn = '<button type="button" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\');" ';
+            var btn = '<button type="button" onclick="eXo.ecm.blog.changeStatus(\'' + elId + '\', \'' + nodePath + '\',  \'' + postPath + '\',\''+ws+'\', '+status+');" ';
 
 
             var blog_icon_approve = $("#blog-icon-approve").val();
@@ -786,6 +786,7 @@
             $(element).find('input[name="isLoad"]').val(false);
             $(element).find(".reply-comment-more").html('');
           }
+          $("[rel=tooltip]").tooltip({ placement: 'bottom'});
         })//end success
         .error(function(){
           location.reload();
@@ -834,10 +835,10 @@
         result+="								<div class=\"author\">";
         result+="									<span id=\"approve-"+commentDate+"\" class=\"pull-right approve\">";
         if(eval(commentStatus)){
-          result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
+          result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn btn\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"', "+eval(commentStatus)+");\">";
           result+="												<i class=\"uiIconAnsDisapprove uiIconAnsLightGray\"></i>"+blog_icon_disapprove+"</button>";
         }else{
-          result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn btn btn-primary\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"');\">";
+          result+="											<button data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\""+blog_icon_disapprove+"\" type=\"button\" class=\"btn btn btn-primary\" onclick=\"eXo.ecm.blog.changeStatus("+commentDate+", '"+commentPath+"', '"+commentPath+"', '"+workspace+"', "+eval(commentStatus)+");\">";
           result+="												<i class=\"uiIconAnsApprove uiIconAnsLightGray\"></i>"+blog_icon_approve+"</button>";
         }
         result+="									</span>";

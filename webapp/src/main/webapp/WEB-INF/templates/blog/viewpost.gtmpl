@@ -77,6 +77,7 @@ def drivePath = driveData.getHomePath();
 
 %>
 <script type="text/javascript" src="/blog/resources/js/jquery.js" ></script>
+<script type="text/javascript" src="/blog/resources/js/tooltip.js" ></script>
 <script type="text/javascript" src="/blog/resources/js/popup.min.js" ></script>
 
 <script type="text/javascript" src="/blog/resources/js/blog-rate.js" ></script>
@@ -89,7 +90,7 @@ def drivePath = driveData.getHomePath();
 
 <div class="view-post" >
 
-  <input type="hidden" id="blog-icon-delele" value='<%=_ctx.appRes("Blog.Icon.Delete")%>' />
+  <input type="hidden" id="blog-icon-delete" value='<%=_ctx.appRes("Blog.Icon.Delete")%>' />
   <input type="hidden" id="blog-icon-edit" value='<%=_ctx.appRes("Blog.Icon.Edit")%>' />
   <input type="hidden" id="blog-icon-approve" value='<%=_ctx.appRes("Blog.Icon.Approve")%>' />
   <input type="hidden" id="blog-icon-disapprove" value='<%=_ctx.appRes("Blog.Icon.Disapprove")%>' />
@@ -231,7 +232,7 @@ def plural=""
 if (comments.size > 1) plural = "s"
 %>
 <h5 class="title" id="total-comment">
-	$postCommentTotal <%=_ctx.appRes("Blog.Comment.Title")%>
+	$postCommentTotal <%=_ctx.appRes("Blog.Comment.Title")%>$plural
   <input type="hidden" id="totalCurrentComment" value="$postCommentTotal" />
 </h5>
 <div class="uiContentBox">
@@ -271,10 +272,10 @@ if (comments.size > 1) plural = "s"
           <%if(isAdmin || viewer == poster){%>
 									<span id="approve-$timeId" class="pull-right approve">
 										<%if(!approve){%>
-											<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Approve")%>' type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');" >
+											<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Approve")%>' type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws', $approve);" >
                         <i class="uiIconAnsApprove uiIconAnsWhite"></i> <%=_ctx.appRes("Blog.Icon.Approve")%>  </button>
 										<%}else{%>
-											<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Disapprove")%>' type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws');"  >
+											<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Disapprove")%>' type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($timeId, '$cmtPath', '$postPath', '$_ws', $approve);"  >
                         <i class="uiIconAnsDisapprove uiIconAnsLightGray"></i> <%=_ctx.appRes("Blog.Icon.Disapprove")%></button>
 										<%}%>
 									</span>
@@ -629,11 +630,11 @@ if(_commentContent != null){
 												<span id="approve-$_timeId" class="pull-right approve">
 													<%if(!_approve){%>
 														<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Approve")%>'
-                                    type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');" >
+                                    type="button" class="btn btn-primary" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws', $_approve);" >
                               <i class="uiIconAnsApprove uiIconAnsWhite"></i><%=_ctx.appRes("Blog.Icon.Approve")%></button>
 													<%}else{%>
 														<button data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title='<%=_ctx.appRes("Blog.Icon.Disapprove")%>'
-                                    type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws');"  >
+                                    type="button" class="btn" onclick="eXo.ecm.blog.changeStatus($_timeId, '$_commentPath', '$_commentPath', '$_ws', $_approve);"  >
                               <i class="uiIconAnsDisapprove uiIconAnsLightGray"></i><%=_ctx.appRes("Blog.Icon.Disapprove")%></button>
 													<%}%>
 												</span>
