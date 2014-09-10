@@ -158,7 +158,7 @@ def drivePath = driveData.getHomePath();
             </div>
             <!--end display vote-->
             <div class="rate-wrapper-form" style="display: none;" >
-              <div class="rate-text" ><%=_ctx.appRes("Blog.Rate.Content")%>:<%=voteValueOfUser%></div>
+              <div class="rate-text" ><%=_ctx.appRes("Blog.Rate.Content")%>:<span><%=voteValueOfUser%></span></div>
               <div class="rate-content">
                 <div class="rate-wrapper">
                   <input type="hidden" name="ws" value="$ws">

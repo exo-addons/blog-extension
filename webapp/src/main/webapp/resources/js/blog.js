@@ -362,16 +362,25 @@
               type: "POST"
             })
                 .success(function (data) {
-                  if(data.result){
-                    var voteValueOfUser = data.voteValueOfUser;
-                    var voteAvg = data.voteAvg;
-                    var voteTotal = data.voteTotal;
+                  var _result = $.parseJSON(data);
+                  if(_result.result){
+                    var voteValueOfUser = _result.voteValueOfUser;
+                    var voteAvg = _result.voteAvg;
+                    var voteTotal = _result.voteTotal;
 
-                    var _score = voteValueOfUser*20;
+                    var _score = voteAvg*20;
                     $('.rate-wrapper-display .rate-current-score').removeAttr('style');
-                    $('.rate-wrapper-display .rate-wrapper-info').html('('+voteTotal+')');
+                    $('.rate-wrapper-info').html('('+voteTotal+')');
 
                     $('.rate-wrapper-display .rate-current-score').attr('style', 'display: block; width: '+_score+'%;');
+                    $('.messi-wrapper .rate-text span').html(parseFloat(voteValueOfUser).toFixed(1));
+
+                    $('.rate-wrapper-form .rate-text span').html(parseFloat(voteValueOfUser).toFixed(1));
+                    $('.rate-wrapper-form input[name="voteAvg"]').val(voteValueOfUser);
+                    $('.rate-wrapper-form input[name="voteTotal"]').val(voteTotal);
+                    $('.rate-wrapper-form input[name="userVote"]').val(voteValueOfUser);
+                    $('.rate-wrapper-form .rate-current-score').html(eval(voteValueOfUser*20));
+
                     //$('.rate-wrapper-display .rate-current-score').removeAttr('style');
                   }
 
