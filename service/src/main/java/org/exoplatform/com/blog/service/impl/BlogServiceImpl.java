@@ -124,7 +124,6 @@ public class BlogServiceImpl implements BlogService {
   }
 
   void initBlogArchive() {
-    System.out.println("init blogservice form data");
     if (isInitData()) {
       try {
         Session session = getSystemSession();

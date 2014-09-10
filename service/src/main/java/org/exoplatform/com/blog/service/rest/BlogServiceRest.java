@@ -29,6 +29,7 @@ import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 import org.exoplatform.services.security.ConversationState;
 import org.exoplatform.services.security.Identity;
+import org.exoplatform.services.wcm.publication.WCMPublicationService;
 import org.exoplatform.services.wcm.utils.WCMCoreUtils;
 import org.exoplatform.social.core.identity.model.Profile;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
@@ -68,7 +69,7 @@ public class BlogServiceRest implements ResourceContainer {
   private static final String BLOG_COMMENT_COMMENTOR_PROPERTY = "exo:commentor";
   private static final String BLOG_COMMENT_CONTENT_PROPERTY = "exo:commentContent";
   private static final String BLOG_COMMENT_DATE_PROPERTY = "exo:commentDate";
-
+  private static final String PUBLISHED = "published";
   private BlogService blogService = null;// WCMCoreUtils.getService(BlogService.class);
   private CommentsService commentsService = WCMCoreUtils.getService(CommentsService.class);
 
@@ -326,6 +327,23 @@ public class BlogServiceRest implements ResourceContainer {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
     return Response.ok("{\"result\": \"failed\"}", MediaType.TEXT_PLAIN).build();
+  }
+
+  @POST
+  @Path("/publishPost")
+  @RolesAllowed("users")
+  public Response publishPost(MultivaluedMap<String, String> data) {
+    WCMPublicationService publicationService = WCMCoreUtils.getService(WCMPublicationService.class);
+    String nodePath = data.getFirst("nodePath");
+    String ws = data.getFirst("ws");
+    try {
+      Node nodeToPublish = getNode(nodePath, ws);
+      String siteName = org.exoplatform.portal.webui.util.Util.getPortalRequestContext().getPortalOwner();
+      publicationService.updateLifecyleOnChangeContent(nodeToPublish, siteName , nodeToPublish.getSession().getUserID(), PUBLISHED);
+    }catch(Exception ex){
+      if(log.isErrorEnabled()) log.error(ex.getMessage());
+    }
+    return null;
   }
 
 
