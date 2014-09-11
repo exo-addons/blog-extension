@@ -775,7 +775,7 @@
         .success(function (data) {
           var _result = $.parseJSON(data);
           var _data = _result.data;
-          console.log(data);
+
           if(_result.success && _data.length>0){
             var isLoaded = eval(offset) + eval(limit);
             var result=getReplyHtml(_data, element);
@@ -828,6 +828,9 @@
       var commentorFullname = val.fullName;
       isOwner = (commentor === viewer);
 
+      if(commentorAvatar == null || commentorAvatar == "" || commentorAvatar == "undefined"){
+        commentorAvatar = $(element).find('input[name="avatar"]').val();
+      }
       if(eval(isAdmin)){
         result += "<ul class=\"commentList children\">";
         result+="<li class=\"commentItem lazyItem\" id=\"comment-"+commentDate+"\">";
