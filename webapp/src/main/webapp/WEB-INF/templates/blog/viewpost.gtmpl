@@ -154,7 +154,7 @@ def drivePath = driveData.getHomePath();
           <div class="blog-vote clearfix">
             <div class="rate-wrapper-info">($voteTotal)</div>
 
-            <div class="rate-wrapper-display">
+            <div class="rate-wrapper-display" data-placement="bottom" rel="tooltip" data-toggle="tooltip" data-original-title="<%=_ctx.appRes("Blog.Rate.RateIt")%>">
               <span class="rate-current-score"><%=voteAvg*20%></span>
             </div>
             <!--end display vote-->
@@ -232,7 +232,7 @@ def plural=""
 if (comments.size > 1) plural = "s"
 %>
 <h5 class="title" id="total-comment">
-	$postCommentTotal <%=_ctx.appRes("Blog.Comment.Title")%>$plural
+	$postCommentTotal <!--%=_ctx.appRes("Blog.Comment.Title")%-->comment$plural
   <input type="hidden" id="totalCurrentComment" value="$postCommentTotal" />
 </h5>
 <div class="uiContentBox">

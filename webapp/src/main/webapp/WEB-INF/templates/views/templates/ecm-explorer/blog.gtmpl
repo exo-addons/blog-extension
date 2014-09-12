@@ -53,7 +53,7 @@ if (StringUtils.isEmpty(drivePath.toString())) {
 drivePath.append("/");
 }
 %>
-<script src="/blog/resources/js/buttons.js" ></script>
+<!--script src="/blog/resources/js/buttons.js" ></script-->
 <div id="$componentId">
 <div id="${componentId}-$viewComponentId" class="uiFileView $componentId">
 <div class="uiListGrid" style="min-height:400px">

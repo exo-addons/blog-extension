@@ -317,18 +317,20 @@ print blogSummary;
 } // end render post
 
 void bloggers() {
-def bloggers = new HashSet();
-def entries = uicomponent.getCurrentPageData()
-entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
-int maxbloggers = 5
-for (blogger in bloggers) {
-if (maxbloggers-- == 0) break;
-def author = fullName(blogger)
-def avatar = avatarUrl(blogger)
-%>
-<a class="avatarXSmall" href="/portal/intranet/profile/$blogger" style="display: inline-block;"> <img src="$avatar" alt="$author"> </a>
-<%
-}
+	try{
+		def bloggers = new HashSet();
+		def entries = uicomponent.getCurrentPageData()
+		entries.each() { bloggers.add(uicomponent.getAuthor(it)) };
+		int maxbloggers = 5
+		for (blogger in bloggers) {
+			if (maxbloggers-- == 0) break;
+			def author = fullName(blogger)
+			def avatar = avatarUrl(blogger)
+			%>
+			<a class="avatarXSmall" href="/portal/intranet/profile/$blogger" style="display: inline-block;"> <img src="$avatar" alt="$author"> </a>
+			<%
+		}
+	}catch(Exception ex){}
 }
 
 void categories() {
