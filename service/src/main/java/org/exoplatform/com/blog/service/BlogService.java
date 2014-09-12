@@ -97,9 +97,9 @@ public interface BlogService {
   /**
    * To increase a blog-post view count when user visited article
    *
-   * @param nodeToUpdate
+   * @param nodeDocument
    */
-  public void increasePostView(Node nodeToUpdate);
+  public void increasePostView(Node nodeDocument);
 
   /**
    * Get total visited of post

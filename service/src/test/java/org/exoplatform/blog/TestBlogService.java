@@ -16,6 +16,7 @@
  */
 
 package org.exoplatform.blog;
+
 import junit.framework.TestCase;
 import org.exoplatform.com.blog.service.BlogService;
 import org.exoplatform.com.blog.service.util.Util;
@@ -25,6 +26,10 @@ import org.exoplatform.services.cms.comments.CommentsService;
 import org.exoplatform.services.ecm.publication.PublicationPlugin;
 import org.exoplatform.services.ecm.publication.PublicationService;
 import org.exoplatform.services.jcr.RepositoryService;
+import org.exoplatform.services.jcr.core.CredentialsImpl;
+import org.exoplatform.services.jcr.core.ManageableRepository;
+import org.exoplatform.services.jcr.ext.app.SessionProviderService;
+import org.exoplatform.services.jcr.ext.common.SessionProvider;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.security.ConversationState;
@@ -54,12 +59,20 @@ public class TestBlogService extends TestCase {
   private static final String PUBLISHED = "published";
   private static final String BLOG_NODE = "exo:blog";
 
+  protected final String REPO_NAME = "repository";
+  protected final String COLLABORATION_WS = "collaboration";
+
   private static StandaloneContainer container;
   private static BlogService blogService;
   private static CommentsService commentsService;
   private static PublicationService publicationService;
   private PublicationPlugin plugin_;
-
+  private RepositoryService      repositoryService;
+  protected ManageableRepository repository;
+  protected SessionProvider sessionProvider;
+  protected CredentialsImpl credentials;
+  protected Session                session;
+  protected SessionProviderService sessionProviderService_;
 
   static {
     initContainer();
@@ -89,6 +102,7 @@ public class TestBlogService extends TestCase {
       String loginConf = Thread.currentThread().getContextClassLoader().getResource("conf/standalone/login.conf").toString();
       System.setProperty("java.security.auth.login.config", loginConf);
       container = StandaloneContainer.getInstance();
+
     } catch (Exception e) {
       throw new RuntimeException("Failed to initialize standalone container: " + e.getMessage(), e);
     }
@@ -99,16 +113,15 @@ public class TestBlogService extends TestCase {
     begin();
     Identity systemIdentity = new Identity(IdentityConstants.SYSTEM);
     ConversationState.setCurrent(new ConversationState(systemIdentity));
+    repositoryService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
+    sessionProviderService_ = (SessionProviderService) container.getComponentInstanceOfType(SessionProviderService.class);
+
+    applySystemSession();
     reset();
     init();
     blogService = (BlogService) container.getComponentInstanceOfType(BlogService.class);
     commentsService = (CommentsService) container.getComponentInstanceOfType(CommentsService.class);
     publicationService = (PublicationService) container.getComponentInstanceOfType(PublicationService.class);
-
-//    plugin_ = new org.exoplatform.services.wcm.publication.DumpPublicationPlugin();
-//    plugin_.setName("Simple");
-//    plugin_.setDescription("Simple");
-//    publicationService.addPublicationPlugin(plugin_);
   }
 
   public void testGetYearArchives() {
@@ -136,14 +149,14 @@ public class TestBlogService extends TestCase {
     assertEquals("Test get month failed ", 3, months.size());
   }
 
-  public void testGetBlog() throws Exception{
+  public void testGetBlog() throws Exception {
     System.out.println("-----TEST GET POST - 01/2014-----");
     int year = 2014;
     int month = 0;
     // Time: 2014/02 -->return 6 posts
     List<Node> nodes = blogService.getPosts(year, month);
     printBlogArchive();
-    System.out.println("testGetBlog() Nodes By Year/Month: 2014/02: " + nodes.size() );
+    System.out.println("testGetBlog() Nodes By Year/Month: 2014/02: " + nodes.size());
     for (Node node : nodes) {
       String _name = "";
       try {
@@ -151,7 +164,7 @@ public class TestBlogService extends TestCase {
       } catch (Exception ex) {
         log.error(ex.getMessage());
       }
-      System.out.println("name: " + _name+", path: "+node.getPath());
+      System.out.println("name: " + _name + ", path: " + node.getPath());
     }
     assertEquals("Get blog time 2014/02 failed", 6, nodes.size());
   }
@@ -176,7 +189,6 @@ public class TestBlogService extends TestCase {
 
   public void testIncreasePostView() throws Exception {
     System.out.println("-----TEST INCREASE POST VIEW-----");
-    Session session = getSession();
     Node rootNode = session.getRootNode();
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     Node node = blog.getNode("Post-001");
@@ -185,20 +197,19 @@ public class TestBlogService extends TestCase {
     blogService.increasePostView(node);
     long afterIncrease = blogService.getPostViewCount(node);
 
-    long denta = afterIncrease-beforeIncrease;
-    assertTrue("Test Increase failed", denta == 1 );
+    long denta = afterIncrease - beforeIncrease;
+    assertTrue("Test Increase failed", denta == 1);
   }
 
-  public void testGetPostView() throws Exception{
+  public void testGetPostView() throws Exception {
     System.out.println("-----TEST GET POST VIEW COUNT-----");
-    Session session = getSession();
     Node rootNode = session.getRootNode();
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     Node node = blog.getNode("Post-001");
 
     long postViewCount = blogService.getPostViewCount(node);
 
-    assertTrue("Test getPostView failed", postViewCount != -1 );
+    assertTrue("Test getPostView failed", postViewCount != -1);
   }
 
   public void testAddBlog() throws Exception {
@@ -236,7 +247,6 @@ public class TestBlogService extends TestCase {
 //    addPost("Post-001", "Post-001 Title", "Post-001 Summary", new GregorianCalendar(2014, 01, 01));
     printBlogArchive();
     int monthPostTotalBefore = blogService.getArchivesCountInMonth(2013, 01);
-    Session session = getSession();
     Node rootNode = session.getRootNode();
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     //("Post-000-2013001", "Post-2013 Title", "Post-2013 Summary", new GregorianCalendar(2013, 01, 01));
@@ -260,8 +270,8 @@ public class TestBlogService extends TestCase {
       }
     }
   }
+
   private Node addBlog(String name, String title, String summary, Calendar date) throws Exception {
-    Session session = getSession();
     Node rootNode = session.getRootNode();
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     Node node = blog.addNode(name, BLOG_NODE);
@@ -273,7 +283,7 @@ public class TestBlogService extends TestCase {
     return node;
   }
 
-  public void testGetPostComments() throws Exception{
+  public void testGetPostComments() throws Exception {
     // You have to change getSession() --> getSystemSession() in run unit test
     Calendar cal = Calendar.getInstance();
     int currentMonth = cal.get(cal.MONTH);
@@ -284,17 +294,17 @@ public class TestBlogService extends TestCase {
     String user = node1.getSession().getUserID();
     // add 6 comment for node1 throught commentService
     commentsService.addComment(node1, user, "toannh@exoplatform.com", "blog", "1st comment", "en");
-    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "2nd comment","en");
-    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "3rd comment","en");
-    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "4th comment","en");
-    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "5th comment","en");
-    commentsService.addComment(node1,user, "toannh@exoplatform.com", "blog", "6th comment","en");
+    commentsService.addComment(node1, user, "toannh@exoplatform.com", "blog", "2nd comment", "en");
+    commentsService.addComment(node1, user, "toannh@exoplatform.com", "blog", "3rd comment", "en");
+    commentsService.addComment(node1, user, "toannh@exoplatform.com", "blog", "4th comment", "en");
+    commentsService.addComment(node1, user, "toannh@exoplatform.com", "blog", "5th comment", "en");
+    commentsService.addComment(node1, user, "toannh@exoplatform.com", "blog", "6th comment", "en");
 
     long commentCount = blogService.getPostComments(node1);
-    assertTrue("TestGetPostComment Failed", commentCount==6);
+    assertTrue("TestGetPostComment Failed", commentCount == 6);
   }
 
-  public void testGetLastComment() throws Exception{
+  public void testGetLastComment() throws Exception {
     // You have to change getSession() --> getSystemSession() in run unit test
     Calendar cal = Calendar.getInstance();
     int currentMonth = cal.get(cal.MONTH);
@@ -303,18 +313,18 @@ public class TestBlogService extends TestCase {
     Node postNode = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
     String user = postNode.getSession().getUserID();
     commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "1st comment", "en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "2nd comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "3rd comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "4th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "5th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "6th comment","en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "2nd comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "3rd comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "4th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "5th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "6th comment", "en");
 
     Node lasComment = blogService.getLastComment(postNode);
 
     assertNotNull("Test get lastcomment failed", lasComment);
   }
 
-  public void testGetComments() throws Exception{
+  public void testGetComments() throws Exception {
     // You have to change getSession() --> getSystemSession() in run unit test
     Calendar cal = Calendar.getInstance();
     int currentMonth = cal.get(cal.MONTH);
@@ -323,34 +333,53 @@ public class TestBlogService extends TestCase {
     Node postNode = addBlog("Post-000-2014", "Post-2014 Title", "Post-2014 Summary", new GregorianCalendar(currentYear, currentMonth, 1));
     String user = postNode.getSession().getUserID();
     commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "1st comment", "en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "2nd comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "3rd comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "4th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "5th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "6th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "7th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "8th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "9th comment","en");
-    commentsService.addComment(postNode,user, "toannh@exoplatform.com", "blog", "10th comment","en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "2nd comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "3rd comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "4th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "5th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "6th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "7th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "8th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "9th comment", "en");
+    commentsService.addComment(postNode, user, "toannh@exoplatform.com", "blog", "10th comment", "en");
 
-    int limit=3;
-    int offset =0;
+    int limit = 3;
+    int offset = 0;
     NodeIterator comments = blogService.getComments(postNode, limit, offset);
 
     assertNotNull("Test get comments failed", comments.getSize() == 3);
   }
 
   private void reset() throws Exception {
-    Session session = getSession();
     Node rootNode = session.getRootNode();
     Node blog = (rootNode.hasNode("Blog")) ? rootNode.getNode("Blog") : rootNode.addNode("Blog");
     blog.remove();
     rootNode.save();
   }
 
-  protected Session getSession() throws Exception {
-    RepositoryService repoService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
-    return repoService.getCurrentRepository().login();
+  public void applySystemSession() throws Exception{
+    System.setProperty("gatein.tenant.repository.name", REPO_NAME);
+    container = StandaloneContainer.getInstance();
+
+    repositoryService = (RepositoryService) container.getComponentInstanceOfType(RepositoryService.class);
+    sessionProviderService_ = (SessionProviderService) container.getComponentInstanceOfType(SessionProviderService.class);
+    repositoryService.setCurrentRepositoryName(REPO_NAME);
+    repository = repositoryService.getCurrentRepository();
+
+    closeOldSession();
+    sessionProvider = sessionProviderService_.getSystemSessionProvider(null);
+    session = sessionProvider.getSession(COLLABORATION_WS, repository);
+    sessionProvider.setCurrentRepository(repository);
+    sessionProvider.setCurrentWorkspace(COLLABORATION_WS);
+  }
+
+  /**
+   * Close current session
+   */
+  private void closeOldSession() {
+    if (session != null && session.isLive()) {
+      session.logout();
+    }
   }
 
   private void init() throws Exception {

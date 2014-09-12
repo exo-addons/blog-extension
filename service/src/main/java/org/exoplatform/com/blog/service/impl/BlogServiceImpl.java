@@ -126,7 +126,7 @@ public class BlogServiceImpl implements BlogService {
   void initBlogArchive() {
     if (isInitData()) {
       try {
-        Session session = getSystemSession();
+        Session session = getSession();
         List<Node> allNode = getAllNode(BLOG_NODE, session);
         Calendar cal = null;
         for (Node node : allNode) {
@@ -264,7 +264,7 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public Node changeCommentStatus(Node postNode, Node nodeUpdate) {
+  public Node changeCommentStatus(Node postNode, Node commentNode) {
     Identity identity = ConversationState.getCurrent().getIdentity();
     boolean isAdmin = userACL.isUserInGroup(userACL.getAdminGroups());
 
@@ -274,16 +274,16 @@ public class BlogServiceImpl implements BlogService {
         String postOwner = postNode.getProperty("exo:owner").getString();
         if (!(isAdmin || postOwner.equals(viewer))) return null;
       }
-      Session session = getSession();
-      if (nodeUpdate.canAddMixin(BLOG_COMMENT_NODE)) {
-        nodeUpdate.addMixin(BLOG_COMMENT_NODE);
-        nodeUpdate.setProperty(BLOG_COMMENT_STATUS_PROPERTY, false);
+      Session session = postNode.getSession();
+      if (commentNode.canAddMixin(BLOG_COMMENT_NODE)) {
+        commentNode.addMixin(BLOG_COMMENT_NODE);
+        commentNode.setProperty(BLOG_COMMENT_STATUS_PROPERTY, false);
       } else {
-        boolean status = nodeUpdate.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean();
-        nodeUpdate.setProperty(BLOG_COMMENT_STATUS_PROPERTY, !status);
+        boolean status = commentNode.getProperty(BLOG_COMMENT_STATUS_PROPERTY).getBoolean();
+        commentNode.setProperty(BLOG_COMMENT_STATUS_PROPERTY, !status);
       }
       session.save();
-      return nodeUpdate;
+      return commentNode;
     } catch (Exception ex) {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
@@ -294,15 +294,15 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public void increasePostView(Node nodeToupdate) {
+  public void increasePostView(Node nodeDocument) {
     try {
-      if (nodeToupdate.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY)) {
-        long currentViewCount = nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
-        nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, ++currentViewCount);
+      if (nodeDocument.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY)) {
+        long currentViewCount = nodeDocument.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
+        nodeDocument.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, ++currentViewCount);
       } else {
-        nodeToupdate.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, 1);
+        nodeDocument.setProperty(BLOG_POST_VIEWCOUNT_PROPERTY, 1);
       }
-      nodeToupdate.save();
+      nodeDocument.save();
     } catch (RepositoryException ex) {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
     }
@@ -312,10 +312,10 @@ public class BlogServiceImpl implements BlogService {
    * {@inheritDoc}
    */
   @Override
-  public long getPostViewCount(Node nodeToupdate) {
+  public long getPostViewCount(Node nodeDocument) {
     try {
-      if (nodeToupdate.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY))
-        return nodeToupdate.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
+      if (nodeDocument.hasProperty(BLOG_POST_VIEWCOUNT_PROPERTY))
+        return nodeDocument.getProperty(BLOG_POST_VIEWCOUNT_PROPERTY).getLong();
       return 0;
     } catch (RepositoryException ex) {
       if (log.isErrorEnabled()) log.error(ex.getMessage());
@@ -332,13 +332,14 @@ public class BlogServiceImpl implements BlogService {
       StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
 
-      Session session = getSystemSession(); //only unitest
-//      Session session = getSession();
+      Session session = postNode.getSession();
       QueryManager queryManager = session.getWorkspace().getQueryManager();
       Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
       NodeIterator nodes = query.execute().getNodes();
       return nodes.getSize();
-    }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
     return -1;
   }
 
@@ -351,15 +352,18 @@ public class BlogServiceImpl implements BlogService {
       StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(COMMENT_NODE);
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
       queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
-      Session session = getSystemSession(); //only unitest
-//      Session session = getSession();
+      Session session = postNode.getSession();
       QueryManager queryManager = session.getWorkspace().getQueryManager();
-      Query query = queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+      QueryImpl query = (QueryImpl) queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+      query.setLimit(1);
+      query.setOffset(0);
 
       NodeIterator nodes = query.execute().getNodes();
 
       return nodes.nextNode();
-    }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
     return null;
   }
 
@@ -373,15 +377,16 @@ public class BlogServiceImpl implements BlogService {
       queryBuilder.append(" WHERE jcr:path LIKE '" + postNode.getPath() + "/comments/%' ");
       queryBuilder.append(" AND NOT jcr:path LIKE '" + postNode.getPath() + "/comments/%/%' ");
       queryBuilder.append(" ORDER BY exo:dateCreated DESC ");
-      Session session = getSystemSession(); //only unitest
-//      Session session = getSession();
+      Session session = postNode.getSession();
       QueryManager queryManager = session.getWorkspace().getQueryManager();
-      QueryImpl query = (QueryImpl)queryManager.createQuery(queryBuilder.toString(), Query.SQL);
+      QueryImpl query = (QueryImpl) queryManager.createQuery(queryBuilder.toString(), Query.SQL);
       query.setLimit(limit);
       query.setOffset(offset);
       NodeIterator nodes = query.execute().getNodes();
       return nodes;
-    }catch(Exception ex){if(log.isErrorEnabled()) log.error(ex.getMessage());}
+    } catch (Exception ex) {
+      if (log.isErrorEnabled()) log.error(ex.getMessage());
+    }
     return null;
   }
 
@@ -418,8 +423,7 @@ public class BlogServiceImpl implements BlogService {
    * @throws Exception
    */
   private List<Node> getAllNode(String nodeElement, String firstDayOfMonth, String lastDayOfMonth) throws Exception {
-//    Session session = getSession();
-    Session session = getSystemSession();
+    Session session = getSession();
     List<Node> rs = new ArrayList<Node>();
     String searchPath = getDriverPath();
     StringBuilder queryBuilder = new StringBuilder("SELECT * FROM ").append(nodeElement);
@@ -438,26 +442,13 @@ public class BlogServiceImpl implements BlogService {
   }
 
   /**
-   * Get session
-   *
-   * @return
-   * @throws Exception
-   */
-  private Session getSession() throws Exception {
-    ManageableRepository repository = repoService.getRepository(this.repo);
-    SessionProvider sessionProvider = sessionProviderService.getSessionProvider(null);
-    Session session = sessionProvider.getSession(this.ws, repository);
-    return session;
-  }
-
-  /**
    * Get system session, only for init data.
    * Please NOT use for navigate JCR data
    *
    * @return
    * @throws Exception
    */
-  private Session getSystemSession() throws Exception {
+  private Session getSession() throws Exception {
     ManageableRepository repository = repoService.getRepository(this.repo);
     SessionProvider sessionProvider = sessionProviderService.getSystemSessionProvider(null);
     Session session = sessionProvider.getSession(this.ws, repository);

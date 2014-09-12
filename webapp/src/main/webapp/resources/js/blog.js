@@ -866,7 +866,7 @@
         result+="									</span>	 &nbsp; &nbsp;";
         if(eval(isAdmin) || eval(isOwner)){
           result+="									<span>";
-          result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+postUUID+"', '"+commentDate+"', '"+workspace+"')\">";
+          result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Edit\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.loadToEdit('"+commentPath+"', '"+commentDate+"', '"+commentDate+"', '"+workspace+"')\">";
           result+="											<i class=\"uiIconLightGray uiIconEdit\"></i>";
           result+="										</a>";
           result+="										<a data-placement=\"bottom\" rel=\"tooltip\" data-toggle=\"tooltip\" data-original-title=\"Delete\" class=\"actionIcon\" href=\"javascript:void(0);\" onclick=\"eXo.ecm.blog.deleteComment('"+commentPath+"', '"+commentDate+"' ,'"+workspace+"')\">";
